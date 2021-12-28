@@ -38,6 +38,8 @@ export default defineConfig(({ mode }) => {
   const isProd = mode === 'production';
   const isReport = mode === 'report';
 
+  const base = isProd ? '/reference-pool/' : '/';
+
   const plugins = [
     injectHtml({
       data: {
@@ -132,6 +134,8 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+
+    base,
 
     build,
     plugins,

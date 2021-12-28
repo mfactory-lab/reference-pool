@@ -21,8 +21,7 @@
     "linter:fix": "eslint -c .eslintrc.js --fix --ext .js,.vue,.ts, src",
     "stylelint": "stylelint --config stylelint.config.js 'src/**/*.{vue,scss}'",
     "stylelint:fix": "stylelint --config stylelint.config.js --fix 'src/**/*.{vue,scss}'",
-    "deploy:gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup",
-    "deploy": "./scripts/deploy.sh"
+    "deploy:gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup"
   },
   "dependencies": {
     "@project-serum/borsh": "^0.2.2",
