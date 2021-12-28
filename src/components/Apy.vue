@@ -65,7 +65,11 @@ export default {
   flex-direction: column;
   align-items: center;
   position: relative;
-  
+
+  .q-inner-loading {
+    background: none !important;
+  }
+
   &__value {
     font-size: 29px;
     line-height: 29px;
