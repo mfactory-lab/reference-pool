@@ -33,9 +33,11 @@
 
 .firstlook-section {
   padding-top: 55px;
+
   @media (max-width: $breakpoint-sm) {
     padding-top: 0;
   }
+
   padding-bottom: 10px;
   position: relative;
   overflow: hidden;
@@ -43,13 +45,20 @@
 
 .firstlook__body {
   background: url(/src/assets/img/bg-sol-part.svg) no-repeat 15px center;
+
+  @media (max-width: $breakpoint-sm) {
+    background-position: center center;
+  }
+
   background-size: contain;
   padding: 30px 0;
   min-height: 400px;
 }
 
 .firstlook {
-  &__wallet, &__stake-box {
+
+  &__wallet,
+  &__stake-box {
     @media (max-width: $breakpoint-sm) {
       padding: 0 !important;
     }
