@@ -72,7 +72,7 @@ export default {
 <style lang="scss" scoped>
 .total-stacked {
   position: relative;
-  padding-left: 1rem;
+  padding-left: 20px;
   z-index: 2;
   margin-top: 5px;
   @media (max-width: $breakpoint-sm) {
@@ -121,7 +121,7 @@ export default {
   }
 
   &__usd {
-    color: #ffffff;
+    color: $lightGray;
     font-size: 14px;
     line-height: 1;
     margin-top: 3px;

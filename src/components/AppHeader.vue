@@ -13,7 +13,6 @@
         </div>
         <q-space />
         <div class="app-header__epoch">
-          <apy />
           <epoch />
         </div>
         <q-space />
@@ -65,7 +64,6 @@ import ClusterSelector from '@/components/ClusterSelector.vue'
 import TotalStacked from '@/components/TotalStacked.vue'
 import ConnectWallet from '@/components/ConnectWallet.vue'
 import Epoch from '@/components/Epoch.vue'
-import Apy from '@/components/Apy.vue'
 
 export default {
   components: {
@@ -74,7 +72,6 @@ export default {
     ClusterSelector,
     TotalStacked,
     ConnectWallet,
-    Apy,
   },
 }
 </script>

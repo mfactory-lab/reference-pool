@@ -1,5 +1,6 @@
 <template>
   <q-card class="stake-box shadow-sm">
+    <apy :selected="tab === 'stake'" @click="() => (tab = 'stake')" />
     <q-tabs
       v-model="tab"
       align="justify"
@@ -159,7 +160,7 @@
                 <span class="text-dark">1</span>
                 <span> xSOL</span>
                 <span class="q-px-sm">≈</span>
-                <span class="text-dark">{{ xsolToSolRate }}</span>
+                <span class="text-dark">{{ xSolToSolRate }}</span>
                 <span> SOL</span>
               </div>
             </div>
@@ -311,11 +312,13 @@ import TokenSvg from '@/components/icons/TokenSvg.vue'
 import { useApy } from '@/store/modules/apy'
 // @ts-ignore
 import vClickOutside from 'click-outside-vue3'
+import Apy from '@/components/Apy.vue'
 
 export default defineComponent({
   components: {
     TokenSvg,
     ConnectWallet,
+    Apy,
   },
   directives: {
     clickOutside: vClickOutside.directive,
@@ -440,7 +443,7 @@ export default defineComponent({
       solToXsolRate: computed(() =>
         exchangeRate.value == 1 ? 1 : formatAmount(exchangeRate.value)
       ),
-      XsolToSolRate: computed(() =>
+      xSolToSolRate: computed(() =>
         exchangeRate.value == 1 ? 1 : formatAmount(1 / exchangeRate.value)
       ),
 

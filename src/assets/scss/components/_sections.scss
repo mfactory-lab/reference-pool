@@ -27,25 +27,29 @@
 
 // Firstlook Section
 
-.q-page {
-  background: url(/src/assets/img/bg-sol.svg) no-repeat center center;
-}
+// .q-page {
+//   background: url(/src/assets/img/bg-sol.svg) no-repeat center center;
+// }
 
 .firstlook-section {
-  padding-bottom: 30px;
+  padding-top: 55px;
+  @media (max-width: $breakpoint-sm) {
+    padding-top: 0;
+  }
+  padding-bottom: 10px;
   position: relative;
   overflow: hidden;
 }
 
 .firstlook__body {
-  padding-top: 75px;
-  @media (max-width: $breakpoint-sm) {
-    padding-top: 20px;
-  }
+  background: url(/src/assets/img/bg-sol-part.svg) no-repeat 15px center;
+  background-size: contain;
+  padding: 30px 0;
+  min-height: 400px;
 }
 
 .firstlook {
-  &__wallet {
+  &__wallet, &__stake-box {
     @media (max-width: $breakpoint-sm) {
       padding: 0 !important;
     }
@@ -55,7 +59,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: -40px auto 30px;
+    margin: -10px auto 20px;
 
     @media (max-width: $breakpoint-xs) {
       margin: 0 auto 30px;
@@ -68,6 +72,23 @@
       .q-inner-loading {
         background: none;
       }
+    }
+  }
+
+  &__placeholder {
+    position: absolute;
+    box-shadow: 0 1px 5px rgb(0 0 0 / 20%), 0 2px 2px rgb(0 0 0 / 14%), 0 3px 1px -2px rgb(0 0 0 / 12%);
+    border-radius: 50%;
+    background: #fff;
+    width: 230px;
+    height: 230px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 55px;
+
+    &__icon {
+      height: 115px;
     }
   }
 }

@@ -58,26 +58,41 @@ export default {
 
 <style scoped lang="scss">
 .apy {
-  font-size: 19px;
-  line-height: 19px;
-  color: #ffffff;
+  position: absolute;
+  color: $gray;
+  background-color: $primary;
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
-
-  .q-inner-loading {
-    background: none !important;
+  left: calc(50% - 108px);
+  border-radius: 50% !important;
+  width: 96px;
+  height: 96px;
+  top: -23px;
+  justify-content: center;
+  z-index: 1;
+  line-height: 18px;
+  cursor: pointer;
+  transition: color 0.3s, background-color 0.3s;
+  &--selected {
+    background-color: $gray;
+    color: #fff;
   }
-
+  @media (max-width: $breakpoint-xs) {
+    border-radius: 50% 50% 0 0 !important;
+    height: 60px;
+    top: -35px;
+  }
   &__value {
-    font-size: 29px;
-    line-height: 29px;
-    font-weight: 900;
-
+    font-size: 24px;
+    line-height: 26px;
     @media (max-width: $breakpoint-xs) {
-      font-size: 24px;
+      font-size: 20px;
+      line-height: 22px;
     }
+  }
+  .q-inner-loading {
+    background: none;
   }
 }
 </style>

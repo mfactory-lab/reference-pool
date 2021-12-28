@@ -53,13 +53,6 @@ body.body--dark {
   }
 }
 
-// for more space on small notebooks
-.container, .container-sm, .container-md {
-  @media (min-width: 1143px) {
-    max-width: 1140px;
-  }
-}
-
 .page-title {
   margin: 4.5rem 0 1.5rem;
   font-size: 3rem;

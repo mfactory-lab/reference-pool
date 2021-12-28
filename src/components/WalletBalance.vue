@@ -1,29 +1,12 @@
 <template>
   <q-card class="wallet-balance">
     <q-card-section class="wallet-balance__head">
-      <!--      <div class="row items-center">-->
-      <!--        <div class="col">-->
-      <!--          <q-btn-->
-      <!--            class="q-manual-focusable&#45;&#45;focused text-no-wrap"-->
-      <!--            rounded-->
-      <!--            size="sm"-->
-      <!--            unelevated-->
-      <!--            @click="dialog = true"-->
-      <!--          >-->
-      <!--            STAKE ACCOUNTS ({{ stakeAccounts?.length ?? 0 }})-->
-      <!--          </q-btn>-->
-      <!--        </div>-->
-      <!--        <div class="col text-right">-->
-      WALLET
-      <!--        </div>-->
-      <!--      </div>-->
+      <div>${{ formatMoney(totalUsd) }}</div>
+      <div>WALLET</div>
     </q-card-section>
     <q-card-section class="wallet-balance__body">
-      <!-- <div class="wallet-balance__title">
-        <q-badge>Portfolio</q-badge>
-      </div> -->
       <q-list dense separator>
-        <q-item >
+        <q-item>
           <q-item-section class="balance__value">
             <span>{{ formatPrice(solBalance) }}</span>
             <span class="balance__value__usd">${{ formatMoney(solUsd) }}</span>
@@ -48,9 +31,7 @@
           </q-item-section>
         </q-item>
       </q-list>
-      <div class="wallet-balance__staking__title">
-        STAKING
-      </div>
+      <div class="wallet-balance__staking__title">STAKING</div>
       <q-list dense separator>
         <q-item>
           <q-item-section side>
@@ -69,7 +50,9 @@
           </q-item-section>
           <q-item-section class="balance__value">
             {{ formatPrice(stakeSolBalance) }}
-            <span class="balance__value__usd">${{ formatMoney(stackedUsd) }}</span>
+            <span class="balance__value__usd"
+              >${{ formatMoney(stackedUsd) }}</span
+            >
           </q-item-section>
           <q-item-section side>
             <q-item-label>
@@ -179,6 +162,13 @@ export default {
 
     const dialog = ref(false)
 
+    const solUsd = computed(() => solPrice.value * solBalance.value)
+    const xsolUsd = computed(
+      () => (solPrice.value * tokenBalance.value) / exchangeRate.value
+    )
+    const stackedUsd = computed(
+      () => solPrice.value * stakeAccounts.stakeSolBalance
+    )
     return {
       deactivate: async (address: string) => {
         await monitorTransaction(
@@ -220,9 +210,10 @@ export default {
       stakeAccounts: computed(() => stakeAccounts.data),
       formatPrice: (v: number) => longPriceFormatter.format(v),
       formatMoney: (v: number) => formatMoney(v),
-      solUsd: computed(() => solPrice.value * solBalance.value),
-      xsolUsd: computed(() => solPrice.value * tokenBalance.value / exchangeRate.value),
-      stackedUsd: computed(() => solPrice.value * stakeAccounts.stakeSolBalance),
+      solUsd,
+      xsolUsd,
+      stackedUsd,
+      totalUsd: computed(() => solUsd.value + xsolUsd.value + stackedUsd.value),
     }
   },
 }

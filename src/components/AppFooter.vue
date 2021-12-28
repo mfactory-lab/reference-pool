@@ -57,7 +57,7 @@
 .footer {
   background-color: $gray !important;
   color: #fff !important;
-  padding: 2rem 0 2rem;
+  padding: 2rem 0 1rem;
   @media (max-width: $breakpoint-sm) {
     text-align: center;
   }

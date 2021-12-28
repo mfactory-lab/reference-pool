@@ -55,10 +55,17 @@
 
 .wallet-balance {
   position: relative;
-  margin-bottom: 40px;
+
+  @media (max-width: $breakpoint-sm) {
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: $breakpoint-xs) {
+    margin-bottom: 60px;
+  }
 
   @media (min-width: $breakpoint-sm) {
-    min-height: 305px;
+    min-height: 335px;
   }
 
   .q-list--separator>.q-item-type+.q-item-type {
@@ -70,14 +77,15 @@
   }
 
   &__head {
-    padding: 8px 30px 8px 12px;
+    padding: 8px 24px;
     background-color: $gray;
-    font-size: 23px;
+    font-size: 20px;
     font-weight: 500;
     height: 50px;
-    padding-top: 10px;
+    padding-top: 11px;
     color: #fff;
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
   }
 
   &__body {

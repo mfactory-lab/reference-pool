@@ -9,19 +9,30 @@
         </div>
         <div class="lt-md flex">
           <div class="firstlook__epoch">
-            <apy />
             <epoch />
           </div>
         </div>
-        <div class="row justify-between">
+        <div class="row justify-between relative-position">
           <div
-            class="col col-12 col-md-5 q-pr-sm firstlook__wallet"
+            class="col col-12 col-md-4 q-pr-md firstlook__wallet"
             v-if="connected"
           >
             <wallet-balance />
           </div>
+          <div
+            v-else
+            class="firstlook__placeholder"
+          >
+            <img
+              alt=""
+              class="firstlook__placeholder__icon"
+              src="@/assets/img/sol-logo.svg"
+            />
+          </div>
 
-          <div class="col col-12 col-md-7 q-ml-auto">
+          <div
+            class="col col-12 col-md-8 q-pl-md q-ml-auto firstlook__stake-box"
+          >
             <stake-box />
           </div>
         </div>
@@ -64,13 +75,11 @@ import { computed } from 'vue'
 import { useWallet } from '@/store/modules/wallet'
 import TotalStacked from '@/components/TotalStacked.vue'
 import Epoch from '@/components/Epoch.vue'
-import Apy from '@/components/Apy.vue'
 
 export default {
   components: {
     WalletBalance,
     Epoch,
-    Apy,
     StakeBox,
     TotalStacked,
   },

@@ -27,11 +27,10 @@
  
 // Header
 .app-header {
-  min-height: 160px;
   display: flex;
   align-items: center;
   background-color: $gray !important;
-  padding: 1.2rem 0;
+  padding: 10px 0;
 
   .q-toolbar {
     padding: 0;
@@ -40,7 +39,7 @@
   &__epoch {
     position: absolute;
     right: calc(50% - 53px);
-    bottom: -58px;
+    bottom: -42px;
     z-index: -1;
 
     @media (max-width: $breakpoint-sm) {
@@ -66,5 +65,9 @@
     font-size: 14px;
     height: 38px;
     z-index: 1;
+  }
+
+  &__logo {
+    margin-top: 12px;
   }
 }
