@@ -118,6 +118,8 @@ export const useValidators = defineStore('validators', () => {
     loading.value = false;
   };
 
+  load();
+
   return {
     loading,
     data,

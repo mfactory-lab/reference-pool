@@ -56,12 +56,17 @@
 
 import { storeToRefs } from 'pinia';
 import { ENDPOINTS } from '@/config';
-import { useConnection, Endpoint } from '@/store';
+import { useConnection, Endpoint, useValidators } from '@/store';
+import { watch } from 'vue';
 
 export default {
   setup() {
     const connectionStore = useConnection();
     const { cluster } = storeToRefs(connectionStore);
+    
+    const validatorStore = useValidators();
+    watch(cluster, validatorStore.load);
+
     return {
       cluster,
       select: (e: Endpoint) => connectionStore.setCluster(e.name),
