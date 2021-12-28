@@ -1,16 +1,16 @@
 {
   "private": true,
-  "name": "jpool",
+  "name": "xpool",
   "version": "0.0.4",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AlexanderRay/jpool-webapp.git"
+    "url": "git+https://github.com/mfactory-lab/reference-pool.git"
   },
   "bugs": {
-    "url": "https://github.com/AlexanderRay/jpool-webapp/issues"
+    "url": "https://github.com/mfactory-lab/reference-pool/issues"
   },
-  "homepage": "https://github.com/AlexanderRay/jpool-webapp#readme",
+  "homepage": "https://github.com/mfactory-lab/reference-pool#readme",
   "scripts": {
     "dev": "vite --port 3333",
     "build": "vite build --mode production",

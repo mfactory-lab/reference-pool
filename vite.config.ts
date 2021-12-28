@@ -41,8 +41,8 @@ export default defineConfig(({ mode }) => {
   const plugins = [
     injectHtml({
       data: {
-        title: 'JPool – Solana Stake Pool',
-        description: 'JPool is a Stake Pool on the Solana blockchain ensuring high rewards at low risk level, while also providing a DeFi token.',
+        title: 'xPool – Solana Stake Pool',
+        description: 'xPool is a Stake Pool on the Solana blockchain ensuring high rewards at low risk level, while also providing a DeFi token.',
         keywords: 'Solana, DeFi, Stake pool, Proof of Stake, Blockchain, SOL',
       },
     }),

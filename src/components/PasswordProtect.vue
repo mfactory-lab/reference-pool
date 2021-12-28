@@ -4,7 +4,7 @@
       <div class="column">
         <div class="row justify-center">
           <div :class="$style.logo">
-            JPOOL
+            xPOOL
           </div>
         </div>
         <div class="row">
