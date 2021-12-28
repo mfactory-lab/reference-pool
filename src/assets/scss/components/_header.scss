@@ -1,0 +1,70 @@
+/* This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+ 
+// Header
+.app-header {
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  background-color: $gray !important;
+  padding: 1.2rem 0;
+
+  .q-toolbar {
+    padding: 0;
+  }
+
+  &__epoch {
+    position: absolute;
+    right: calc(50% - 53px);
+    bottom: -58px;
+    z-index: -1;
+
+    @media (max-width: $breakpoint-sm) {
+      display: none;
+    }
+  }
+
+  & &__wallet-btn {
+    font-size: 14px;
+    height: 38px;
+    min-height: auto;
+    font-weight: 400;
+    padding-top: 8px;
+    @media(min-width: $breakpoint-sm) {
+      margin-left: -30px;
+      padding-left: 40px;
+    }
+  }
+
+  &__cluster-btn {
+    min-height: auto;
+    padding-top: 8px;
+    font-size: 14px;
+    height: 38px;
+    z-index: 1;
+  }
+}

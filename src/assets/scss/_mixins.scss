@@ -1,0 +1,79 @@
+/* This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+ 
+// functions to urlencode the svg string
+@function str-replace($string, $search, $replace: '') {
+  $index: str-index($string, $search);
+
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace +
+      str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+  }
+
+  @return $string;
+}
+
+@function url-encode($string) {
+  $map: (
+    '%': '%25',
+    '<': '%3C',
+    '>': '%3E',
+    ' ': '%20',
+    '!': '%21',
+    '*': '%2A',
+    "'": '%27',
+    '"': '%22',
+    '(': '%28',
+    ')': '%29',
+    ';': '%3B',
+    ':': '%3A',
+    '@': '%40',
+    '&': '%26',
+    '=': '%3D',
+    '+': '%2B',
+    '$': '%24',
+    ',': '%2C',
+    '/': '%2F',
+    '?': '%3F',
+    '#': '%23',
+    '[': '%5B',
+    ']': '%5D',
+  );
+  $new: $string;
+
+  @each $search, $replace in $map {
+    $new: str-replace($new, $search, $replace);
+  }
+
+  @return $new;
+}
+
+@mixin bgWave($color: $body-bg) {
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-image: url("data:image/svg+xml,%3Csvg width='1200' height='217' viewBox='0 0 1200 217' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='#{url-encode('#{$color}')}' d='M721.402 88.875C888.846 61.805 1075.29 1.55402 1199.27 1.55402L1200 216.033H0V0C123.74 0 309.824 60.063 476.945 87.049C497.645 90.391 518.03 92.698 538.026 94.109C594.517 99.685 656.412 99.381 721.402 88.875Z'/%3E%3C/svg%3E");
+}

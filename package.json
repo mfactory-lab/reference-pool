@@ -1,0 +1,101 @@
+{
+  "private": true,
+  "name": "jpool",
+  "version": "0.0.4",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexanderRay/jpool-webapp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlexanderRay/jpool-webapp/issues"
+  },
+  "homepage": "https://github.com/AlexanderRay/jpool-webapp#readme",
+  "scripts": {
+    "dev": "vite --port 3333",
+    "build": "vite build --mode production",
+    "build:report": "vite build --mode report",
+    "build:ssg": "cross-env NODE_ENV=production vite-ssg build",
+    "serve": "vite preview",
+    "linter": "eslint -c .eslintrc.js --ext .js,.vue,.ts, src",
+    "linter:fix": "eslint -c .eslintrc.js --fix --ext .js,.vue,.ts, src",
+    "stylelint": "stylelint --config stylelint.config.js 'src/**/*.{vue,scss}'",
+    "stylelint:fix": "stylelint --config stylelint.config.js --fix 'src/**/*.{vue,scss}'",
+    "deploy:gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup",
+    "deploy": "./scripts/deploy.sh"
+  },
+  "dependencies": {
+    "@project-serum/borsh": "^0.2.2",
+    "@project-serum/serum": "^0.13.59",
+    "@project-serum/sol-wallet-adapter": "^0.2.5",
+    "@pythnetwork/client": "^2.2.0",
+    "@quasar/extras": "^1.11.4",
+    "@solana/spl-token": "^0.1.8",
+    "@solana/wallet-adapter-base": "^0.8.1",
+    "@solana/wallet-adapter-slope": "^0.4.0",
+    "@solana/web3.js": "^1.29.2",
+    "@vue/server-renderer": "^3.2.21",
+    "@vueuse/core": "^6.7.4",
+    "@vueuse/head": "^0.6.0",
+    "axios": "^0.24.0",
+    "bn.js": "^5.2.0",
+    "bs58": "^4.0.1",
+    "buffer-layout": "^1.2.2",
+    "click-outside-vue3": "^4.0.1",
+    "eventemitter3": "^4.0.7",
+    "lodash-es": "^4.17.21",
+    "mitt": "^3.0.0",
+    "pinia": "^2.0.0",
+    "quasar": "^2.2.2",
+    "vue": "^3.2.21",
+    "vue-gtag": "^2.0.1",
+    "vue-router": "^4.0.12"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/bs58": "^4.0.1",
+    "@types/lodash-es": "^4.17.4",
+    "@types/node": "^16.9.2",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
+    "@typescript-eslint/parser": "^5.3.0",
+    "@vitejs/plugin-legacy": "^1.6.0",
+    "@vitejs/plugin-vue": "^1.9.4",
+    "@vue/compiler-sfc": "^3.2.16",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/eslint-config-typescript": "^9.0.0",
+    "commitizen": "^4.2.4",
+    "critters": "^0.0.10",
+    "cross-env": "^7.0.3",
+    "cz-emoji": "^1.3.1",
+    "eslint": "^8.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-vue": "^7.18.0",
+    "husky": "^7.0.2",
+    "lint-staged": "^11.1.2",
+    "path": "^0.12.7",
+    "prettier": "^2.3.2",
+    "push-dir": "^0.4.1",
+    "rollup-plugin-visualizer": "^5.5.2",
+    "sass": "1.32.0",
+    "stylelint": "^13.13.1",
+    "stylelint-config-recommended": "^6.0.0",
+    "stylelint-config-standard": "^22.0.0",
+    "typescript": "^4.4.3",
+    "unplugin-vue-components": "^0.15.6",
+    "vite": "^2.6.13",
+    "vite-plugin-html": "^2.1.1",
+    "vite-ssg": "^0.15.6"
+  },
+  "husky": {
+    "hooks": {}
+  },
+  "lint-staged": {
+    "*.{ts,vue}": "eslint --fix",
+    "*": "prettier -w -u"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
+}
