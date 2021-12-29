@@ -71,7 +71,7 @@ export default {
   top: -23px;
   justify-content: center;
   z-index: 1;
-  line-height: 18px;
+  line-height: 14px;
   cursor: pointer;
   transition: color 0.3s, background-color 0.3s;
   &--selected {
@@ -84,11 +84,12 @@ export default {
     top: -35px;
   }
   &__value {
-    font-size: 24px;
-    line-height: 26px;
+    font-size: 22px;
+    line-height: 22px;
+    font-weight: 500;
     @media (max-width: $breakpoint-xs) {
       font-size: 20px;
-      line-height: 22px;
+      line-height: 20px;
     }
   }
   .q-inner-loading {
