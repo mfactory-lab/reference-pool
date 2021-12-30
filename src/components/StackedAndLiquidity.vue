@@ -1,33 +1,8 @@
 <template>
-  <q-header
-    :class="!$q.dark.isActive ? 'bg-white text-dark' : null"
-    class="app-header"
-  >
-    <div class="container">
-      <q-toolbar>
-        <router-link class="app-header__logo" to="/">
-          <app-logo />
-        </router-link>
-        <div class="xs-hide">
-          <stacked-and-liquidity />
-        </div>
-        <q-space />
-        <div class="app-header__epoch">
-          <epoch />
-        </div>
-        <q-space />
-        <div class="text-right">
-          <div class="q-gutter-sm justify-end flex wrap">
-            <!--          <q-btn-group rounded flat>-->
-            <cluster-selector />
-            <connect-wallet />
-            <!--          </q-btn-group>-->
-            <!--<theme-mode-selector/>-->
-          </div>
-        </div>
-      </q-toolbar>
+    <total-stacked />
+    <div class="total-stacked__reserved-balance">
+      Available Liquidity: <b>{{ reserveStakeBalance }} SOL</b>
     </div>
-  </q-header>
 </template>
 
 <script lang="ts">
@@ -58,20 +33,64 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-// @ts-ignore
-import AppLogo from '@/components/AppLogo.vue'
-import ClusterSelector from '@/components/ClusterSelector.vue'
-import StackedAndLiquidity from '@/components/StackedAndLiquidity.vue'
-import ConnectWallet from '@/components/ConnectWallet.vue'
-import Epoch from '@/components/Epoch.vue'
+import TotalStacked from '@/components/TotalStacked.vue'
+import { computed } from 'vue'
+import { useStakePool } from '@/store'
+import { storeToRefs } from 'pinia'
+import { lamportsToSol, priceFormatter } from '@/utils'
 
 export default {
   components: {
-    Epoch,
-    AppLogo,
-    ClusterSelector,
-    StackedAndLiquidity,
-    ConnectWallet,
+    TotalStacked,
+  },
+  setup() {
+    const stakePoolStore = useStakePool()
+    const { reserveStakeBalance } = storeToRefs(stakePoolStore)
+
+    function formatAmount(val: number) {
+      return priceFormatter.format(val)
+    }
+    return {
+      reserveStakeBalance: computed(() =>
+        formatAmount(lamportsToSol(reserveStakeBalance.value))
+      ),
+    }
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.total-stacked {
+  &__reserved-balance {
+    padding: 0 0 0 23px;
+    font-size: 12px;
+    color: #fff;
+
+    @media (max-width: $breakpoint-sm) {
+      width: 270px;
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      width: auto;
+    }
+  }
+}
+
+.total-stacked-alter {
+  .total-stacked {
+    &__reserved-balance {
+      color: #000;
+    }
+  }
+}
+</style>
+<style lang="scss">
+.total-stacked-alter {
+  display: flex;
+  flex-direction: column;
+  margin-top: -20px;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>

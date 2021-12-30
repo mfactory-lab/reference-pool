@@ -4,7 +4,7 @@
       <div class="firstlook__body">
         <div class="lt-sm flex">
           <div class="total-stacked-alter flex justify-center q-mx-auto">
-            <total-stacked />
+            <stacked-and-liquidity />
           </div>
         </div>
         <div class="lt-md flex">
@@ -73,7 +73,7 @@ import StakeBox from '@/components/StakeBox/StakeBox.vue'
 import WalletBalance from '@/components/WalletBalance.vue'
 import { computed } from 'vue'
 import { useWallet } from '@/store/modules/wallet'
-import TotalStacked from '@/components/TotalStacked.vue'
+import StackedAndLiquidity from '@/components/StackedAndLiquidity.vue'
 import Epoch from '@/components/Epoch.vue'
 
 export default {
@@ -81,7 +81,7 @@ export default {
     WalletBalance,
     Epoch,
     StakeBox,
-    TotalStacked,
+    StackedAndLiquidity,
   },
   setup() {
     const wallet = useWallet()

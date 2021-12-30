@@ -72,18 +72,14 @@ export default {
 <style lang="scss" scoped>
 .total-stacked {
   position: relative;
-  padding-left: 20px;
+  padding-left: 25px;
   z-index: 2;
-  margin-top: 5px;
-  @media (max-width: $breakpoint-sm) {
-    margin-bottom: 10px;
-  }
+  margin-top: 2px;
 
   &__label {
     text-transform: uppercase;
-    font-size: 14px;
+    font-size: 11px;
     color: #ffffff;
-    margin-bottom: 4px;
   }
 
   &__value {
@@ -102,13 +98,14 @@ export default {
       //noinspection CssUnknownTarget
       background: url(@/assets/img/sol-gray-logo.svg) no-repeat center center;
       background-size: contain;
-      width: 38px;
+      width: 33px;
       height: 100%;
       position: absolute;
       left: 0;
 
-      @media (max-width: $breakpoint-sm) {
+      @media (max-width: $breakpoint-xs) {
         background: url(@/assets/img/sol-logo.svg) no-repeat center center;
+        background-size: contain;
       }
     }
   }
@@ -116,16 +113,16 @@ export default {
   &__sol {
     white-space: nowrap;
     color: #fff;
-    font-size: 19px;
+    font-size: 16px;
     line-height: 1;
   }
 
   &__usd {
     color: $lightGray;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1;
-    margin-top: 3px;
-    margin-bottom: 5px;
+    margin-top: 1px;
+    margin-bottom: 2px;
   }
 }
 

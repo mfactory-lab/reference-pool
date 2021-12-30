@@ -99,7 +99,7 @@ const abbreviateNumber = (number: number, precision: number, trimZeros: boolean 
   const tier = (Math.log10(number) / 3) | 0;
   let scaled = number;
   const suffix = SI_SYMBOL[tier];
-  if (tier !== 0) {
+  if (tier > 0) {
     const scale = Math.pow(10, tier * 3);
     scaled = number / scale;
   }
