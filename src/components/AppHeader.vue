@@ -18,11 +18,8 @@
         <q-space />
         <div class="text-right">
           <div class="q-gutter-sm justify-end flex wrap">
-            <!--          <q-btn-group rounded flat>-->
             <cluster-selector />
             <connect-wallet />
-            <!--          </q-btn-group>-->
-            <!--<theme-mode-selector/>-->
           </div>
         </div>
       </q-toolbar>
