@@ -87,6 +87,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
+
     build,
     plugins,
     optimizeDeps,
