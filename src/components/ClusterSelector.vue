@@ -22,23 +22,23 @@
 </template>
 
 <script lang="ts">
-  import { watch } from 'vue';
-  import { storeToRefs } from 'pinia';
+  import { computed, watch } from 'vue';
   import { ENDPOINTS } from '@/config';
   import { Endpoint, useConnectionStore, useValidatorStore } from '@/store';
 
   export default {
     setup() {
       const connectionStore = useConnectionStore();
-      const { cluster } = storeToRefs(connectionStore);
-
       const validatorStore = useValidatorStore();
+
+      const cluster = computed(() => connectionStore.cluster);
+
       watch(cluster, validatorStore.load);
 
       return {
         cluster,
-        select: (e: Endpoint) => connectionStore.setCluster(e.name),
         items: ENDPOINTS,
+        select: (e: Endpoint) => connectionStore.setCluster(e.name),
         filter: (name: string) => name.replace('-beta', ''),
       };
     },

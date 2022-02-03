@@ -21,7 +21,7 @@
         <q-item>
           <q-item-section class="balance__value">
             {{ formatPrice(tokenBalance) }}
-            <span class="balance__value__usd">${{ formatMoney(xsolUsd) }}</span>
+            <span class="balance__value__usd">${{ formatMoney(tokenUsd) }}</span>
           </q-item-section>
           <q-item-section side>
             <q-item-label>
@@ -66,8 +66,7 @@
 </template>
 
 <script lang="ts">
-  import { computed, defineComponent } from 'vue';
-  import { storeToRefs } from 'pinia';
+  import { computed, defineComponent, toRef } from 'vue';
   import {
     useBalanceStore,
     useCoinRateStore,
@@ -77,20 +76,23 @@
   import { longPriceFormatter } from '@/utils';
   import { formatMoney } from '@/utils/check-number';
   import StakeAccountsDialog from '@/components/StakeAccountsDialog.vue';
+  import TokenSvg from '@/components/Icons/TokenSvg.vue';
 
   export default defineComponent({
-    components: { StakeAccountsDialog },
+    components: { StakeAccountsDialog, TokenSvg },
     setup() {
       const stakePoolStore = useStakePoolStore();
       const balanceStore = useBalanceStore();
       const stakeAccountStore = useStakeAccountStore();
       const coinRateStore = useCoinRateStore();
 
-      const { solBalance, tokenBalance } = storeToRefs(balanceStore);
-      const { stakeSolBalance, dialog } = storeToRefs(stakeAccountStore);
+      const solBalance = toRef(balanceStore, 'solBalance');
+      const tokenBalance = toRef(balanceStore, 'tokenBalance');
+      const stakeSolBalance = toRef(stakeAccountStore, 'stakeSolBalance');
+      const dialog = toRef(stakeAccountStore, 'dialog');
 
       const solUsd = computed(() => coinRateStore.solPrice * solBalance.value);
-      const jsolUsd = computed(
+      const tokenUsd = computed(
         () => (coinRateStore.solPrice * tokenBalance.value) / stakePoolStore.exchangeRate,
       );
       const stackedUsd = computed(() => coinRateStore.solPrice * stakeSolBalance.value);
@@ -99,9 +101,9 @@
         solBalance,
         tokenBalance,
         solUsd,
-        jsolUsd,
+        tokenUsd,
         stackedUsd,
-        totalUsd: computed(() => solUsd.value + jsolUsd.value + stackedUsd.value),
+        totalUsd: computed(() => solUsd.value + tokenUsd.value + stackedUsd.value),
         stakeSolBalance: computed(() => stakeSolBalance.value),
         formatPrice: (v: number) => longPriceFormatter.format(v),
         formatMoney: (v: number) => formatMoney(v),

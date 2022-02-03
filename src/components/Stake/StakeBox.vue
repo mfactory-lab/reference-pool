@@ -249,7 +249,7 @@
   } from '@/store';
   import { formatAmount, formatPct, lamportsToSol } from '@/utils';
   import { useDeposit, useWithdraw } from '@/hooks';
-  import TokenSvg from '@/components/icons/TokenSvg.vue';
+  import TokenSvg from '@/components/Icons/TokenSvg.vue';
   import { clickOutside } from '@/directives';
   import Apy from '@/components/Apy.vue';
 

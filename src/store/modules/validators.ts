@@ -52,7 +52,7 @@ export interface ValidatorData {
 
 export const useValidatorStore = defineStore('validators', () => {
   const connectionStore = useConnectionStore();
-  const loading = ref(false);
+  const loading = ref<boolean>(false);
   const data = ref<ValidatorData[]>([]);
   const voteIds = ref<string[]>([]);
 

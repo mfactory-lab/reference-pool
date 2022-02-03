@@ -32,7 +32,7 @@
 <script lang="ts">
   import { computed } from 'vue';
   import { useWalletStore } from '@/store';
-  import StakeBox from '@/components/StakeBox/StakeBox.vue';
+  import StakeBox from '@/components/Stake/StakeBox.vue';
   import WalletBalance from '@/components/WalletBalance.vue';
   import StackedAndLiquidity from '@/components/StackedAndLiquidity.vue';
   import Epoch from '@/components/Epoch.vue';
