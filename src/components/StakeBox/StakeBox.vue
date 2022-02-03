@@ -264,14 +264,23 @@
     },
     setup() {
       const { notify } = useQuasar();
-      const { cluster } = storeToRefs(useConnectionStore());
-      const { connected } = storeToRefs(useWalletStore());
-      const { solBalance, tokenBalance } = storeToRefs(useBalanceStore());
-      const { fees, exchangeRate, connectionLost } = storeToRefs(useStakePoolStore());
-      const { depositFee, depositing, deposit } = useDeposit();
+      const stakePoolStore = useStakePoolStore();
+      const connectionStore = useConnectionStore();
+      const walletStore = useWalletStore();
+      const balanceStore = useBalanceStore();
+      const stakeAccountStore = useStakeAccountStore();
+
+      const { depositFee, depositing, depositSol } = useDeposit();
       const { withdrawFee, withdrawing, setAmount, withdraw, useWithdrawSol } = useWithdraw();
-      const stakeAccounts = useStakeAccountStore();
       const { apy } = storeToRefs(useApyStore());
+
+      const cluster = computed(() => connectionStore.cluster);
+      const connected = computed(() => walletStore.connected);
+      const solBalance = computed(() => balanceStore.solBalance);
+      const tokenBalance = computed(() => balanceStore.tokenBalance);
+      const fees = computed(() => stakePoolStore.fees);
+      const exchangeRate = computed(() => stakePoolStore.exchangeRate);
+      const connectionLost = computed(() => stakePoolStore.connectionLost);
 
       const stake = reactive<{ from: any; to: any; factor: number }>({
         from: null,
@@ -406,7 +415,7 @@
             stakeFromInput.value?.focus();
             return;
           }
-          await deposit(stake.from - lamportsToSol(depositFee.value));
+          await depositSol(stake.from - lamportsToSol(depositFee.value));
           stake.from = 0;
           stake.to = 0;
         },
@@ -419,7 +428,7 @@
           await withdraw();
           unstake.from = 0;
           unstake.to = 0;
-          stakeAccounts.load();
+          stakeAccountStore.load();
         },
 
         formatPct(v: number) {

@@ -47,9 +47,11 @@ export const useBalanceStore = defineStore('balance', () => {
   const stakePoolStore = useStakePoolStore();
   const emitter = useEmitter();
 
-  const nativeBalance = ref(0);
+  const nativeBalance = ref<number>(0);
   const hasTokenAccount = ref<boolean>(false);
-  const tokenBalance = ref(0);
+  const tokenBalance = ref<number>(0);
+
+  const solBalance = computed(() => lamportsToSol(nativeBalance.value));
 
   const { wallet, connected } = storeToRefs(walletStore);
 
@@ -90,8 +92,6 @@ export const useBalanceStore = defineStore('balance', () => {
       connectionStore.connection.getAccountInfo(wallet.value?.publicKey).then(_onAccountChange);
     }
   });
-
-  const solBalance = computed(() => lamportsToSol(nativeBalance.value));
 
   return {
     hasTokenAccount,
