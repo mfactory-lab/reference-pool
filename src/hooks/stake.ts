@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,80 +26,154 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { useMonitorTransaction } from '@/hooks/index';
-import { solToLamports, formatAmount } from '@/utils';
-import { depositSol, withdrawStake, withdrawSol } from '@/utils/spl';
 import { useQuasar } from 'quasar';
-import { ref, computed, watch } from 'vue';
-import { useConnection, sendTransaction, useStakePool, useEpochInfo } from '@/store';
+import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useWallet } from '@/store/modules/wallet';
-import { WITHDRAW_SOL_ACTIVE } from '@/config';
 import { useDebounce } from '@vueuse/core';
-import { loadApyInfo } from '@/store/modules/apy';
-import { ValidatorAccount } from '@/utils/spl/utils';
+import { PublicKey } from '@solana/web3.js';
+import { depositSol, depositStake, withdrawSol, withdrawStake } from '@solana/spl-stake-pool';
+import { ValidatorAccount } from '@solana/spl-stake-pool/src/utils/stake';
+import { formatAmount, lamportsToSol, solToLamports } from '@/utils';
+import { ProgramAccount } from '@/store';
+
+import {
+  loadApyInfo,
+  sendTransaction,
+  useBalanceStore,
+  useConnectionStore,
+  useEpochStore,
+  useStakePoolStore,
+  useWalletStore,
+} from '@/store';
+import { useMonitorTransaction } from './monitor';
+
+import { WITHDRAW_SOL_ACTIVE } from '@/config';
 
 export function useDeposit() {
-  const { connection, stakePoolAddress, stakeLimit } = storeToRefs(useConnection());
-  const { lamportsPerSignature, stakePool } = storeToRefs(useStakePool());
-  const walletStore = useWallet();
+  const connectionStore = useConnectionStore();
+  const stakePoolStore = useStakePoolStore();
+
+  const walletStore = useWalletStore();
   const { wallet, connected } = storeToRefs(walletStore);
   const { monitorTransaction, sending } = useMonitorTransaction();
+  const { nativeBalance, hasTokenAccount } = storeToRefs(useBalanceStore());
   const { notify } = useQuasar();
   const loading = ref(false);
+  const stakeSuccessDialog = ref(false);
 
-  const solStaked = computed(() => stakePool.value?.totalLamports.toNumber() ?? 0);
-  const remainingAmount = computed(() => Math.max(0, solToLamports(stakeLimit.value) - solStaked.value));
+  const solStaked = computed(() => stakePoolStore.stakePool?.totalLamports.toNumber() ?? 0);
+  const remainingAmount = computed(() =>
+    Math.max(0, solToLamports(connectionStore.stakeLimit) - solStaked.value),
+  );
 
   return {
-    depositFee: computed(() => lamportsPerSignature.value * 2),
+    stakeSuccessDialog,
+    depositFee: computed(
+      () =>
+        stakePoolStore.lamportsPerSignature * 2 +
+        (!hasTokenAccount.value ? stakePoolStore.minRentBalance : 0),
+    ),
     depositing: computed(() => loading.value || sending.value),
-    deposit: async (amount = 1) => {
-      if (connected.value) {
+    depositStake: async (stakeAccount: ProgramAccount) => {
+      try {
+        // const stakeActivation = await connection.value!.getStakeActivation(stakeAccount.pubkey);
 
-        try {
-          const lamports = solToLamports(amount);
-
-          if (stakeLimit.value > 0 && lamports > remainingAmount.value) {
-            throw new Error(`Stake limit is reached. Available to stake ${formatAmount(remainingAmount.value)} SOL`);
-          }
-
-          loading.value = true;
-
-          const { instructions, signers } = await depositSol(
-            connection.value!,
-            stakePoolAddress.value!,
-            wallet.value!.publicKey!,
-            lamports,
-          );
-
-          await monitorTransaction(sendTransaction(
-            connection.value!,
-            wallet.value!,
-            instructions,
-            signers,
-          ));
-
-          return true;
-        } catch (e: any) {
-          notify({ message: e.message, type: 'negative' });
-          throw e;
-        } finally {
-          loading.value = false;
+        const voter = stakeAccount.account.data?.parsed?.info?.stake?.delegation?.voter;
+        if (!voter) {
+          // noinspection ExceptionCaughtLocallyJS
+          throw new Error('Wrong stake account state, must be delegated to validator');
         }
+
+        const { rentFee, instructions, signers } = await depositStake(
+          connectionStore.connection,
+          connectionStore.stakePoolAddress!,
+          wallet.value!.publicKey!,
+          new PublicKey(voter),
+          stakeAccount.pubkey,
+        );
+
+        if (nativeBalance.value < rentFee) {
+          // noinspection ExceptionCaughtLocallyJS
+          throw new Error(
+            `Insufficient balance, at least ${lamportsToSol(rentFee)} SOL are required.`,
+          );
+        }
+
+        await monitorTransaction(
+          sendTransaction(connectionStore.connection, wallet.value!, instructions, signers),
+        );
+
+        return true;
+      } catch (e: any) {
+        notify({ message: e.message, type: 'negative' });
+        throw e;
+      } finally {
+        loading.value = false;
       }
-      return false;
+    },
+    depositSol: async (amount = 1) => {
+      if (!connected.value) {
+        return false;
+      }
+      try {
+        // console.log('stakeLimit', solToLamports(stakeLimit.value));
+        // console.log('solStaked', solStaked.value);
+        // console.log('StakeRemainingAmount', remainingAmount.value);
+
+        const lamports = solToLamports(amount);
+
+        if (connectionStore.stakeLimit > 0 && lamports > remainingAmount.value) {
+          // noinspection ExceptionCaughtLocallyJS
+          throw new Error(
+            `Stake limit is reached. Available to stake ${formatAmount(remainingAmount.value)} SOL`,
+          );
+        }
+
+        loading.value = true;
+
+        const { rentFee, instructions, signers } = await depositSol(
+          connectionStore.connection,
+          connectionStore.stakePoolAddress!,
+          wallet.value!.publicKey!,
+          lamports,
+        );
+
+        if (nativeBalance.value < rentFee) {
+          // noinspection ExceptionCaughtLocallyJS
+          throw new Error(
+            `Insufficient balance, at least ${lamportsToSol(rentFee)} SOL are required.`,
+          );
+        }
+
+        await monitorTransaction(
+          sendTransaction(connectionStore.connection, wallet.value!, instructions, signers),
+          { onSuccess: () => (stakeSuccessDialog.value = true) },
+        );
+
+        return true;
+      } catch (e: any) {
+        notify({ message: e.message, type: 'negative' });
+        throw e;
+      } finally {
+        loading.value = false;
+      }
     },
   };
 }
 
 export function useWithdraw() {
-  const { connection, stakePoolAddress } = storeToRefs(useConnection());
-  const { lamportsPerSignature, stakePool, reserveStakeBalance } = storeToRefs(useStakePool());
-  const { wallet, connected } = storeToRefs(useWallet());
-  const { epochInfo } = storeToRefs(useEpochInfo());
-  const { monitorTransaction, sending } = useMonitorTransaction();
   const { notify } = useQuasar();
+  const { monitorTransaction, sending } = useMonitorTransaction();
+
+  const connectionStore = useConnectionStore();
+  const stakePoolStore = useStakePoolStore();
+
+  const { wallet, connected } = storeToRefs(useWalletStore());
+  const { epochInfo } = storeToRefs(useEpochStore());
+
+  const stakePool = computed(() => stakePoolStore.stakePool);
+  const reserveStakeBalance = computed(() => stakePoolStore.reserveStakeBalance);
+
   const useReserve = ref(false);
   const useWithdrawSol = ref(true);
   const loading = ref(false);
@@ -118,11 +193,14 @@ export function useWithdraw() {
   return {
     amount,
     useWithdrawSol,
-    setAmount: (val: number) => amount.value = Number(val),
-    useReserve: (val = true) => useReserve.value = val,
-    withdrawFee: computed(() => lamportsPerSignature.value * (useWithdrawSol.value ? 2 : 3)),
+    setAmount: (val: number) => (amount.value = Number(val)),
+    useReserve: (val = true) => (useReserve.value = val),
+    // TODO: find a better way
+    // withdrawFee: computed(() => lamportsPerSignature.value * (useWithdrawSol.value ? 2 : 3)),
+    withdrawFee: computed(() => stakePoolStore.lamportsPerSignature * 3),
+    withdrawSolFee: computed(() => stakePoolStore.lamportsPerSignature * 2),
     withdrawing: computed(() => loading.value || sending.value),
-    withdraw: async () => {
+    withdraw: async (forceDelayed = false) => {
       if (!connected.value) {
         throw new Error('Wallet not connected');
       }
@@ -133,33 +211,29 @@ export function useWithdraw() {
         loading.value = true;
 
         // Try to use "withdraw sol"
-        if (useWithdrawSol.value) {
-
+        if (useWithdrawSol.value && !forceDelayed) {
           console.log('------------------------');
           console.log('|- WITHDRAW SOL');
           console.log('------------------------');
 
           const { instructions, signers } = await withdrawSol(
-            connection.value!,
-            stakePoolAddress.value!,
+            connectionStore.connection,
+            connectionStore.stakePoolAddress!,
             wallet.value!.publicKey!,
             wallet.value!.publicKey!,
             amount.value,
           );
 
-          await monitorTransaction(sendTransaction(
-            connection.value!,
-            wallet.value!,
-            instructions,
-            signers,
-          ));
+          await monitorTransaction(
+            sendTransaction(connectionStore.connection, wallet.value!, instructions, signers),
+          );
 
           return true;
         }
 
         const { instructions, signers } = await withdrawStake(
-          connection.value!,
-          stakePoolAddress.value!,
+          connectionStore.connection,
+          connectionStore.stakePoolAddress!,
           wallet.value!.publicKey!,
           amount.value,
           useReserve.value,
@@ -169,12 +243,9 @@ export function useWithdraw() {
           epochInfo.value?.epoch ? await prepareApyComparator(epochInfo.value.epoch) : undefined,
         );
 
-        await monitorTransaction(sendTransaction(
-          connection.value!,
-          wallet.value!,
-          instructions,
-          signers,
-        ));
+        await monitorTransaction(
+          sendTransaction(connectionStore.connection, wallet.value!, instructions, signers),
+        );
 
         return true;
       } catch (e: any) {
@@ -213,7 +284,10 @@ async function prepareApyComparator(epoch: number) {
         }
         const aApy = parseFloat(String(voteApyMap[aVoteId]));
         const bApy = parseFloat(String(voteApyMap[bVoteId]));
-
+        // console.log(`Compare ${aVoteId} (${aApy}) and ${bVoteId} (${bApy})`);
+        // if (isNaN(aApy) || isNaN(bApy)) {
+        //   return defaultResult;
+        // }
         return aApy - bApy;
       };
     }

@@ -26,117 +26,67 @@
  */
 
 import { resolve } from 'path';
-import { defineConfig } from 'vite';
-import { minifyHtml, injectHtml } from 'vite-plugin-html';
+import { BuildOptions, DepOptimizationOptions, defineConfig } from 'vite';
+import { createHtmlPlugin } from 'vite-plugin-html';
 import Vue from '@vitejs/plugin-vue';
-// import ViteLegacy from '@vitejs/plugin-legacy';
-import ViteVisualizer from 'rollup-plugin-visualizer';
 
 export default defineConfig(({ mode }) => {
-
   const isDev = mode === 'development';
   const isProd = mode === 'production';
-  const isReport = mode === 'report';
 
+  // TODO: fix
   const base = isProd ? '/reference-pool/' : '/';
 
   const plugins = [
-    injectHtml({
-      data: {
-        title: 'xPool – Solana Stake Pool',
-        description: 'xPool is a Stake Pool on the Solana blockchain ensuring high rewards at low risk level, while also providing a DeFi token.',
-        keywords: 'Solana, DeFi, Stake pool, Proof of Stake, Blockchain, SOL',
+    createHtmlPlugin({
+      minify: true,
+      entry: 'src/main.ts',
+      inject: {
+        data: {
+          title: 'xPool – Solana Stake Pool',
+          description:
+            'xPool is a Stake Pool on the Solana blockchain ensuring high rewards at low risk level, while also providing a DeFi token.',
+          keywords: 'Solana, DeFi, Stake pool, Proof of Stake, Blockchain, SOL',
+        },
       },
-    }),
-    minifyHtml({
-      // collapseBooleanAttributes: true,
-      // collapseWhitespace: true,
-      // minifyCSS: true,
-      // minifyJS: true,
-      // minifyURLs: true,
-      // removeAttributeQuotes: true,
-      // removeComments: true,
-      // removeEmptyAttributes: true,
-      // html5: true,
-      // keepClosingSlash: true,
-      // removeRedundantAttributes: true,
-      // removeScriptTypeAttributes: true,
-      // removeStyleLinkTypeAttributes: true,
-      // useShortDoctype: true,
     }),
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),
-    // ViteComponents({
-    //   customComponentResolvers: [resolveQuasar],
-    // }
   ];
 
-  const build = {
+  const build: BuildOptions = {
     manifest: false,
     cssCodeSplit: false, // true,
+    sourcemap: false,
     polyfillDynamicImport: false,
     brotliSize: false,
-    chunkSizeWarningLimit: 2000,
+    chunkSizeWarningLimit: 2000, //550
+    assetsInlineLimit: 4096,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        // drop_console: true,
+        drop_debugger: true,
+      },
+    },
   };
 
   if (isProd) {
     build.manifest = true;
-
-    // plugins.push(
-    //   /**
-    //    * DESC:
-    //    * provides support for legacy browsers
-    //    * that do not support native ESM
-    //    */
-    //   ViteLegacy({
-    //     targets: [
-    //       'defaults',
-    //       'not IE 11',
-    //     ],
-    //   }),
-    // );
   }
 
-  if (isReport) {
-    plugins.push(
-      /**
-       * DESC:
-       * visualize bundle
-       */
-      ViteVisualizer({
-        filename: './dist/report.html',
-        open: true,
-        brotliSize: true,
-      }),
-    );
-  }
+  let optimizeDeps: DepOptimizationOptions = {};
 
-  let optimizeDeps = {};
   if (isDev) {
-    /**
-     * DESC:
-     * dependency pre-bundling
-     */
     optimizeDeps = {
-      include: [
-        'vue',
-        'vue-router',
-        'pinia',
-        'quasar',
-        '@vueuse/core',
-        '@vueuse/head',
-      ],
-      exclude: [
-        'vue-demi',
-      ],
+      include: ['quasar', 'lodash', '@vue/runtime-core', '@vueuse/core', '@vueuse/head'],
+      exclude: ['vue-demi'],
     };
   }
 
   return {
-
     base,
-
     build,
     plugins,
     optimizeDeps,
@@ -144,8 +94,11 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
+          charset: false,
           additionalData: '@import "@/assets/scss/_variables.scss";\n',
         },
+        // TODO https://github.com/vitejs/vite/issues/5833
+        charset: false,
       },
     },
 
@@ -155,10 +108,7 @@ export default defineConfig(({ mode }) => {
           find: /~(.+)/,
           replacement: resolve('node_modules/$1'),
         },
-        {
-          find: '@/',
-          replacement: `${resolve(__dirname, 'src')}/`,
-        },
+        { find: '@', replacement: resolve(__dirname, './src') },
       ],
     },
 
@@ -168,16 +118,10 @@ export default defineConfig(({ mode }) => {
       },
     },
 
-    // https://github.com/antfu/vite-ssg
-    // ssgOptions: {
-    //   script: 'async',
-    //   formatting: 'minify',
-    // },
-
+    // support node libraries
     define: {
       'process.env': process.env,
       global: 'window',
     },
-
   };
 });

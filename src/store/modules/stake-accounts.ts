@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -26,58 +27,117 @@
  */
 
 import { defineStore, storeToRefs } from 'pinia';
-import { ref, watch, computed } from 'vue';
-import { StakePoolAccount } from '@/utils/spl';
-import { useConnection, useWallet } from '@/store';
+import { computed, ref, watch } from 'vue';
+import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js';
+import { useConnectionStore, useWalletStore } from '@/store';
 import { getFilteredProgramAccounts, lamportsToSol } from '@/utils';
-import { STAKE_PROGRAM_ID } from '@/config';
 
-export const useStakeAccounts = defineStore('stake-accounts', () => {
-  const { connection } = storeToRefs(useConnection());
-  const { walletPubKey } = storeToRefs(useWallet());
-  const data = ref<StakePoolAccount[]>([]);
-  const loading = ref(false);
+import { STAKE_PROGRAM_ID } from '@/config';
+import { STAKE_STATE_LEN } from '@solana/spl-stake-pool/src/constants';
+
+export interface ProgramAccount {
+  pubkey: PublicKey;
+  account: AccountInfo<ParsedAccountData>;
+}
+
+export const useStakeAccountStore = defineStore('stake-accounts', () => {
+  const connectionStore = useConnectionStore();
+  const walletStore = useWalletStore();
+  const { walletPubKey } = storeToRefs(walletStore);
+
+  const data = ref<ProgramAccount[]>([]);
+  const loading = ref<boolean>(false);
+  const dialog = ref<boolean>(false);
+
+  // filter by voter
+  const voter = ref<string | null>();
 
   async function load() {
     if (loading.value || !walletPubKey.value) {
+      console.log('[Stake accounts] Skip loading...');
       return;
     }
+
+    console.log('[Stake accounts] Loading...');
 
     // stake user info account
     const filters = [
       {
+        // 12 is Staker authority offset in stake account stake
         memcmp: {
           offset: 12,
           bytes: walletPubKey.value.toBase58(),
         },
       },
-      { dataSize: 200 },
+      { dataSize: STAKE_STATE_LEN },
+      // {
+      //   memcmp: {
+      //     offset: 44,
+      //     bytes: wallet.publicKey!.toBase58(),
+      //   },
+      // },
+      // {
+      //   dataSize: USER_STAKE_INFO_ACCOUNT_LAYOUT.span,
+      // },
     ];
 
     loading.value = true;
 
     // @ts-ignore
     data.value = await getFilteredProgramAccounts(
-      connection.value!,
+      connectionStore.connection,
       STAKE_PROGRAM_ID,
       filters,
     );
+
+    console.log('[Stake accounts] Data:', data.value);
+    console.log(data.value.map((acc) => acc.pubkey.toBase58()).join('\n'));
 
     loading.value = false;
   }
 
   watch(walletPubKey, load, { immediate: true });
 
+  watch(dialog, () => {
+    if (dialog.value == false) {
+      voter.value = null;
+    }
+  });
+
+  const calcStakeBalance = (accounts: ProgramAccount[]) => {
+    const lamports = accounts.reduce((total, acc) => {
+      total += acc.account.lamports;
+      return total;
+    }, 0);
+    return lamportsToSol(lamports);
+  };
+
+  const voterAccounts = (voter: string) =>
+    computed(() => {
+      return data.value.filter(
+        (acc) => acc.account.data?.parsed?.info?.stake?.delegation?.voter == voter,
+      );
+    });
+
+  const voterStake = (voter: string) =>
+    computed(() => calcStakeBalance(voterAccounts(voter).value));
+
   return {
     loading,
-    data,
+    dialog,
+    voter,
+
+    data: computed(() =>
+      voter.value
+        ? data.value.filter(
+            (acc) => acc.account.data?.parsed?.info?.stake?.delegation?.voter == voter.value,
+          )
+        : data.value,
+    ),
+
     load,
-    stakeSolBalance: computed(() => {
-      const lamports = data.value.reduce((total, acc) => {
-        total += acc.account.lamports;
-        return total;
-      }, 0);
-      return lamportsToSol(lamports);
-    }),
+    stakeSolBalance: computed(() => calcStakeBalance(data.value)),
+    voterAccounts,
+    voterStake,
   };
 });

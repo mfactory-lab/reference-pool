@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -24,6 +25,37 @@
  *
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
+
+import { Connection, PublicKey } from '@solana/web3.js';
+import { parsePriceData } from '@pythnetwork/client';
+
+export async function getStakeAccountsByWithdrawAuthority(
+  connection: Connection,
+  stakeProgramId: PublicKey,
+  withdrawAuthority: PublicKey,
+) {
+  return await connection.getParsedProgramAccounts(stakeProgramId, {
+    filters: [
+      // {
+      //   // only delegated
+      //   memcmp: { bytes: bs58.encode(new Uint8Array([2, 0, 0, 0])), offset: 0 },
+      // },
+      // 44 is Withdrawer authority offset in stake account stake
+      { memcmp: { offset: 44, bytes: withdrawAuthority.toBase58() } },
+    ],
+  });
+}
+
+export async function getSOLPriceUSD(connection: Connection): Promise<number> {
+  const SOLUSDPriceAccountKey = new PublicKey('J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix');
+  const priceAccountInfo = await connection.getAccountInfo(SOLUSDPriceAccountKey);
+  if (!priceAccountInfo) {
+    return 0;
+  }
+  const { price, confidence } = parsePriceData(priceAccountInfo?.data);
+  console.log(`price: ${price}, confidence: ${confidence}`);
+  return price ?? 0;
+}
 
 export async function getSolPriceBinance(): Promise<number | undefined> {
   return new Promise((resolve, reject) => {

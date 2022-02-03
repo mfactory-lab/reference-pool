@@ -43,16 +43,14 @@
               text-color="primary-gray"
               dense
               class="q-px-md"
-              @click="dialog = true"
+              @click="openDetails"
             >
               Details
             </q-btn>
           </q-item-section>
           <q-item-section class="balance__value">
             {{ formatPrice(stakeSolBalance) }}
-            <span class="balance__value__usd"
-              >${{ formatMoney(stackedUsd) }}</span
-            >
+            <span class="balance__value__usd">${{ formatMoney(stackedUsd) }}</span>
           </q-item-section>
           <q-item-section side>
             <q-item-label>
@@ -64,157 +62,53 @@
       </q-list>
     </q-card-section>
   </q-card>
-
-  <q-dialog v-model="dialog">
-    <q-card>
-      <q-card-section v-if="loadingStakeAccounts" class="flex flex-center">
-        <q-spinner size="md" />
-      </q-card-section>
-      <template v-else>
-        <q-card-section>
-          <div class="text-h6 text-center">Stake Accounts</div>
-        </q-card-section>
-        <q-separator />
-        <q-card-section>
-          <q-list
-            v-if="stakeAccounts.length > 0"
-            separator
-            style="width: 400px"
-          >
-            <stake-account-item
-              v-for="acc in stakeAccounts"
-              :key="acc.pubkey"
-              :stake-account="acc"
-              @deactivate="deactivate"
-              @withdraw="withdraw"
-            />
-          </q-list>
-          <div v-else class="flex flex-center q-pa-lg">
-            Your stake accounts will be shown here.
-            <br />
-            You don't have any valid stake accounts.
-          </div>
-        </q-card-section>
-      </template>
-    </q-card>
-  </q-dialog>
+  <stake-accounts-dialog />
 </template>
 
 <script lang="ts">
-/* This file is part of Solana Reference Stake Pool code.
- *
- * Copyright © 2021, mFactory GmbH
- *
- * Solana Reference Stake Pool is free software: you can redistribute it
- * and/or modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * Solana Reference Stake Pool is distributed in the hope that it
- * will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.
- * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
- *
- * You can be released from the requirements of the Affero GNU General Public License
- * by purchasing a commercial license. The purchase of such a license is
- * mandatory as soon as you develop commercial activities using the
- * Solana Reference Stake Pool code without disclosing the source code of
- * your own applications.
- *
- * The developer of this program can be contacted at <info@mfactory.ch>.
- */
+  import { computed, defineComponent } from 'vue';
+  import { storeToRefs } from 'pinia';
+  import {
+    useBalanceStore,
+    useCoinRateStore,
+    useStakeAccountStore,
+    useStakePoolStore,
+  } from '@/store';
+  import { longPriceFormatter } from '@/utils';
+  import { formatMoney } from '@/utils/check-number';
+  import StakeAccountsDialog from '@/components/StakeAccountsDialog.vue';
 
-import { useMonitorTransaction } from '@/hooks'
-import { longPriceFormatter } from '@/utils'
-import { ref, computed } from 'vue'
+  export default defineComponent({
+    components: { StakeAccountsDialog },
+    setup() {
+      const stakePoolStore = useStakePoolStore();
+      const balanceStore = useBalanceStore();
+      const stakeAccountStore = useStakeAccountStore();
+      const coinRateStore = useCoinRateStore();
 
-import { StakeProgram, PublicKey } from '@solana/web3.js'
-import StakeAccountItem from '@/components/StakeAccountItem.vue'
-import {
-  sendTransaction,
-  useConnection,
-  useWallet,
-  useBalance,
-  useStakeAccounts,
-  useStakePool,
-  useExchangeRates,
-} from '@/store'
-import { storeToRefs } from 'pinia'
-// @ts-ignore
-import TokenSvg from '@/components/icons/TokenSvg.vue'
+      const { solBalance, tokenBalance } = storeToRefs(balanceStore);
+      const { stakeSolBalance, dialog } = storeToRefs(stakeAccountStore);
 
-import { formatMoney } from '@/utils/check-number'
+      const solUsd = computed(() => coinRateStore.solPrice * solBalance.value);
+      const jsolUsd = computed(
+        () => (coinRateStore.solPrice * tokenBalance.value) / stakePoolStore.exchangeRate,
+      );
+      const stackedUsd = computed(() => coinRateStore.solPrice * stakeSolBalance.value);
 
-export default {
-  components: { TokenSvg, StakeAccountItem },
-  setup() {
-    const { connection } = storeToRefs(useConnection())
-    const { wallet } = storeToRefs(useWallet())
-    const { solBalance, tokenBalance } = storeToRefs(useBalance())
-    const { monitorTransaction, sending } = useMonitorTransaction()
-    const stakeAccounts = useStakeAccounts()
-    const { solPrice } = storeToRefs(useExchangeRates())
-    const { exchangeRate } = storeToRefs(useStakePool())
-
-    const dialog = ref(false)
-
-    const solUsd = computed(() => solPrice.value * solBalance.value)
-    const xsolUsd = computed(
-      () => (solPrice.value * tokenBalance.value) / exchangeRate.value
-    )
-    const stackedUsd = computed(
-      () => solPrice.value * stakeAccounts.stakeSolBalance
-    )
-    return {
-      deactivate: async (address: string) => {
-        await monitorTransaction(
-          sendTransaction(
-            connection.value!,
-            wallet.value!,
-            StakeProgram.deactivate({
-              stakePubkey: new PublicKey(address),
-              authorizedPubkey: wallet.value!.publicKey!,
-            }).instructions,
-            []
-          )
-        )
-        dialog.value = false
-      },
-      withdraw: async (address: string, lamports: number) => {
-        await monitorTransaction(
-          sendTransaction(
-            connection.value!,
-            wallet.value!,
-            StakeProgram.withdraw({
-              stakePubkey: new PublicKey(address),
-              authorizedPubkey: wallet.value!.publicKey!,
-              toPubkey: wallet.value!.publicKey!,
-              lamports: lamports,
-            }).instructions,
-            []
-          )
-        )
-        await stakeAccounts.load()
-        dialog.value = false
-      },
-      sending,
-      dialog,
-      tokenBalance,
-      solBalance,
-      stakeSolBalance: computed(() => stakeAccounts.stakeSolBalance),
-      loading: computed(() => stakeAccounts.loading),
-      stakeAccounts: computed(() => stakeAccounts.data),
-      formatPrice: (v: number) => longPriceFormatter.format(v),
-      formatMoney: (v: number) => formatMoney(v),
-      solUsd,
-      xsolUsd,
-      stackedUsd,
-      totalUsd: computed(() => solUsd.value + xsolUsd.value + stackedUsd.value),
-    }
-  },
-}
+      return {
+        solBalance,
+        tokenBalance,
+        solUsd,
+        jsolUsd,
+        stackedUsd,
+        totalUsd: computed(() => solUsd.value + jsolUsd.value + stackedUsd.value),
+        stakeSolBalance: computed(() => stakeSolBalance.value),
+        formatPrice: (v: number) => longPriceFormatter.format(v),
+        formatMoney: (v: number) => formatMoney(v),
+        openDetails() {
+          dialog.value = true;
+        },
+      };
+    },
+  });
 </script>

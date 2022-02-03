@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,17 +26,18 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { ref, watch, computed } from 'vue';
-import { storeToRefs, defineStore } from 'pinia';
-import { useValidators, useEpochInfo } from '@/store';
 import axios from 'axios';
+import { computed, ref, watch } from 'vue';
+import { defineStore, storeToRefs } from 'pinia';
 import { useLocalStorage } from '@vueuse/core';
-import { DEFAULT_APY, APY_VALIDATOR_ID } from '@/config';
+import { APY_VALIDATOR_ID, DEFAULT_APY } from '@/config';
+import { useValidatorStore } from '@/store';
+import { useEpochStore } from './epoch';
 
 interface ApyValidatorInfo {
-  id: string,
-  vote: string,
-  apy: number
+  id: string;
+  vote: string;
+  apy: number;
 }
 
 interface ApyInfo {
@@ -48,9 +50,11 @@ interface ApyInfo {
   validators: ApyValidatorInfo[];
 }
 
-export const useApy = defineStore('apy', () => {
-  const { voteIds } = storeToRefs(useValidators());
-  const { epochInfo } = storeToRefs(useEpochInfo());
+export const useApyStore = defineStore('apy', () => {
+  const epochStore = useEpochStore();
+  const validatorStore = useValidatorStore();
+  const { epochInfo } = storeToRefs(epochStore);
+  const { voteIds } = storeToRefs(validatorStore);
   const apyInfo = useLocalStorage<ApyInfo>('apy', {
     beginTimestamp: 0,
     collectionTimestamp: 0,
@@ -63,22 +67,24 @@ export const useApy = defineStore('apy', () => {
   const selectedApy = ref();
   const loading = ref(!apyInfo.value?.lastEpoch);
 
-  watch([epochInfo, voteIds], async ([epochInfo, ids]) => {
-    if (epochInfo?.epoch && ids.length > 0) {
-      if (apyInfo.value?.lastEpoch == epochInfo.epoch) {
+  watch([epochInfo, voteIds], async () => {
+    if (epochInfo.value?.epoch && voteIds?.value.length > 0) {
+      if (apyInfo.value?.lastEpoch == epochInfo.value.epoch) {
+        console.log('[APY] Skip loading...');
         loading.value = false;
         return;
       }
+      console.log('[APY] Loading apy info...');
       loading.value = true;
       try {
         const res = await loadApyInfo('prev10');
         apyInfo.value = {
           ...res,
-          validators: res?.validators.filter(v => ids.includes(v.vote)) ?? [],
+          validators: res?.validators.filter((v) => voteIds?.value.includes(v.vote)) ?? [],
         };
         // use APY from selected validator
         if (APY_VALIDATOR_ID) {
-          const apyValidator = res?.validators.find(v => v.id == APY_VALIDATOR_ID);
+          const apyValidator = res?.validators.find((v) => v.id == APY_VALIDATOR_ID);
           if (apyValidator) {
             selectedApy.value = apyValidator.apy;
           }

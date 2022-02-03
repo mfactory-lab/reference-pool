@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -27,83 +28,106 @@
 
 import { useQuasar } from 'quasar';
 import { ref } from 'vue';
-import { useConnection } from '@/store';
-import { storeToRefs } from 'pinia';
+import { useConnectionStore } from '@/store';
 
 const CONFIRM_TIMEOUT = 30000;
 
 export function useMonitorTransaction() {
-  const { connection, cluster } = storeToRefs(useConnection());
+  const connectionStore = useConnectionStore();
   const { notify } = useQuasar();
   const sending = ref(false);
 
   async function monitorTransaction(
     signatureOrPromise: Promise<string> | string,
-    { onSuccess, onError }: { onSuccess?: (signature: string) => void, onError?: (signature: string) => void } = {},
+    {
+      onSuccess,
+      onError,
+    }: {
+      onSuccess?: (signature: string) => void;
+      onError?: (signature: string) => void;
+    } = {},
   ): Promise<void> {
-
     let dismiss = notify({
       progress: true,
-      type: ' ongoing',
+      type: 'ongoing',
       message: 'Sending transaction...',
       timeout: 15000,
     });
 
     sending.value = true;
 
+    let signature = '';
     try {
-      const signature = await signatureOrPromise;
+      signature = String(await signatureOrPromise);
+    } catch (e: any) {
+      notify({ caption: e.message, type: 'negative', timeout: 5000 });
+      sending.value = false;
+      return dismiss();
+    }
 
-      // https://solscan.io/tx/{id}
-      const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=${cluster.value}`;
-      const exploreAction = {
-        label: 'Explore', color: 'white', target: '_blank', type: 'a', href: explorerUrl,
-      };
+    // https://solscan.io/tx/{id}
+    const explorerUrl = `https://explorer.solana.com/tx/${signature}?cluster=${connectionStore.cluster}`;
 
+    const exploreAction = {
+      label: 'Explore',
+      color: 'white',
+      target: '_blank',
+      type: 'a',
+      href: explorerUrl,
+    };
+
+    const closeAction = {
+      label: 'Close',
+      color: 'white',
+      type: 'a',
+    };
+
+    try {
       dismiss();
 
       dismiss = notify({
         // spinner: true,
         progress: true,
-        type: ' ongoing',
+        type: 'ongoing',
         message: 'Confirming transaction...',
         actions: [exploreAction],
         timeout: CONFIRM_TIMEOUT,
       });
-      const res = await connection.value!.confirmTransaction(signature);
+      const res = await connectionStore.connection.confirmTransaction(signature);
 
       dismiss();
 
-      if (!res.value.err) {
-        dismiss = notify({
-          message: 'Transaction confirmed',
-          type: 'positive',
-          actions: [exploreAction],
-        });
-
-        if (onSuccess) {
-          onSuccess(signature);
-        }
-      } else {
+      if (res.value.err) {
         console.error(res.value.err);
-        dismiss = notify({
-          message: 'Transaction error',
-          caption: JSON.stringify(res.value.err),
-          type: 'negative',
-          actions: [exploreAction],
-          timeout: 15000,
-        });
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(JSON.stringify(res.value.err));
       }
 
-      sending.value = false;
+      dismiss = notify({
+        message: 'Transaction confirmed',
+        type: 'positive',
+        actions: [exploreAction],
+      });
+
+      if (onSuccess) {
+        onSuccess(signature);
+      }
     } catch (e: any) {
       dismiss();
-      sending.value = false;
-      notify({ message: e.message, type: 'negative' });
+      notify({
+        message: 'Transaction error',
+        caption: e.message,
+        type: 'negative',
+        timeout: 0,
+        actions: [exploreAction, closeAction],
+      });
+
       if (onError) {
         onError(e);
       }
       console.error(e);
+    } finally {
+      sending.value = false;
     }
   }
 

@@ -28,6 +28,7 @@
 import { Notify, LocalStorage, Dark, QuasarPluginOptions, Quasar } from 'quasar';
 import iconSet from 'quasar/icon-set/eva-icons';
 import { App } from 'vue';
+
 export const quasarConfig = {
   config: {
     globalProperties: {},

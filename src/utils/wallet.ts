@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -27,13 +28,19 @@
 
 import { PublicKey, Transaction } from '@solana/web3.js';
 import SolanaWalletAdapter from '@project-serum/sol-wallet-adapter';
-import { PhantomWalletAdapter, SolongWalletAdapter } from '@/utils/wallet-adapters';
 import { SlopeWalletAdapter } from '@solana/wallet-adapter-slope';
+
 import solletIcon from '@/assets/img/wallets/sollet.svg';
 import solongIcon from '@/assets/img/wallets/solong.png';
 import solflareIcon from '@/assets/img/wallets/solflare.svg';
 import phantomIcon from '@/assets/img/wallets/phantom.svg';
 import mathwalletIcon from '@/assets/img/wallets/mathwallet.svg';
+
+import {
+  PhantomWalletAdapter,
+  SolflareExtensionWalletAdapter,
+  SolongWalletAdapter,
+} from '../wallet-adapters';
 
 // shorten the checksummed version of the input address to have 4 characters at start and end
 export function shortenAddress(address: string, chars = 4): string {
@@ -41,32 +48,55 @@ export function shortenAddress(address: string, chars = 4): string {
 }
 
 export interface WalletInfo {
-  name: string,
-  url: string,
-  installUrl?: string,
-  icon?: any,
-  isExtension?: boolean,
-  getAdapter?: ({ providerUrl, endpoint }: { providerUrl: string, endpoint: string }) => WalletAdapter | undefined
+  name: string;
+  url: string;
+  installUrl?: string;
+  icon?: any;
+  isExtension?: boolean;
+  getAdapter?: ({
+    providerUrl,
+    endpoint,
+  }: {
+    providerUrl: string;
+    endpoint: string;
+  }) => WalletAdapter | undefined;
 }
 
 export interface WalletAdapter {
-  publicKey: PublicKey | null | undefined,
-  autoApprove: boolean,
-  connected: boolean,
-  signTransaction: (transaction: Transaction) => Promise<Transaction>,
-  signAllTransactions: (transaction: Transaction[]) => Promise<Transaction[]>,
-  connect: () => any,
-  disconnect: () => any,
+  publicKey: PublicKey | null | undefined;
+  autoApprove: boolean;
+  connected: boolean;
+  signTransaction: (transaction: Transaction) => Promise<Transaction>;
+  signAllTransactions: (transaction: Transaction[]) => Promise<Transaction[]>;
+  connect: () => any;
+  disconnect: () => any;
 
-  on(event: string, fn: () => void): this
+  on(event: string, fn: () => void): this;
 }
 
 export const WALLET_PROVIDERS: WalletInfo[] = [
   {
-    name: 'Solflare',
+    name: 'Solflare Web',
     url: 'https://solflare.com/access-wallet',
     icon: solflareIcon,
   },
+  {
+    name: 'Solflare Extension',
+    url: 'https://solflare.com/access-wallet',
+    icon: solflareIcon,
+    getAdapter(): WalletAdapter | undefined {
+      if ((window as any).solflare === undefined) {
+        return;
+      }
+      // return new SolanaWalletAdapter((window as any).solflare, endpoint);
+      return new SolflareExtensionWalletAdapter();
+    },
+  },
+  // {
+  //   name: 'Solflare Legacy',
+  //   url: 'https://legacy.solflare.com/access-wallet',
+  //   icon: solflareIcon,
+  // },
   {
     name: 'Sollet Web',
     url: 'https://www.sollet.io',
@@ -96,24 +126,53 @@ export const WALLET_PROVIDERS: WalletInfo[] = [
       return new SolongWalletAdapter();
     },
   },
+  // {
+  //   name: 'Bonfida',
+  //   url: 'https://bonfida.com/wallet',
+  //   icon: bonfidaIcon,
+  // },
   {
     name: 'Phantom',
     url: 'https://phantom.app',
     icon: phantomIcon,
-    installUrl: 'https://chrome.google.com/webstore/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa',
+    installUrl:
+      'https://chrome.google.com/webstore/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa',
     getAdapter() {
-      if ((window as any).solana === undefined ||
-        !(window as any).solana.isPhantom) {
+      if ((window as any).solana === undefined || !(window as any).solana.isPhantom) {
         return;
       }
       return new PhantomWalletAdapter();
     },
   },
-  {
-    name: 'MathWallet',
-    url: 'https://mathwallet.org',
-    icon: mathwalletIcon
-  },
+  // {
+  //   name: 'Ledger',
+  //   url: 'https://www.ledger.com',
+  //   getAdapter() {
+  //     return new LedgerWalletAdapter();
+  //   },
+  // },
+  // {
+  //   name: 'Coin98',
+  //   url: 'https://www.coin98.com',
+  //   installUrl: 'https://chrome.google.com/webstore/detail/coin98-wallet/aeachknmefphepccionboohckonoeemg',
+  //   getAdapter() {
+  //     if ((window as any).coin98 === undefined) {
+  //       return;
+  //     }
+  //     return new Coin98WalletAdapter();
+  //   },
+  // },
+  // {
+  //   name: 'Blocto',
+  //   url: 'https://blocto.portto.io',
+  //   getAdapter() {
+  //     if ((window as any).solana === undefined ||
+  //       !(window as any).solana.isBlocto) {
+  //       return;
+  //     }
+  //     return new BloctoWalletAdapter();
+  //   },
+  // },
   {
     name: 'Slope',
     url: 'https://slope.finance',
@@ -125,5 +184,10 @@ export const WALLET_PROVIDERS: WalletInfo[] = [
       }
       return new SlopeWalletAdapter();
     },
+  },
+  {
+    name: 'MathWallet',
+    url: 'https://mathwallet.org',
+    icon: mathwalletIcon,
   },
 ];

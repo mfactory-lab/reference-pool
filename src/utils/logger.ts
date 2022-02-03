@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -31,11 +32,11 @@ const style = `
   color: white;
   font-weight: bold;
   padding: 2px 0.5em;
-`
+`;
 
 function logger(...args: any): void {
   // eslint-disable-next-line
   console.info(`%c${new Date().toLocaleString()}`, style, ...args);
 }
 
-export default logger
+export default logger;

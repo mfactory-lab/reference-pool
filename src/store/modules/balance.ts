@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,43 +26,56 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
+import { computed, ref, toRef, watchEffect } from 'vue';
 import { defineStore, storeToRefs } from 'pinia';
-import { ref, watchEffect, computed } from 'vue';
-import { Connection, PublicKey, AccountInfo } from '@solana/web3.js';
+import { Buffer } from 'buffer';
+import { debounce } from 'lodash-es';
+import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import {
-  useConnection,
-  useWallet,
-  useStakePool,
   ACCOUNT_CHANGE_EVENT,
   WALLET_DISCONNECT_EVENT,
+  useConnectionStore,
+  useStakePoolStore,
+  useWalletStore,
 } from '@/store';
 import { findAssociatedTokenAddress, lamportsToSol } from '@/utils';
 import { useEmitter } from '@/hooks';
-import { Buffer } from 'buffer';
-import { debounce } from 'lodash-es';
 
-export const useBalance = defineStore('balance', () => {
-  const { connection } = storeToRefs(useConnection());
-  const { wallet, connected } = storeToRefs(useWallet());
-  const { stakePool } = storeToRefs(useStakePool());
+export const useBalanceStore = defineStore('balance', () => {
+  const connectionStore = useConnectionStore();
+  const walletStore = useWalletStore();
+  const stakePoolStore = useStakePoolStore();
   const emitter = useEmitter();
 
   const nativeBalance = ref(0);
+  const hasTokenAccount = ref<boolean>(false);
   const tokenBalance = ref(0);
 
-  const _onAccountChange = debounce(async function(acc: AccountInfo<Buffer>) {
+  const { wallet, connected } = storeToRefs(walletStore);
+
+  const stakePool = toRef(stakePoolStore, 'stakePool');
+
+  const _onAccountChange = debounce(async function (acc: AccountInfo<Buffer> | null) {
+    // console.log('[Balance] onAccountChange...', acc);
     nativeBalance.value = acc?.lamports ?? 0;
-    _getTokenBalance().then();
+    console.log(`SOL Balance: ${nativeBalance.value}`);
+    await _getTokenBalance();
+    console.log(`Token Balance: ${tokenBalance.value}`);
   }, 300);
 
   async function _getTokenBalance() {
-    if (wallet.value != null && stakePool.value?.poolMint) {
-      tokenBalance.value = await getTokenBalance(
-        connection.value!,
-        wallet.value!.publicKey!,
-        stakePool.value.poolMint,
-      ) ?? 0;
+    if (wallet.value == null || !stakePool.value?.poolMint) {
+      return;
     }
+    const balance = await getTokenBalance(
+      connectionStore.connection,
+      wallet.value!.publicKey!,
+      stakePool.value.poolMint,
+    );
+    hasTokenAccount.value = balance !== null;
+    tokenBalance.value = balance ?? 0;
+
+    console.log(`hasTokenAccount`, hasTokenAccount.value);
   }
 
   emitter.on(WALLET_DISCONNECT_EVENT, () => {
@@ -73,16 +87,17 @@ export const useBalance = defineStore('balance', () => {
 
   watchEffect(async () => {
     if (connected.value && wallet.value?.publicKey) {
-      connection.value!.getAccountInfo(wallet.value?.publicKey).then(_onAccountChange);
+      connectionStore.connection.getAccountInfo(wallet.value?.publicKey).then(_onAccountChange);
     }
   });
 
   const solBalance = computed(() => lamportsToSol(nativeBalance.value));
 
   return {
+    hasTokenAccount,
+    tokenBalance,
     nativeBalance,
     solBalance,
-    tokenBalance,
   };
 });
 
@@ -95,14 +110,11 @@ export async function getTokenBalance(
   mint: PublicKey,
 ): Promise<number | null> {
   try {
-    const associatedTokenAcc = await findAssociatedTokenAddress(
-      walletAddress,
-      mint,
-    );
+    const associatedTokenAcc = await findAssociatedTokenAddress(walletAddress, mint);
     const tBalance = await connection.getTokenAccountBalance(associatedTokenAcc);
     return tBalance.value.uiAmount;
   } catch (ex) {
-    console.log(ex);
-    return 0;
+    // No token account found
+    return null;
   }
 }

@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,24 +26,27 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { defineStore, storeToRefs } from 'pinia';
-import { ref, watch, computed } from 'vue';
-import { getStakePoolAccount } from '@/utils/spl';
-import { useConnection, ACCOUNT_CHANGE_EVENT } from '@/store';
-import { StakePool } from '@/utils/spl/schema';
-import { divideBnToNumber } from '@/utils/spl/utils';
+import { defineStore } from 'pinia';
+import { computed, reactive, ref, watch } from 'vue';
+import { ACCOUNT_CHANGE_EVENT, useConnectionStore } from '@/store';
 import { useEmitter } from '@/hooks';
+
+import { StakePool, getStakePoolAccount } from '@solana/spl-stake-pool';
+import { divideBnToNumber } from '@solana/spl-stake-pool/src/utils';
+import { STAKE_STATE_LEN } from '@solana/spl-stake-pool/src/constants';
+
 import { POOL_CONNECTION_DELAY } from '@/config';
 
-export const useStakePool = defineStore('stake-pool', () => {
+export const useStakePoolStore = defineStore('stake-pool', () => {
+  const connectionStore = useConnectionStore();
   const emitter = useEmitter();
-  const { connection, stakePoolAddress } = storeToRefs(useConnection());
-  const stakePool = ref<StakePool | null>(null);
-  const minRentBalance = ref(0);
-  const reserveStakeBalance = ref(0);
-  const lamportsPerSignature = ref(5000);
 
-  const fees = ref({
+  const stakePool = ref<StakePool | null>();
+  const minRentBalance = ref<number>(0);
+  const reserveStakeBalance = ref<number>(0);
+  const lamportsPerSignature = ref<number>(5000); // TODO: getFeeCalculatorForBlockhash
+
+  const fees = reactive({
     fee: 0,
     feeNext: 0,
     stakeDepositFee: 0,
@@ -63,14 +67,22 @@ export const useStakePool = defineStore('stake-pool', () => {
       return;
     }
     const reserveStakeAddress = stakePool.value!.reserveStake.toBase58();
-    const reserveStake = await connection.value.getAccountInfo(stakePool.value!.reserveStake);
+    console.log('Loading reserve stake balance from', reserveStakeAddress);
+    const reserveStake = await connectionStore.connection.getAccountInfo(
+      stakePool.value!.reserveStake,
+    );
     reserveStakeBalance.value = reserveStake?.lamports ?? 0;
+    console.log('Reserve Stake Balance:', reserveStakeBalance.value);
   }
 
   async function loadStakePool() {
     try {
-      if (stakePoolAddress.value) {
-        const stakePoolAccount = await getStakePoolAccount(connection.value, stakePoolAddress.value);
+      console.log('Loading stake pool info...');
+      if (connectionStore.stakePoolAddress) {
+        const stakePoolAccount = await getStakePoolAccount(
+          connectionStore.connection,
+          connectionStore.stakePoolAddress,
+        );
         stakePool.value = stakePoolAccount?.account.data as StakePool;
         await loadReserveStake();
       }
@@ -80,30 +92,47 @@ export const useStakePool = defineStore('stake-pool', () => {
     }
   }
 
+  async function loadMinRentBalance() {
+    minRentBalance.value = await connectionStore.connection.getMinimumBalanceForRentExemption(
+      STAKE_STATE_LEN,
+    );
+    console.log(`MinimumBalanceForRentExemption:`, minRentBalance.value);
+  }
+
   setInterval(async () => {
     await loadStakePool();
   }, POOL_CONNECTION_DELAY);
 
+  // TODO: don't reload when transaction error
   emitter.on(ACCOUNT_CHANGE_EVENT, loadStakePool);
 
-  watch(stakePoolAddress, async () => {
-    await loadStakePool();
-  }, { immediate: true });
+  watch(
+    () => connectionStore.stakePoolAddress,
+    () => Promise.all([loadStakePool(), loadMinRentBalance()]),
+    { immediate: true },
+  );
+
+  // watch(reserveStakeBalance, async (con) => {
+  //   const { blockhash } = await con.getRecentBlockhash('max');
+  //   fees.txFee = (await con.getFeeCalculatorForBlockhash(blockhash)).value?.lamportsPerSignature ?? 0;
+  //   // minRentBalance.value = (await con.getMinimumBalanceForRentExemption(STAKE_STATE_LEN)) + 1;
+  // }, { immediate: true });
 
   watch(stakePool, async (sp) => {
     if (!sp) {
+      // TODO: refactory
       exchangeRate.value = 1;
-      fees.value.fee = 0;
-      fees.value.feeNext = 0;
-      fees.value.stakeDepositFee = 0;
-      fees.value.solDepositFee = 0;
-      fees.value.withdrawalFee = 0;
-      fees.value.solWithdrawalFee = 0;
-      fees.value.nextWithdrawalFee = 0;
-      fees.value.nextSolWithdrawalFee = 0;
-      fees.value.nextEpochFee = 0;
-      fees.value.solReferralFee = 0;
-      fees.value.stakeReferralFee = 0;
+      fees.fee = 0;
+      fees.feeNext = 0;
+      fees.stakeDepositFee = 0;
+      fees.solDepositFee = 0;
+      fees.withdrawalFee = 0;
+      fees.solWithdrawalFee = 0;
+      fees.nextWithdrawalFee = 0;
+      fees.nextSolWithdrawalFee = 0;
+      fees.nextEpochFee = 0;
+      fees.solReferralFee = 0;
+      fees.stakeReferralFee = 0;
       return;
     }
 
@@ -113,36 +142,62 @@ export const useStakePool = defineStore('stake-pool', () => {
       exchangeRate.value = divideBnToNumber(sp.poolTokenSupply, sp.totalLamports);
     }
 
-    fees.value.fee = divideBnToNumber(sp.epochFee.numerator, sp.epochFee.denominator);
-    fees.value.stakeDepositFee = divideBnToNumber(sp.stakeDepositFee.numerator, sp.stakeDepositFee.denominator);
-    fees.value.withdrawalFee = divideBnToNumber(sp.stakeWithdrawalFee.numerator, sp.stakeWithdrawalFee.denominator);
-    fees.value.solWithdrawalFee = divideBnToNumber(sp.solWithdrawalFee.numerator, sp.solWithdrawalFee.denominator);
-    fees.value.solDepositFee = divideBnToNumber(sp.solDepositFee.numerator, sp.solDepositFee.denominator);
+    // console.log('CalcLamportsWithdrawAmount:', calcLamportsWithdrawAmount(sp, solToLamports(1)));
+
+    console.log('sp ======================== ', sp);
+    console.log('TotalStakeLamports:', sp.totalLamports.toNumber());
+    console.log('PoolTokenSupply:', sp.poolTokenSupply.toNumber());
+    console.log('ExchangeRate:', exchangeRate.value);
+    console.log('Fees:', fees);
+
+    fees.fee = divideBnToNumber(sp.epochFee.numerator, sp.epochFee.denominator);
+    fees.stakeDepositFee = divideBnToNumber(
+      sp.stakeDepositFee.numerator,
+      sp.stakeDepositFee.denominator,
+    );
+    fees.withdrawalFee = divideBnToNumber(
+      sp.stakeWithdrawalFee.numerator,
+      sp.stakeWithdrawalFee.denominator,
+    );
+    fees.solWithdrawalFee = divideBnToNumber(
+      sp.solWithdrawalFee.numerator,
+      sp.solWithdrawalFee.denominator,
+    );
+    fees.solDepositFee = divideBnToNumber(sp.solDepositFee.numerator, sp.solDepositFee.denominator);
     if (sp.nextEpochFee != undefined) {
-      fees.value.nextEpochFee = divideBnToNumber(sp.nextEpochFee.numerator, sp.nextEpochFee.denominator);
+      fees.nextEpochFee = divideBnToNumber(sp.nextEpochFee.numerator, sp.nextEpochFee.denominator);
     }
     if (sp.nextWithdrawalFee != undefined) {
-      fees.value.nextWithdrawalFee = divideBnToNumber(sp.stakeWithdrawalFee.numerator, sp.stakeWithdrawalFee.denominator);
+      fees.nextWithdrawalFee = divideBnToNumber(
+        sp.stakeWithdrawalFee.numerator,
+        sp.stakeWithdrawalFee.denominator,
+      );
     }
     if (sp.nextSolWithdrawalFee != undefined) {
-      fees.value.nextSolWithdrawalFee = divideBnToNumber(sp.nextSolWithdrawalFee.numerator, sp.nextSolWithdrawalFee.denominator);
+      fees.nextSolWithdrawalFee = divideBnToNumber(
+        sp.nextSolWithdrawalFee.numerator,
+        sp.nextSolWithdrawalFee.denominator,
+      );
     }
     if (sp.nextEpochFee != undefined) {
-      fees.value.feeNext = divideBnToNumber(sp.nextEpochFee.numerator, sp.nextEpochFee.denominator);
+      fees.feeNext = divideBnToNumber(sp.nextEpochFee.numerator, sp.nextEpochFee.denominator);
     }
-    fees.value.solReferralFee = sp.solReferralFee != undefined ? sp.solReferralFee : 0; 
-    fees.value.stakeReferralFee = sp.stakeReferralFee != undefined ? sp.stakeReferralFee : 0; 
+    fees.solReferralFee = sp.solReferralFee != undefined ? sp.solReferralFee : 0;
+    fees.stakeReferralFee = sp.stakeReferralFee != undefined ? sp.stakeReferralFee : 0;
   });
 
+  const stakePoolAddress = computed(() => connectionStore.stakePoolAddress);
+  const connectionLost = computed(() => !stakePool.value);
+
   return {
-    stakePoolAddress,
+    fees,
     stakePool,
     exchangeRate,
     minRentBalance,
     reserveStakeBalance,
     lamportsPerSignature,
-    fees,
+    stakePoolAddress,
+    connectionLost,
     loadReserveStake,
-    connectionLost: computed(() => !stakePool.value),
   };
 });

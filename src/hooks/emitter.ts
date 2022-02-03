@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -27,7 +28,7 @@
 
 import mitt from 'mitt';
 
-const emitter = mitt();
+const emitter = mitt<any>();
 
 export function useEmitter() {
   return emitter;

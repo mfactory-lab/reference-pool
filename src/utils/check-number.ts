@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -41,22 +42,19 @@ export function isInvalidTime(n: string, p: string): boolean {
   else if (p == 'Epoch') max = 365;
 
   return num < 1 || num > max;
-
 }
 
-export function formatMoney(val: string | number, decimals: number = 2): string {
+export function formatMoney(val: string | number): string {
   if (typeof val === 'undefined' || val === null || val === '') {
-    return val;
+    return '';
   }
 
   val = val.toString();
 
   const decimalSeparator = val.lastIndexOf('.');
 
-  let integerPart =
-    decimalSeparator >= 0 ? val.slice(0, decimalSeparator) : val;
-  let fractionalPart =
-    decimalSeparator >= 0 ? val.slice(decimalSeparator + 1) : null;
+  let integerPart = decimalSeparator >= 0 ? val.slice(0, decimalSeparator) : val;
+  let fractionalPart = decimalSeparator >= 0 ? val.slice(decimalSeparator + 1) : null;
 
   if (fractionalPart) {
     fractionalPart = fractionalPart.slice(0, 2).replace(/[^0-9]+/g, '');

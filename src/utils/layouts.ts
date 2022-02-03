@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,9 +26,10 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { publicKey, struct, u32, u64, u8, bool, option, vec } from '@project-serum/borsh';
+import { bool, option, publicKey, struct, u32, u64, u8, vec } from '@project-serum/borsh';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
+// import {Fee} from "@/utils/spl/schema";
 
 export const ACCOUNT_LAYOUT = struct([
   publicKey('mint'),
@@ -53,12 +55,10 @@ export const MINT_LAYOUT = struct([
   publicKey('freezeAuthority'),
 ]);
 
-const feeFields = [
-  u64('denominator'),
-  u64('numerator'),
-];
+const feeFields = [u64('denominator'), u64('numerator')];
 
 export const STAKE_POOL_LAYOUT = struct([
+  // rustEnum(AccountTypeKind, 'accountType'),
   u8('accountType'),
   publicKey('manager'),
   publicKey('staker'),
@@ -72,11 +72,7 @@ export const STAKE_POOL_LAYOUT = struct([
   u64('totalLamports'),
   u64('poolTokenSupply'),
   u64('lastUpdateEpoch'),
-  struct([
-    u64('unixTimestamp'),
-    u64('epoch'),
-    publicKey('custodian'),
-  ], 'lockup'),
+  struct([u64('unixTimestamp'), u64('epoch'), publicKey('custodian')], 'lockup'),
   struct(feeFields, 'epochFee'),
   option(struct(feeFields), 'nextEpochFee'),
   option(publicKey(), 'preferredDepositValidatorVoteAddress'),
@@ -95,7 +91,7 @@ export const STAKE_POOL_LAYOUT = struct([
   u8('lastEpochTotalLamports'),
 ]);
 
-export class ValidatorStakeInfo {
+export interface ValidatorStakeInfo {
   status: number;
   voteAccountAddress: PublicKey;
   activeStakeLamports: BN;
@@ -131,7 +127,7 @@ export const VALIDATOR_STAKE_INFO_LAYOUT = struct<ValidatorStakeInfo>([
   publicKey('voteAccountAddress'),
 ]);
 
-export class ValidatorList {
+export interface ValidatorList {
   /// Account type, must be ValidatorList currently
   accountType: number;
   /// Maximum allowable number of validators

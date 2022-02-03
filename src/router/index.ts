@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,13 +26,13 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { createRouter, createMemoryHistory, createWebHashHistory } from 'vue-router';
+import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router';
 import routes from './routes';
 import type { App } from 'vue';
 
 const router = createRouter({
-  // history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
-  history: import.meta.env.SSR ? createMemoryHistory() : createWebHashHistory(),
+  history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
+  // history: import.meta.env.SSR ? createMemoryHistory() : createWebHashHistory(),
   scrollBehavior: () => ({ left: 0, top: 0 }),
   strict: true,
   routes,
@@ -40,6 +41,6 @@ const router = createRouter({
 export default router;
 
 // config router
-export function setupRouter(app: App<Element>) {
+export function setupRouter(app: App) {
   app.use(router);
 }

@@ -1,52 +1,56 @@
 {
   "compilerOptions": {
-    "jsx": "preserve",
-    "target": "esnext",
-    "module": "esnext",
-    "strict": true,
-    "esModuleInterop": true,
-    "incremental": false,
-    "skipLibCheck": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "noUnusedLocals": true,
-    "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
-    "strictFunctionTypes": false,
-    "strictPropertyInitialization": false,
     "baseUrl": ".",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "lib": [
-      "esnext",
-      "dom"
+      "ESNext",
+      "DOM",
+      "DOM.Iterable",
+      "ScriptHost"
     ],
+    "declaration": true,
+    "esModuleInterop": true,
+    "useDefineForClassFields": true,
+    "forceConsistentCasingInFileNames": true,
+    "preserveConstEnums": true,
+    "skipLibCheck": true,
+    "importHelpers": true,
+    "isolatedModules": false,
+    "strict": true,
+    "strictFunctionTypes": false,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "noImplicitAny": false,
+    "noImplicitThis": true,
+    "resolveJsonModule": true,
+    "removeComments": true,
     "types": [
       "vite/client",
-      "@types/jest",
       "quasar",
       "node"
     ],
-    "typeRoots": [
-      "node_modules/@types",
-      "typings"
-    ],
     "paths": {
-      "*": [
-        "types/*"
-      ],
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     }
   },
   "include": [
+    "tests/**/*.ts",
     "src/**/*.ts",
+    "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "src/**/*.d.ts"
+    "types/**/*.d.ts",
+    "types/**/*.ts",
+    "vite.config.ts"
   ],
   "exclude": [
+    "node_modules",
     "dist",
-    "public",
-    "node_modules"
+    "**/*.js"
   ]
 }

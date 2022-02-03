@@ -1,0 +1,15 @@
+/public
+/docs
+/bin
+node_modules
+dist
+.vscode
+.idea
+.husky
+.local
+*.woff
+*.ttf
+*.sh
+*.scss
+*.css
+*.svg

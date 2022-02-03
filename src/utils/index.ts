@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,16 +26,15 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import BN from 'bn.js';
 
+export * from './check-number';
 export * from './logger';
 export * from './web3';
 export * from './wallet';
 export * from './layouts';
-export * from './tokens';
-export * from './ids';
-
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+export * from './stake';
 
 export function lamportsToSol(lamports: number | BN): number {
   if (typeof lamports === 'number') {
@@ -49,20 +49,19 @@ export function lamportsToSol(lamports: number | BN): number {
   const absLamports = lamports.abs();
   const lamportsString = absLamports.toString(10).padStart(10, '0');
   const splitIndex = lamportsString.length - 9;
-  const solString =
-    lamportsString.slice(0, splitIndex) +
-    '.' +
-    lamportsString.slice(splitIndex);
+  const solString = lamportsString.slice(0, splitIndex) + '.' + lamportsString.slice(splitIndex);
   return signMultiplier * parseFloat(solString);
 }
 
-export function lamportsToSolString(
-  lamports: number | BN,
-  maximumFractionDigits = 9,
-): String {
+export function lamportsToSolString(lamports: number | BN, maximumFractionDigits = 9): String {
   const sol = lamportsToSol(lamports);
   return `◎ ${new Intl.NumberFormat('en-US', { maximumFractionDigits }).format(sol)}`;
 }
+
+// export const solToLamports = (amount: string | number | BN): number => {
+//   const val = new BN(amount, 10);
+//   return val.mul(new BN(LAMPORTS_PER_SOL, 10)).toNumber();
+// };
 
 export function solToLamports(amount: number): number {
   if (isNaN(amount)) return Number(0);
@@ -95,7 +94,7 @@ export const formatPct = new Intl.NumberFormat('en-US', {
 
 const SI_SYMBOL = ['', 'K', 'M', 'G', 'T', 'P', 'E'];
 
-const abbreviateNumber = (number: number, precision: number, trimZeros: boolean = false) => {
+const abbreviateNumber = (number: number, precision: number, trimZeros = false) => {
   const tier = (Math.log10(number) / 3) | 0;
   let scaled = number;
   const suffix = SI_SYMBOL[tier];
@@ -105,20 +104,14 @@ const abbreviateNumber = (number: number, precision: number, trimZeros: boolean 
   }
 
   if (isNaN(scaled)) {
-    return "";
+    return '';
   }
   const result = trimZeros ? Number(scaled.toFixed(precision)) : scaled.toFixed(precision);
-  return result + (typeof suffix === "string" ? suffix : "");
+  return result + (typeof suffix === 'string' ? suffix : '');
 };
 
-export const formatAmount = (
-  val: number,
-  precision = 5,
-  abbr = true,
-) => (abbr ? abbreviateNumber(val, precision) : val.toFixed(precision));
+export const formatAmount = (val: number, precision = 5, abbr = true) =>
+  abbr ? abbreviateNumber(val, precision) : val.toFixed(precision);
 
-export const formatAndTrimAmount = (
-  val: number,
-  precision = 5,
-  abbr = true,
-) => (abbr ? abbreviateNumber(val, precision, true) : Number(val.toFixed(precision)));
+export const formatAndTrimAmount = (val: number, precision = 5, abbr = true) =>
+  abbr ? abbreviateNumber(val, precision, true) : Number(val.toFixed(precision));

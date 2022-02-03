@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -27,50 +28,55 @@
 
 import { defineStore } from 'pinia';
 import {
-  Connection,
+  Cluster,
   Commitment,
+  Connection,
   PublicKey,
-  TransactionInstruction,
   Signer,
   Transaction,
-  Cluster,
+  TransactionInstruction,
 } from '@solana/web3.js';
-import { ENDPOINTS, DEFAULT_COMMITMENT, DEFAULT_ENDPOINT } from '@/config';
-import { ref, computed } from 'vue';
-import { useLocalStorage } from '@vueuse/core';
+import { DEFAULT_COMMITMENT, DEFAULT_ENDPOINT, ENDPOINTS } from '@/config';
+import { useStorage } from '@vueuse/core';
 import { WalletAdapter } from '@/utils';
 
-export type ExtendedCluster = Cluster | 'localnet'
+export type ExtendedCluster = Cluster | 'localnet';
 
 export interface Endpoint {
-  name: ExtendedCluster,
-  url: string,
-  stakePoolAddress: string,
-  stakeLimit?: number,
+  name: ExtendedCluster;
+  url: string;
+  stakePoolAddress: string;
+  stakeLimit?: number;
 }
 
-export const useConnection = defineStore('connection', () => {
-  const commitment = ref<Commitment>(DEFAULT_COMMITMENT);
-  const cluster = useLocalStorage<ExtendedCluster>('cluster', DEFAULT_ENDPOINT.name);
-  const endpoint = computed<Endpoint | undefined>(
-    () => ENDPOINTS.find((e) => e.name === cluster.value),
-  );
-
-  const connection = computed(() => new Connection(endpoint.value!.url, commitment.value));
-
-  const stakePoolAddress = computed(() => endpoint.value ?
-    new PublicKey(endpoint.value?.stakePoolAddress) : null);
-
-  return {
-    cluster,
-    endpoint,
-    commitment,
-    connection,
-    stakePoolAddress,
-    stakeLimit: computed(() => endpoint.value?.stakeLimit ?? 0),
-    setCluster: (v: ExtendedCluster) => cluster.value = v,
-    setCommitment: (v: Commitment) => commitment.value = v,
-  };
+export const useConnectionStore = defineStore({
+  id: 'connection',
+  state: () => ({
+    commitment: DEFAULT_COMMITMENT,
+    cluster: useStorage<ExtendedCluster>('cluster', DEFAULT_ENDPOINT.name),
+  }),
+  getters: {
+    endpoint(state) {
+      return ENDPOINTS.find((e) => e.name === state.cluster)!;
+    },
+    connection(state): Connection {
+      return new Connection(this.endpoint.url, state.commitment);
+    },
+    stakePoolAddress(): PublicKey | null {
+      return this.endpoint ? new PublicKey(this.endpoint.stakePoolAddress) : null;
+    },
+    stakeLimit(): number {
+      return this.endpoint.stakeLimit ?? 0;
+    },
+  },
+  actions: {
+    setCluster(cluster: ExtendedCluster) {
+      this.cluster = cluster;
+    },
+    setCommitment(commitment: Commitment) {
+      this.commitment = commitment;
+    },
+  },
 });
 
 /**
@@ -89,16 +95,27 @@ export async function sendTransaction(
   let transaction = new Transaction({ feePayer: wallet.publicKey });
   transaction.add(...instructions);
   transaction.recentBlockhash = (await connection.getRecentBlockhash('finalized')).blockhash;
+
   if (signers.length > 0) {
     transaction.partialSign(...signers);
   }
+
   transaction = await wallet.signTransaction(transaction);
   const rawTransaction = transaction.serialize();
+
+  // if (simulate) {
+  //   const simulation = await connection.simulateTransaction(transaction);
+  //   console.log('TX Simulation:', simulation);
+  //   return simulation;
+  // }
 
   const result = await connection.sendRawTransaction(rawTransaction, {
     skipPreflight: true,
     preflightCommitment: DEFAULT_COMMITMENT,
   });
+
+  console.log('TX(signature): ', result.toString());
+  console.log('TX(base64): ', rawTransaction.toString('base64'));
 
   return result;
 }

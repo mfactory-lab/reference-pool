@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -26,24 +27,22 @@
  */
 
 import {
-  Transaction,
-  Connection,
-  Signer,
   Commitment,
-  PublicKey,
-  AccountInfo,
-  SystemProgram,
-  TransactionInstruction,
+  Connection,
   Keypair,
+  PublicKey,
+  SYSVAR_RENT_PUBKEY,
+  Signer,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
 } from '@solana/web3.js';
-
-// import { initializeAccount } from '@project-serum/serum/lib/token-instructions'
 import * as struct from 'superstruct';
 import assert from 'assert';
-
-import { ACCOUNT_LAYOUT, RENT_PROGRAM_ID, SYSTEM_PROGRAM_ID, MINT_LAYOUT, TOKENS } from '@/utils';
-import { ASSOCIATED_TOKEN_PROGRAM_ID, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { initializeAccount } from '@project-serum/serum/lib/token-instructions';
+
+import { ACCOUNT_LAYOUT, MINT_LAYOUT } from './layouts';
 
 /**
  * The level of commitment desired when querying state
@@ -117,24 +116,14 @@ const AccountInfoResult = struct.type({
   rentEpoch: struct.nullable(struct.number()),
 });
 
-export async function findProgramAddress(
-  seeds: Array<Buffer | Uint8Array>,
-  programId: PublicKey,
-) {
-  const [publicKey, nonce] = await PublicKey.findProgramAddress(
-    seeds,
-    programId,
-  );
+export async function findProgramAddress(seeds: Array<Buffer | Uint8Array>, programId: PublicKey) {
+  const [publicKey, nonce] = await PublicKey.findProgramAddress(seeds, programId);
   return { publicKey, nonce };
 }
 
 export async function createAmmAuthority(programId: PublicKey) {
   return await findProgramAddress(
-    [
-      new Uint8Array(
-        Buffer.from('amm authority'.replace('\u00A0', ' '), 'utf-8'),
-      ),
-    ],
+    [new Uint8Array(Buffer.from('amm authority'.replace('\u00A0', ' '), 'utf-8'))],
     programId,
   );
 }
@@ -156,11 +145,7 @@ export async function findAssociatedTokenAddress(
   tokenMintAddress: PublicKey,
 ) {
   const { publicKey } = await findProgramAddress(
-    [
-      walletAddress.toBuffer(),
-      TOKEN_PROGRAM_ID.toBuffer(),
-      tokenMintAddress.toBuffer(),
-    ],
+    [walletAddress.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), tokenMintAddress.toBuffer()],
     ASSOCIATED_TOKEN_PROGRAM_ID,
   );
   return publicKey;
@@ -203,38 +188,6 @@ export async function createTokenAccountIfNotExist(
   return publicKey;
 }
 
-export async function createAssociatedTokenAccountIfNotExist(
-  account: string | undefined | null,
-  owner: PublicKey,
-  mint: PublicKey,
-  transaction: Transaction,
-) {
-  let publicKey;
-  if (account) {
-    publicKey = new PublicKey(account);
-  }
-
-  const ata = await Token.getAssociatedTokenAddress(ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, mint, owner, true);
-
-  if (
-    (!publicKey || !ata.equals(publicKey)) &&
-    mint.toBase58() !== TOKENS.WSOL.mintAddress
-  ) {
-    transaction.add(
-      Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        mint,
-        ata,
-        owner,
-        owner,
-      ),
-    );
-  }
-
-  return ata;
-}
-
 export async function createProgramAccountIfNotExist(
   connection: Connection,
   account: string | undefined | null,
@@ -254,9 +207,7 @@ export async function createProgramAccountIfNotExist(
     // eslint-disable-next-line prefer-destructuring
     publicKey = newAccount.publicKey;
 
-    lamports =
-      lamports ??
-      (await connection.getMinimumBalanceForRentExemption(layout.span));
+    lamports = lamports ?? (await connection.getMinimumBalanceForRentExemption(layout.span));
 
     transaction.add(
       SystemProgram.createAccount({
@@ -279,10 +230,7 @@ export async function createAssociatedTokenAccount(
   owner: PublicKey,
   transaction: Transaction,
 ) {
-  const associatedTokenAddress = await findAssociatedTokenAddress(
-    owner,
-    tokenMintAddress,
-  );
+  const associatedTokenAddress = await findAssociatedTokenAddress(owner, tokenMintAddress);
 
   const keys = [
     {
@@ -306,7 +254,7 @@ export async function createAssociatedTokenAccount(
       isWritable: false,
     },
     {
-      pubkey: SYSTEM_PROGRAM_ID,
+      pubkey: SystemProgram.programId,
       isSigner: false,
       isWritable: false,
     },
@@ -316,7 +264,7 @@ export async function createAssociatedTokenAccount(
       isWritable: false,
     },
     {
-      pubkey: RENT_PROGRAM_ID,
+      pubkey: SYSVAR_RENT_PUBKEY,
       isSigner: false,
       isWritable: false,
     },
@@ -333,11 +281,7 @@ export async function createAssociatedTokenAccount(
   return associatedTokenAddress;
 }
 
-export async function createTokenAccount(
-  connection: Connection,
-  wallet: any,
-  mint: string,
-) {
+export async function createTokenAccount(connection: Connection, wallet: any, mint: string) {
   const transaction = new Transaction();
   const signers: Signer[] = [];
   const owner = wallet.publicKey;
@@ -361,7 +305,7 @@ export async function getMultipleAccounts(
   connection: Connection,
   publicKeys: PublicKey[],
   commitment?: Commitment,
-): Promise<Array<null | { publicKey: PublicKey, account: AccountInfo<Buffer> }>> {
+) {
   const keys: string[][] = [];
   let tempKeys: string[] = [];
 
@@ -378,10 +322,10 @@ export async function getMultipleAccounts(
   }
 
   const accounts: Array<null | {
-    executable: any,
-    owner: PublicKey,
-    lamports: any,
-    data: Buffer
+    executable: any;
+    owner: PublicKey;
+    lamports: any;
+    data: Buffer;
   }> = [];
 
   for (const key of keys) {
@@ -397,9 +341,9 @@ export async function getMultipleAccounts(
     if ('error' in res) {
       throw new Error(
         'failed to get info about accounts ' +
-        publicKeys.map((k) => k.toBase58()).join(', ') +
-        ': ' +
-        res.error.message,
+          publicKeys.map((k) => k.toBase58()).join(', ') +
+          ': ' +
+          res.error.message,
       );
     }
 
@@ -451,14 +395,8 @@ function throwIfNull<T>(value: T | null, message = 'account not found'): T {
   return value;
 }
 
-export async function getMintDecimals(
-  connection: Connection,
-  mint: PublicKey,
-): Promise<number> {
-  const { data } = throwIfNull(
-    await connection.getAccountInfo(mint),
-    'mint not found',
-  );
+export async function getMintDecimals(connection: Connection, mint: PublicKey): Promise<number> {
+  const { data } = throwIfNull(await connection.getAccountInfo(mint), 'mint not found');
   const { decimals } = MINT_LAYOUT.decode(data);
   return decimals;
 }
@@ -490,9 +428,7 @@ async function covertToProgramWalletTransaction(
   transaction: Transaction,
   signers: Array<Signer> = [],
 ) {
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash(commitment)
-  ).blockhash;
+  transaction.recentBlockhash = (await connection.getRecentBlockhash(commitment)).blockhash;
   transaction.feePayer = wallet.publicKey;
   if (signers.length > 0) {
     transaction = await wallet.convertToProgramWalletTransaction(transaction);
@@ -508,9 +444,7 @@ export async function signTransaction(
   transaction: Transaction,
   signers: Array<Signer> = [],
 ) {
-  transaction.recentBlockhash = (
-    await connection.getRecentBlockhash()
-  ).blockhash;
+  transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
   transaction.setSigners(wallet.publicKey, ...signers.map((s) => s.publicKey));
   if (signers.length > 0) {
     transaction.partialSign(...signers);
@@ -544,11 +478,6 @@ export async function sendTransaction(
     );
     return await wallet.signAndSendTransaction(programWalletTransaction);
   }
-  const signedTransaction = await signTransaction(
-    connection,
-    wallet,
-    transaction,
-    signers,
-  );
+  const signedTransaction = await signTransaction(connection, wallet, transaction, signers);
   return await sendSignedTransaction(connection, signedTransaction);
 }

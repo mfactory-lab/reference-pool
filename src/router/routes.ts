@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,24 +26,24 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { RouteRecordRaw } from 'vue-router'
+import { RouteRecordRaw } from 'vue-router';
 
-const pages = import.meta.glob(`../pages/*.vue`)
+const pages = import.meta.glob(`../pages/*.vue`);
 
 function createRoutes(prefix = '') {
   return Object.keys(pages)
     .map((path) => {
-      const matches = path.match(/\.\/pages\/(.*)\.vue$/)
-      let name = ''
-      if (matches) {
-        name = matches[1].toLowerCase()
+      const matches = path.match(/\.\/pages\/(.*)\.vue$/);
+      let name = '';
+      if (matches && matches[1]) {
+        name = matches[1].toLowerCase();
       }
       return {
         path: ['home', 'index'].includes(name) ? prefix : prefix + name,
         component: pages[path], // () => import('./pages/*.vue')
-      }
+      };
     })
-    .filter((route) => !route.path.startsWith('/_'))
+    .filter((route) => !route.path.startsWith('/_'));
 }
 
 export default [
@@ -56,4 +57,4 @@ export default [
     component: () => import('@/pages/404.vue'),
     children: [],
   },
-] as RouteRecordRaw[]
+] as RouteRecordRaw[];

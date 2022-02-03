@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,23 +26,23 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
+import { PublicKey } from '@solana/web3.js';
+import { useConnectionStore, useWalletStore } from '@/store';
 import { solToLamports } from '@/utils';
 import { useMonitorTransaction } from './monitor';
-import { PublicKey } from '@solana/web3.js';
-import { storeToRefs } from 'pinia';
-import { useConnection } from '@/store';
-import { useWallet } from '@/store/modules/wallet';
+
+const DEFAULT_AMOUNT = 1;
 
 export function useAirdrop() {
-  const { connection } = storeToRefs(useConnection());
-  const { wallet, connected } = storeToRefs(useWallet());
+  const connectionStore = useConnectionStore();
+  const walletStore = useWalletStore();
   const { monitorTransaction, sending } = useMonitorTransaction();
   return {
-    airdroping: sending,
-    airdrop: async (amount = 10) => {
-      if (connected.value) {
-        const sign = await connection.value!.requestAirdrop(
-          wallet.value?.publicKey as PublicKey,
+    airdropping: sending,
+    airdrop: async (amount = DEFAULT_AMOUNT) => {
+      if (walletStore.connected) {
+        const sign = await connectionStore.connection.requestAirdrop(
+          walletStore.wallet?.publicKey as PublicKey,
           solToLamports(amount),
         );
         await monitorTransaction(sign);
