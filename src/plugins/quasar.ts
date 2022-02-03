@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -25,7 +26,7 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { Notify, LocalStorage, Dark, QuasarPluginOptions, Quasar } from 'quasar';
+import { Dark, LocalStorage, Notify, Quasar, QuasarPluginOptions } from 'quasar';
 import iconSet from 'quasar/icon-set/eva-icons';
 import { App } from 'vue';
 
