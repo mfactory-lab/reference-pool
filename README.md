@@ -1,5 +1,5 @@
 # Reference Stake Pool (Solana Blockchain)
-Abstract
+## Abstract
 
 Stake Pools are a new concept that has been introduced to improve the stake distribution across the validator network.
 Delegating via stake pool is good for the Solana network:
@@ -19,6 +19,10 @@ Following tasks must be completed to launch your own stake pool:
 It is also recommended to do the following:
 * Write documentation and guides for your users
 * Negotiate with DeFi platforms to have your pool token added as an asset to liquidity pools, lending solutions, and other DeFi services
+
+## Prototype Stake Pool
+
+A fully functioning prototype stake pool is running at https://mfactory-lab.github.io/reference-pool/#/
 
 ## Requirements
 
