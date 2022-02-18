@@ -1,4 +1,4 @@
-# reference-pool
+# Reference Stake Pool (Solana Blockchain)
 Abstract
 
 Stake Pools are a new concept that has been introduced to improve the stake distribution across the validator network.
@@ -20,10 +20,10 @@ It is also recommended to do the following:
 * Write documentation and guides for your users
 * Negotiate with DeFi platforms to have your pool token added as an asset to liquidity pools, lending solutions, and other DeFi services
 
-## Requirement
+## Requirements
 
 - Familiarity with the command line
-- For running this application you need to have [NodeJs](https://nodejs.org/en/)
+- [NodeJs](https://nodejs.org/en/)
 - [Yarn](https://yarnpkg.com/) package manager
 
 ## Getting Started
@@ -34,7 +34,7 @@ It is also recommended to do the following:
 
 ### Clone to local
 
-If you prefer to do it manually with the cleaner git history
+If you prefer to do it manually with cleaner git history:
 
 ```bash
 # clone repository
@@ -52,7 +52,7 @@ $ yarn dev
 
 ## Community
 
-We have a few channels for contact:
+You can contact us via following channels:
 
 - [Discord](https://discord.com/invite/qR4BA9QXVR) 
 - [Twitter](https://twitter.com/JPoolSolana) 
@@ -60,27 +60,27 @@ We have a few channels for contact:
 
 ## Built With
 
-- [TypeScript](https://www.typescriptlang.org/) - Primary language
-- [Vite](https://vitejs.dev/) - An extremely fast frontend tooling
-- [Vue](https://vuejs.org/) - Framework
+- [TypeScript](https://www.typescriptlang.org/): primary language
+- [Vite](https://vitejs.dev/): an extremely fast frontend tooling
+- [Vue](https://vuejs.org/): framework
 - [VS Code Extensions](./.vscode/extensions.json)
-  - [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) - Vue 3 `<script setup>` IDE support
+  - [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar): Vue 3 `<script setup>` IDE support
   - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 
 ## How to Contribute
 
-We are delighted that you're helping make this open source project better. 
-Here are a few quick guidelines to make this an easier and better process for everyone.
+We are delighted that you want to help improve this open source project.
+Here are a few quick guidelines to make the process easy and efficient for everyone involved.
 
-### Reporting a bug
+### Reporting a Bug
 
 First, **make sure the bug hasn't already been reported** by searching GitHub's issues section.
 
-If no existing issue exists, go ahead and create one. **Please be sure to include all of the following**:
+If no such issue exists, go ahead and create one. **Please be sure to include all of the following**:
 
-1. A clear, descriptive title (ie. "A bug" is not a good title).
-2. Include the error message if have.
-3. The browser and OS that you're using.
+1. A clear, descriptive title (i.e. "A bug" is not a good title).
+2. The error message if applicable.
+3. Your OS and browser information.
 
 ## License
 
