@@ -49,13 +49,13 @@ export const STAKE_PROGRAM_ID = StakeProgram.programId;
 export const ENDPOINTS: Endpoint[] = [
   {
     name: 'mainnet-beta',
-    url: 'https://mainnet.rpcpool.com/', // clusterApiUrl('mainnet-beta'),
+    url: 'https://mainnet.rpcpool.com/',
     stakePoolAddress: 'CtMyWsrUtAwXWiGr9WjHT5fC3p3fgV8cyGpLTo2LJzG1',
     stakeLimit: 150000,
   },
   {
     name: 'testnet',
-    url: 'https://testnet.rpcpool.com/', // clusterApiUrl('testnet'),
+    url: 'https://testnet.rpcpool.com/',
     stakePoolAddress: 'AeuEVJrnL5SwftWzchEfqMkKXPxLcZjrFtShdAZ7FwKy',
     stakeLimit: 100000,
   },
@@ -75,7 +75,7 @@ if (isDev) {
   });
 }
 
-export const DEFAULT_ENDPOINT = ENDPOINTS[0];
+export const DEFAULT_ENDPOINT = ENDPOINTS[0] as Endpoint;
 
 /**
  * The level of commitment desired when querying state

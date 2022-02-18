@@ -28,12 +28,11 @@
 
 import { defineStore, storeToRefs } from 'pinia';
 import { computed, ref, watch } from 'vue';
-import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js';
+import { AccountInfo, ParsedAccountData, PublicKey, StakeProgram } from '@solana/web3.js';
 import { useConnectionStore, useWalletStore } from '@/store';
 import { getFilteredProgramAccounts, lamportsToSol } from '@/utils';
 
 import { STAKE_PROGRAM_ID } from '@/config';
-import { STAKE_STATE_LEN } from '@solana/spl-stake-pool/src/constants';
 
 export interface ProgramAccount {
   pubkey: PublicKey;
@@ -69,7 +68,7 @@ export const useStakeAccountStore = defineStore('stake-accounts', () => {
           bytes: walletPubKey.value.toBase58(),
         },
       },
-      { dataSize: STAKE_STATE_LEN },
+      { dataSize: StakeProgram.space },
       // {
       //   memcmp: {
       //     offset: 44,

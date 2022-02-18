@@ -33,9 +33,9 @@ import { useEmitter } from '@/hooks';
 
 import { StakePool, getStakePoolAccount } from '@solana/spl-stake-pool';
 import { divideBnToNumber } from '@solana/spl-stake-pool/src/utils';
-import { STAKE_STATE_LEN } from '@solana/spl-stake-pool/src/constants';
 
 import { POOL_CONNECTION_DELAY } from '@/config';
+import { StakeProgram } from '@solana/web3.js';
 
 export const useStakePoolStore = defineStore('stake-pool', () => {
   const connectionStore = useConnectionStore();
@@ -53,7 +53,7 @@ export const useStakePoolStore = defineStore('stake-pool', () => {
     solDepositFee: 0,
     withdrawalFee: 0,
     solWithdrawalFee: 0,
-    nextWithdrawalFee: 0,
+    nextStakeWithdrawalFee: 0,
     nextSolWithdrawalFee: 0,
     nextEpochFee: 0,
     solReferralFee: 0,
@@ -94,7 +94,7 @@ export const useStakePoolStore = defineStore('stake-pool', () => {
 
   async function loadMinRentBalance() {
     minRentBalance.value = await connectionStore.connection.getMinimumBalanceForRentExemption(
-      STAKE_STATE_LEN,
+      StakeProgram.space,
     );
     console.log(`MinimumBalanceForRentExemption:`, minRentBalance.value);
   }
@@ -128,7 +128,7 @@ export const useStakePoolStore = defineStore('stake-pool', () => {
       fees.solDepositFee = 0;
       fees.withdrawalFee = 0;
       fees.solWithdrawalFee = 0;
-      fees.nextWithdrawalFee = 0;
+      fees.nextStakeWithdrawalFee = 0;
       fees.nextSolWithdrawalFee = 0;
       fees.nextEpochFee = 0;
       fees.solReferralFee = 0;
@@ -167,8 +167,8 @@ export const useStakePoolStore = defineStore('stake-pool', () => {
     if (sp.nextEpochFee != undefined) {
       fees.nextEpochFee = divideBnToNumber(sp.nextEpochFee.numerator, sp.nextEpochFee.denominator);
     }
-    if (sp.nextWithdrawalFee != undefined) {
-      fees.nextWithdrawalFee = divideBnToNumber(
+    if (sp.nextStakeWithdrawalFee != undefined) {
+      fees.nextStakeWithdrawalFee = divideBnToNumber(
         sp.stakeWithdrawalFee.numerator,
         sp.stakeWithdrawalFee.denominator,
       );
