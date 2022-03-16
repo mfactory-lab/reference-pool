@@ -480,7 +480,7 @@
             const value = from ? (from - depositFeeVal) * exchangeRate.value : 0;
             return {
               networkFee: depositFeeVal + ' SOL',
-              poolFee: formatAmount((value > 0 ? value : 0) * fees.value.solDepositFee) + ' JSOL',
+              poolFee: formatAmount((value > 0 ? value : 0) * fees.value.solDepositFee) + ' xSOL',
             };
           }
           const from = unstake.from;
@@ -490,7 +490,7 @@
           const withdrawFeeVal = from * withdrawRealFee;
           return {
             networkFee: lamportsToSol(withdrawFee.value) + ' SOL',
-            poolFee: formatAmount(withdrawFeeVal) + ' JSOL',
+            poolFee: formatAmount(withdrawFeeVal) + ' xSOL',
           };
         }),
 
