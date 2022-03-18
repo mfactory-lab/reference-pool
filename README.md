@@ -58,9 +58,9 @@ $ yarn dev
 
 You can contact us via following channels:
 
-- [Discord](https://discord.com/invite/qR4BA9QXVR) 
+- [Discord](https://discord.gg/RpUHMkVCxN) 
 - [Twitter](https://twitter.com/JPoolSolana) 
-- [Telegram](https://t.me/jpoolsolana) 
+- [Telegram](https://t.me/+87EmXvpxuRhkYzMy) 
 
 ## Built With
 
