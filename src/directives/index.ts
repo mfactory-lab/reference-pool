@@ -26,6 +26,6 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import clickOutside from './click-outside';
+import clickOutside from './click-outside'
 
-export { clickOutside };
+export { clickOutside }

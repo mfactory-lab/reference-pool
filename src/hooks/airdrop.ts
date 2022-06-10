@@ -26,27 +26,26 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { PublicKey } from '@solana/web3.js';
-import { useConnectionStore, useWalletStore } from '@/store';
-import { solToLamports } from '@/utils';
-import { useMonitorTransaction } from './monitor';
-
-const DEFAULT_AMOUNT = 1;
+import type { PublicKey } from '@solana/web3.js'
+import { useWallet } from 'solana-wallets-vue'
+import { useMonitorTransaction } from './monitor'
+import { useConnectionStore } from '@/store'
+import { solToLamports } from '@/utils'
 
 export function useAirdrop() {
-  const connectionStore = useConnectionStore();
-  const walletStore = useWalletStore();
-  const { monitorTransaction, sending } = useMonitorTransaction();
+  const { connection } = useConnectionStore()
+  const { wallet, connected } = useWallet()
+  const { monitorTransaction, sending } = useMonitorTransaction()
   return {
     airdropping: sending,
-    airdrop: async (amount = DEFAULT_AMOUNT) => {
-      if (walletStore.connected) {
-        const sign = await connectionStore.connection.requestAirdrop(
-          walletStore.wallet?.publicKey as PublicKey,
+    airdrop: async (amount = 10) => {
+      if (connected.value) {
+        const sign = await connection.requestAirdrop(
+          wallet.value?.publicKey as PublicKey,
           solToLamports(amount),
-        );
-        await monitorTransaction(sign);
+        )
+        await monitorTransaction(sign)
       }
     },
-  };
+  }
 }

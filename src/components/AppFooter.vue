@@ -33,7 +33,7 @@
         <div class="col justify-between d-flex column">
           <div class="text-caption">
             © Copyright 2021 xxx. All rights reserved.
-            <br />
+            <br>
             Powered by
             <a href="https://mfactory.tech/" target="_blank">mFactory GmbH</a>
           </div>
@@ -41,10 +41,18 @@
         <div class="col col-12 col-md-auto justify-between q-mt-auto d-flex column">
           <div :class="$style.nav" class="row text-caption footer-links">
             <a href="#" target="_blank">Documentation</a>
-            <router-link to="/terms">Terms of Service</router-link>
-            <router-link to="/impressum">Legal Disclosure</router-link>
-            <router-link to="/privacy">Privacy</router-link>
-            <router-link to="/pool-info">Pool Info</router-link>
+            <router-link to="/terms">
+              Terms of Service
+            </router-link>
+            <router-link to="/impressum">
+              Legal Disclosure
+            </router-link>
+            <router-link to="/privacy">
+              Privacy
+            </router-link>
+            <router-link to="/pool-info">
+              Pool Info
+            </router-link>
           </div>
         </div>
       </div>
@@ -76,6 +84,7 @@
     }
   }
 </style>
+
 <style lang="scss" scope>
   .contact-title {
     text-align: right;

@@ -27,10 +27,10 @@
  */
 
 interface PairData {
-  timeClose: string;
+  timeClose: string
   quote: {
-    close: number;
-  };
+    close: number
+  }
 }
 
 /*
@@ -42,15 +42,15 @@ export async function getPairIntervalPrice(
   count = 30,
 ) {
   return new Promise<Array<PairData>>((resolve, reject) => {
-    const timeEnd = String(Date.now()).slice(0, -3);
-    const timeStart = Number(timeEnd) - (count + 1) * 3600 * 24;
+    const timeEnd = String(Date.now()).slice(0, -3)
+    const timeStart = Number(timeEnd) - (count + 1) * 3600 * 24
     fetch(
       `https://api.coinmarketcap.com/data-api/v3/cryptocurrency/historical?id=${id}&convertId=${convertTo}&timeStart=${timeStart}&timeEnd=${timeEnd}&interval=hourly`,
     )
       // fetch(`https://api.coinmarketcap.com/data-api/v3/cryptocurrency/detail/chart?id=${id}&range=${range}${convertId}`)
       // fetch(`https://api.coinmarketcap.com/data-api/v3/cryptocurrency/detail/chart?id=${id}&interval=daily${convertId}count=31`)
       // https://web-api.coinmarketcap.com/v1.1/cryptocurrency/quotes/historical?aux=search_interval,market_cap&format=chart&id=1,1027,1839,825,5426,2010,3408,52,6636,74&include_global=true&interval=weekly&time_end=1639602000&time_start=2013-04-28
-      .then((res) => res.json())
+      .then(res => res.json())
       .then(
         (resp) => {
           // console.log('getPairIntervalPrice ====================================== ')
@@ -58,14 +58,14 @@ export async function getPairIntervalPrice(
           // console.log('to  ===== ', convertTo)
           // console.log('resp ===== ', resp)
           if (resp.data?.quotes) {
-            resolve(resp.data.quotes);
+            resolve(resp.data.quotes)
           } else {
-            reject(Error('Promise rejected'));
+            reject(Error('Promise rejected'))
           }
         },
         (error) => {
-          console.error(error);
+          console.error(error)
         },
-      );
-  });
+      )
+  })
 }

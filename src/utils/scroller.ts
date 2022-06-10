@@ -26,14 +26,16 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { scroll } from 'quasar';
+import { scroll } from 'quasar'
 
-const { getScrollTarget, setVerticalScrollPosition } = scroll;
+const { getScrollTarget, setVerticalScrollPosition } = scroll
 
 export default function handleScroll(element: string, additionalOffset = 0, duration = 500) {
-  const ele = document.getElementById(element); // You need to get your element here
-  if (!ele) return;
-  const target = getScrollTarget(ele);
-  const offset = ele.offsetTop + additionalOffset;
-  setVerticalScrollPosition(target, offset, duration);
+  const ele = document.getElementById(element) // You need to get your element here
+  if (!ele) {
+    return
+  }
+  const target = getScrollTarget(ele)
+  const offset = ele.offsetTop + additionalOffset
+  setVerticalScrollPosition(target, offset, duration)
 }

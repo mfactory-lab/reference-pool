@@ -26,6 +26,31 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { copyToClipboard, useQuasar } from 'quasar'
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  props: {
+    text: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
+    const { notify } = useQuasar()
+    return {
+      copy() {
+        copyToClipboard(props.text)
+        notify({
+          message: 'Copied to clipboard',
+        })
+      },
+    }
+  },
+})
+</script>
+
 <template>
   <q-btn flat round dense>
     <svg
@@ -49,28 +74,3 @@
     </q-tooltip>
   </q-btn>
 </template>
-
-<script lang="ts">
-  import { copyToClipboard, useQuasar } from 'quasar';
-  import { defineComponent } from 'vue';
-
-  export default defineComponent({
-    props: {
-      text: {
-        type: String,
-        required: true,
-      },
-    },
-    setup(props) {
-      const { notify } = useQuasar();
-      return {
-        copy() {
-          copyToClipboard(props.text);
-          notify({
-            message: 'Copied to clipboard',
-          });
-        },
-      };
-    },
-  });
-</script>

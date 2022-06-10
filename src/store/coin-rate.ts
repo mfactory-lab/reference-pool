@@ -26,34 +26,38 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { defineStore } from 'pinia';
-import { getTokenPrice } from '@/utils/coingecko';
-import { SOL_USD_RELOAD_DURATION } from '@/config';
-import { reactive, toRefs } from 'vue';
+import { ref } from 'vue'
+import { defineStore } from 'pinia'
+import { useIntervalFn, useLocalStorage } from '@vueuse/core'
+import { getTokenPrice } from '@/utils/coingecko'
+import { RATES_RELOAD_INTERVAL } from '@/config'
 
 export const useCoinRateStore = defineStore('coin-rate', () => {
-  const state = reactive({
-    solPrice: 0,
-    solVol24: 0,
-    solChange24: 0,
-    solChangePercentage24: 0,
-  });
+  const solPrice = useLocalStorage('sol-price', 200)
+  const solVol24 = ref(0)
+  const solChange24 = ref(0)
+  const solChangePercentage24 = ref(0)
+  const loading = ref(false)
 
   async function load() {
-    const resp = await getTokenPrice();
-    console.log('[CoinRate]', resp);
-
-    state.solPrice = resp.current_price;
-    state.solVol24 = resp.total_volume;
-    state.solChange24 = resp.price_change_24h;
-    state.solChangePercentage24 = resp.price_change_percentage_24h_in_currency;
+    loading.value = true
+    const resp = await getTokenPrice()
+    solPrice.value = resp.current_price
+    solVol24.value = resp.total_volume
+    solChange24.value = resp.price_change_24h
+    solChangePercentage24.value = resp.price_change_percentage_24h_in_currency
+    loading.value = false
+    console.log('[CoinRate]', resp)
   }
 
-  load().then();
+  useIntervalFn(load, RATES_RELOAD_INTERVAL, { immediateCallback: true })
 
-  if (SOL_USD_RELOAD_DURATION > 0) {
-    setInterval(load, SOL_USD_RELOAD_DURATION);
+  return {
+    solPrice,
+    solVol24,
+    solChange24,
+    solChangePercentage24,
+    loading,
+    load,
   }
-
-  return toRefs(state);
-});
+})

@@ -26,24 +26,24 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script type="ts">
+import FirstlookSection from './home/FirstlookSection.vue'
+import FaqSection from './home/FaqSection.vue'
+import ConnectionLost from '@/components/ConnectionLost.vue'
+
+export default {
+  components: {
+    FaqSection,
+    FirstlookSection,
+    ConnectionLost,
+  },
+}
+</script>
+
 <template>
   <q-page>
-    <connection-lost />
-    <firstlook-section />
-    <faq-section />
+    <ConnectionLost />
+    <FirstlookSection />
+    <FaqSection />
   </q-page>
 </template>
-
-<script type="ts">
-  import ConnectionLost from '@/components/ConnectionLost.vue'
-    import FirstlookSection from './home/FirstlookSection.vue'
-    import FaqSection from './home/FaqSection.vue'
-
-    export default {
-      components: {
-        FaqSection,
-        FirstlookSection,
-        ConnectionLost,
-      },
-    }
-</script>

@@ -26,39 +26,23 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-/*
- * length is count of intervals
- */
-export async function getPairIntervalPriceBinance(
-  pair = 'SOLUSDT',
-  length = 31,
-  interval = '1d',
-): Promise<Array<Array<number | string>>> {
-  return new Promise((resolve, reject) => {
-    fetch(
-      `https://api.binance.com/api/v3/klines?limit=${length}&symbol=${pair}&interval=${interval}`,
-    )
-      .then((res) => res.json())
-      .then(
-        (resp) => {
-          console.log('resp ===== ', resp);
-          if (resp) {
-            resolve(resp);
-          } else {
-            reject(Error('Promise rejected'));
-          }
-        },
-        (error) => {
-          console.error(error);
-        },
-      );
-  });
-}
+import { computed } from 'vue'
+import { defineStore } from 'pinia'
+import { useLocalStorage } from '@vueuse/core'
+import { PASSWORD_PROTECT } from '@/config'
 
-// binance for charts:
-// https://www.binance.com/api/v1/aggTrades?limit=80&symbol=SOLUSDT
-// https://www.binance.com/api/v3/depth?symbol=SOLUSDT&limit=1000
-// https://www.binance.com/bapi/asset/v2/public/asset-service/product/get-product-by-symbol?symbol=SOLUSDT
-// https://www.binance.com/bapi/composite/v1/public/marketing/tardingPair/detail?symbol=sol
-// https://www.binance.com/bapi/margin/v1/public/isolated-margin/pair/listed
-// !!! https://www.binance.com/api/v3/klines?limit=1000&symbol=SOLUSDT&interval=1d
+export const useAuthStore = defineStore('auth', () => {
+  const password = useLocalStorage<string>('password', null)
+  const isAuthenticated = computed(() => password.value === String(PASSWORD_PROTECT))
+  const isEnabled = computed(() => String(PASSWORD_PROTECT).length > 0)
+
+  return {
+    isEnabled,
+    isAuthenticated,
+    password,
+    login: (pass: string) => {
+      password.value = pass
+      return isAuthenticated.value
+    },
+  }
+})

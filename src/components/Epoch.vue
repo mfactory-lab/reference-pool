@@ -26,6 +26,30 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
+import { useEpochStore } from '@/store'
+
+export default {
+  setup() {
+    const { epochTimeRemaining, epochProgress, epochNumber } = storeToRefs(useEpochStore())
+    return {
+      epochNumber,
+      epochProgress,
+      time: computed(() => {
+        const timeInMs = epochTimeRemaining.value
+        const _h = timeInMs / 1000 / 60 / 60
+        const h = Math.floor(_h)
+        const m = Math.floor((_h - h) * 60)
+        const s = Math.ceil(((_h - h) * 60 - m) * 60)
+        return { h, m: m < 10 ? `0${m}` : m, s: s < 10 ? `0${s}` : s }
+      }),
+    }
+  },
+}
+</script>
+
 <template>
   <div class="epoch">
     <q-circular-progress
@@ -39,39 +63,19 @@
       center-color="white"
     >
       <div class="epoch__label">
-        <div class="epoch__label-title">Epoch</div>
+        <div class="epoch__label-title">
+          Epoch
+        </div>
         <div class="epoch__label-number">
           {{ epochNumber }}
         </div>
-        <div class="epoch__label-value"> {{ time.h }}:{{ time.m }}<br />{{ time.s }} </div>
+        <div class="epoch__label-value">
+          {{ time.h }}:{{ time.m }}<br>{{ time.s }}
+        </div>
       </div>
     </q-circular-progress>
   </div>
 </template>
-
-<script lang="ts">
-  import { useEpochStore } from '@/store';
-  import { storeToRefs } from 'pinia';
-  import { computed } from 'vue';
-
-  export default {
-    setup() {
-      const { epochTimeRemaining, epochProgress, epochNumber } = storeToRefs(useEpochStore());
-      return {
-        epochNumber,
-        epochProgress,
-        time: computed(() => {
-          const timeInMs = epochTimeRemaining.value;
-          const _h = timeInMs / 1000 / 60 / 60;
-          const h = Math.floor(_h);
-          const m = Math.floor((_h - h) * 60);
-          const s = Math.ceil(((_h - h) * 60 - m) * 60);
-          return { h, m: m < 10 ? `0${m}` : m, s: s < 10 ? `0${s}` : s };
-        }),
-      };
-    },
-  };
-</script>
 
 <style scoped lang="scss">
   .epoch {

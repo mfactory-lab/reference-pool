@@ -26,37 +26,37 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useStakePoolStore } from '@/store'
+import { lamportsToSol, priceFormatter } from '@/utils'
+import TotalStacked from '@/components/TotalStacked.vue'
+
+export default {
+  components: {
+    TotalStacked,
+  },
+  setup() {
+    const stakePoolStore = useStakePoolStore()
+    const { reserveStakeBalance } = storeToRefs(stakePoolStore)
+
+    function formatAmount(val: number) {
+      return priceFormatter.format(val)
+    }
+    return {
+      reserveStakeBalance: computed(() => formatAmount(lamportsToSol(reserveStakeBalance.value))),
+    }
+  },
+}
+</script>
+
 <template>
-  <total-stacked />
+  <TotalStacked />
   <div class="total-stacked__reserved-balance">
     Available Liquidity: <b>{{ reserveStakeBalance }} SOL</b>
   </div>
 </template>
-
-<script lang="ts">
-  import { computed } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useStakePoolStore } from '@/store';
-  import { lamportsToSol, priceFormatter } from '@/utils';
-  import TotalStacked from '@/components/TotalStacked.vue';
-
-  export default {
-    components: {
-      TotalStacked,
-    },
-    setup() {
-      const stakePoolStore = useStakePoolStore();
-      const { reserveStakeBalance } = storeToRefs(stakePoolStore);
-
-      function formatAmount(val: number) {
-        return priceFormatter.format(val);
-      }
-      return {
-        reserveStakeBalance: computed(() => formatAmount(lamportsToSol(reserveStakeBalance.value))),
-      };
-    },
-  };
-</script>
 
 <style lang="scss" scoped>
   .total-stacked {
@@ -83,6 +83,7 @@
     }
   }
 </style>
+
 <style lang="scss">
   .total-stacked-alter {
     display: flex;

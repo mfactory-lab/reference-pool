@@ -26,56 +26,10 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import axios from 'axios';
+import { createPinia } from 'pinia'
+import type { App } from 'vue'
 
-export interface SaberLiquidityPoolStats {
-  vol24h: number;
-  vol24h_usd: number;
-  vol7d: number;
-  vol7d_usd: number;
-  price: number;
-  price_usd: number;
-  tvl_coin: number;
-  tvl_pc: number;
-  tvl_usd: number;
-}
-
-export interface SaberToken {
-  chainId: number;
-  address: string;
-  name: string;
-  decimals: number;
-  symbol: string;
-  logoURI: string;
-  tag: string;
-}
-
-export interface SaberPair {
-  ammId: string;
-  name: string;
-  coin: SaberToken;
-  pc: SaberToken;
-  lp: SaberToken;
-  stats: SaberLiquidityPoolStats;
-  version: string;
-  programId: string;
-}
-
-export async function getSaberPairs(): Promise<SaberPair[]> {
-  const resp = await axios.post('https://saberqltest.aleph.cloud/', {
-    query: `query AllPoolStats{
-  pools {
-    name
-    stats {
-      tvl_pc
-      tvl_coin
-      price
-      vol24h
-    }
-  }
-}
-`,
-  });
-
-  return resp.data.data?.pools;
+export const install = ({ app }: { app: App<Element> }) => {
+  const store = createPinia()
+  app.use(store)
 }

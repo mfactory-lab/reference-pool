@@ -26,14 +26,12 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import type { App } from 'vue';
-import { createPinia } from 'pinia';
-
-const store = createPinia();
-
-export function setupStore(app: App) {
-  app.use(store);
-}
-
-export { store };
-export * from './modules';
+export * from './apy'
+export * from './auth'
+export * from './balance'
+export * from './connection'
+export * from './epoch'
+export * from './coin-rate'
+export * from './stake-accounts'
+export * from './stake-pool'
+export * from './validators'

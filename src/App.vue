@@ -26,18 +26,37 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<template>
-  <router-view />
-</template>
+<script lang="ts" setup>
+import { computed, onBeforeMount } from 'vue'
+import { useAuthStore } from '@/store'
+import { initWallet } from '@/hooks'
 
-<script lang="ts">
-  import '@/assets/scss/app.scss';
+import '@/assets/scss/app.scss'
 
-  import { defineComponent } from 'vue';
+// useHead({
+//   title: SITE_TITLE,
+//   meta: [
+//     { name: 'description', content: SITE_DESCRIPTION },
+//     { name: 'keywords', content: SITE_KEYWORDS },
+//     { name: 'og:title', content: SITE_TITLE },
+//     { name: 'og:description', content: SITE_DESCRIPTION },
+//     { name: 'og:type', content: 'website' },
+//     { name: 'og:image', content: '/img/logo.svg' },
+//     { name: 'twitter:title', content: SITE_TITLE },
+//     { name: 'twitter:creator', content: '@JPoolSolana' },
+//   ],
+// });
 
-  export default defineComponent({
-    setup() {
-      return {};
-    },
-  });
+onBeforeMount(() => {
+  initWallet()
+})
+
+const auth = useAuthStore()
+
+const isPasswordProtected = computed(() => auth.isEnabled && !auth.isAuthenticated)
 </script>
+
+<template>
+  <password-protect v-if="isPasswordProtected" />
+  <router-view v-else />
+</template>

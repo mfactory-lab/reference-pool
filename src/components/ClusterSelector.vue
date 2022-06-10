@@ -26,6 +26,31 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { computed, watch } from 'vue'
+import { ENDPOINTS } from '@/config'
+import type { Endpoint } from '@/store'
+import { useConnectionStore, useValidatorStore } from '@/store'
+
+export default {
+  setup() {
+    const connectionStore = useConnectionStore()
+    const validatorStore = useValidatorStore()
+
+    const cluster = computed(() => connectionStore.cluster)
+
+    watch(cluster, validatorStore.load)
+
+    return {
+      cluster,
+      items: ENDPOINTS,
+      select: (e: Endpoint) => connectionStore.setCluster(e.name),
+      filter: (name: string) => name.replace('-beta', ''),
+    }
+  },
+}
+</script>
+
 <template>
   <q-btn-dropdown
     class="app-header__cluster-btn"
@@ -48,27 +73,3 @@
     </q-list>
   </q-btn-dropdown>
 </template>
-
-<script lang="ts">
-  import { computed, watch } from 'vue';
-  import { ENDPOINTS } from '@/config';
-  import { Endpoint, useConnectionStore, useValidatorStore } from '@/store';
-
-  export default {
-    setup() {
-      const connectionStore = useConnectionStore();
-      const validatorStore = useValidatorStore();
-
-      const cluster = computed(() => connectionStore.cluster);
-
-      watch(cluster, validatorStore.load);
-
-      return {
-        cluster,
-        items: ENDPOINTS,
-        select: (e: Endpoint) => connectionStore.setCluster(e.name),
-        filter: (name: string) => name.replace('-beta', ''),
-      };
-    },
-  };
-</script>

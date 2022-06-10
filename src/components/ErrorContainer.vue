@@ -26,6 +26,21 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script>
+export default {
+  props: {
+    code: {
+      type: Number,
+      default: 500,
+    },
+    message: {
+      type: String,
+      default: 'An unexpected error occurred',
+    },
+  },
+}
+</script>
+
 <template>
   <div class="container">
     <slot>
@@ -38,21 +53,6 @@
     </slot>
   </div>
 </template>
-
-<script>
-  export default {
-    props: {
-      code: {
-        type: Number,
-        default: 500,
-      },
-      message: {
-        type: String,
-        default: 'An unexpected error occurred',
-      },
-    },
-  };
-</script>
 
 <style lang="scss" scoped>
   .container {

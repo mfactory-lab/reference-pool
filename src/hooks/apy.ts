@@ -26,40 +26,20 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-export interface OrcaPair {
-  name: string;
-  name2: string;
-  account: string;
-  mint_account: string;
-  lp_mint: string;
-  official: boolean;
-  liquidity: number;
-  price: number;
-  volume_7d: number;
-  volume_7d_quote: number;
-  volume_24h: number;
-  volume_24h_quote: number;
-  volume_30d: number;
-  volume_30d_quote: number;
-  apy_24h: number;
-  apy_7d: number;
-  apy_30d: number;
-}
+import { computed, ref } from 'vue'
+import { useApyStore } from '@/store'
 
-export async function getOrcaPairs(): Promise<OrcaPair[]> {
-  return new Promise((resolve, reject) => {
-    fetch(`https://api.orca.so/pools`)
-      .then((res) => res.json())
-      .then(
-        (resp) => {
-          resolve(resp);
-        },
-        (error) => {
-          console.error(error);
-          reject(Error('Promise rejected'));
-        },
-      );
-  });
-}
+const DEFAULT_STAKING = 0.07
 
-//for APR https://api.orca.so/allpools
+export function useTotalApy() {
+  const { apy } = useApyStore()
+
+  const loading = ref(false)
+  const staking = computed(() => apy ?? DEFAULT_STAKING)
+
+  return {
+    loading,
+    staking,
+    total: computed(() => staking.value),
+  }
+}

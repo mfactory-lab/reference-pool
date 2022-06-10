@@ -31,7 +31,9 @@
     <div class="container">
       <div class="faq-list">
         <div class="faq-item">
-          <div class="faq-item__title">What is "staking"?</div>
+          <div class="faq-item__title">
+            What is "staking"?
+          </div>
           <div class="faq-item__body">
             <p>
               By staking your SOL tokens, you help secure the network and earn rewards while doing
@@ -45,7 +47,9 @@
           </div>
         </div>
         <div class="faq-item">
-          <div class="faq-item__title">What is a Stake Pool?</div>
+          <div class="faq-item__title">
+            What is a Stake Pool?
+          </div>
           <div class="faq-item__body">
             <p>
               Here's what Solana Docs have to say on Stake Pools: "This on-chain program pools
@@ -68,7 +72,9 @@
           </div>
         </div>
         <div class="faq-item">
-          <div class="faq-item__title">What is a xSOL token?</div>
+          <div class="faq-item__title">
+            What is a xSOL token?
+          </div>
           <div class="faq-item__body">
             <p>
               When you delegate your SOL to a Stake Pool, you get xSOL tokens in return. These

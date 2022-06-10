@@ -26,21 +26,22 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { createApp } from 'vue';
-import { setupStore } from '@/store';
-import { setupRouter } from '@/router';
-import { setupPlugins } from '@/plugins';
-
-import App from './App.vue';
+import { createApp } from 'vue'
+import App from './App.vue'
+import { setupRouter } from '@/router'
+// import { ViteSSG } from 'vite-ssg';
+// import routes from '@/router/routes';
 
 async function bootstrap() {
-  const app = createApp(App);
-
-  setupStore(app);
-  setupRouter(app);
-  setupPlugins(app);
-
-  app.mount('#app');
+  const app = createApp(App)
+  Object.values(import.meta.globEager('./plugins/*.ts')).forEach(i => i.install?.({ app }))
+  setupRouter(app)
+  app.mount('#app')
 }
 
-bootstrap().then();
+bootstrap().then()
+
+// https://github.com/antfu/vite-ssg
+// export const createApp = ViteSSG(App, { routes, base: import.meta.env.BASE_URL }, (ctx) => {
+//   Object.values(import.meta.globEager('./plugins/*.ts')).forEach((i) => i.install?.(ctx));
+// });

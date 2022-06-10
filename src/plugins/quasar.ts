@@ -26,24 +26,23 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { Dark, LocalStorage, Notify, Quasar, QuasarPluginOptions } from 'quasar';
-import iconSet from 'quasar/icon-set/eva-icons';
-import { App } from 'vue';
+import type { QuasarPluginOptions } from 'quasar'
+import { Dark, LocalStorage, Notify, Quasar } from 'quasar'
+import iconSet from 'quasar/icon-set/svg-eva-icons'
+import type { App } from 'vue'
 
-export const quasarConfig = {
-  config: {
-    globalProperties: {},
-  },
-  iconSet: iconSet,
-  plugins: {
-    Dark,
-    Notify,
-    LocalStorage,
-  },
-} as QuasarPluginOptions;
+// import lang from 'quasar/lang/en-US'
+// import 'quasar/src/css/index.sass';
+// import '@quasar/extras/eva-icons/eva-icons.css';
+// import '@quasar/extras/roboto-font/roboto-font.css';
 
-export default {
-  install: (app: App<Element>) => {
-    app.use(Quasar, quasarConfig);
-  },
-};
+export const install = ({ app }: { app: App<Element> }) => {
+  app.use(Quasar, {
+    plugins: {
+      Dark,
+      Notify,
+      LocalStorage,
+    },
+    iconSet,
+  } as QuasarPluginOptions)
+}

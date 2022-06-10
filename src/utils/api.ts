@@ -26,6 +26,42 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-export * from './phantom';
-export * from './solong';
-export * from './solflare-extension';
+import { API_COLLECTOR_URL } from '@/config'
+
+export interface ValidatorStats {
+  voteId: string
+  validatorId: string
+  fee: number
+  apy: number
+  totalStake: number | string
+  network: string
+  name: string | undefined
+  details: string | undefined
+  website: string | undefined
+  keybaseUsername: string | undefined
+  inTop33: boolean
+  inJpool: boolean
+  isDelinquent: boolean
+  svName: string
+  apyComparedMax: Number
+  jpoolLamports: number | string
+}
+
+export async function getValidatorsStats(network, onlyJpool = '') {
+  return new Promise<Array<ValidatorStats>>((resolve, _reject) => {
+    fetch(`${API_COLLECTOR_URL}/validators/list?network=${network}&only_jpool=${onlyJpool}`)
+      .then(res => res.json())
+      .then(
+        (res) => {
+          if (res.data?.length > 0) {
+            resolve(res.data)
+          } else {
+            resolve([])
+          }
+        },
+        (error) => {
+          console.error(error)
+        },
+      )
+  })
+}

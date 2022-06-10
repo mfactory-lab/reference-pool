@@ -26,17 +26,81 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import type { StakeActivationData } from '@solana/web3.js'
+import { computed, defineComponent, ref, watchEffect } from 'vue'
+import { storeToRefs } from 'pinia'
+import type { StakePoolAccount } from '@solana/spl-stake-pool'
+import { formatAmount, lamportsToSol, shortenAddress } from '@/utils'
+import CopyToClipboard from '@/components/CopyToClipboard.vue'
+import { useConnectionStore } from '@/store'
+
+export default defineComponent({
+  components: { CopyToClipboard },
+  props: {
+    stakeAccount: {
+      type: Object as () => StakePoolAccount,
+      required: true,
+    },
+  },
+  emits: ['deposit', 'deactivate', 'withdraw'],
+  setup(props, { emit }) {
+    const { connection } = storeToRefs(useConnectionStore())
+
+    const stakeActivation = ref<StakeActivationData>()
+    const loading = ref(true)
+
+    watchEffect(async () => {
+      loading.value = true
+      stakeActivation.value = await connection.value!.getStakeActivation(
+        props.stakeAccount.pubkey,
+      )
+      loading.value = false
+    })
+
+    return {
+      address: computed(() => props.stakeAccount.pubkey.toBase58()),
+      shortAddress: computed(() => shortenAddress(props.stakeAccount.pubkey.toBase58())),
+      amount: computed(() => {
+        return formatAmount(lamportsToSol(props.stakeAccount?.account?.lamports ?? 0))
+      }),
+      lamports: computed(() => props.stakeAccount?.account?.lamports),
+      state: computed(() => stakeActivation.value?.state),
+      stateColor: computed(() => {
+        switch (stakeActivation.value?.state) {
+          case 'active':
+            return 'positive'
+          case 'inactive':
+            return 'negative'
+          default:
+            return 'grey'
+        }
+      }),
+      loading,
+      deactivate(address: string) {
+        emit('deactivate', address)
+      },
+      withdraw(address: string, lamports: number) {
+        emit('withdraw', address, lamports)
+      },
+    }
+  },
+})
+</script>
+
 <template>
   <q-item>
     <q-item-section>
       <q-item-label class="items-center">
-        <copy-to-clipboard :text="address" />
+        <CopyToClipboard :text="address" />
         <span class="q-mx-sm">{{ shortAddress }}</span>
         <q-badge :color="stateColor">
           {{ state }}
         </q-badge>
       </q-item-label>
-      <q-item-label caption> {{ amount }} SOL </q-item-label>
+      <q-item-label caption>
+        {{ amount }} SOL
+      </q-item-label>
     </q-item-section>
 
     <q-item-section side>
@@ -64,64 +128,3 @@
     </q-inner-loading>
   </q-item>
 </template>
-
-<script lang="ts">
-  import { StakeActivationData } from '@solana/web3.js';
-  import { computed, defineComponent, ref, watchEffect } from 'vue';
-  import { formatAmount, lamportsToSol, shortenAddress } from '@/utils';
-  import CopyToClipboard from '@/components/CopyToClipboard.vue';
-  import { storeToRefs } from 'pinia';
-  import { useConnectionStore } from '@/store';
-  import { StakePoolAccount } from '@solana/spl-stake-pool';
-
-  export default defineComponent({
-    components: { CopyToClipboard },
-    props: {
-      stakeAccount: {
-        type: Object as () => StakePoolAccount,
-        required: true,
-      },
-    },
-    setup(props, { emit }) {
-      const { connection } = storeToRefs(useConnectionStore());
-
-      const stakeActivation = ref<StakeActivationData>();
-      const loading = ref(true);
-
-      watchEffect(async () => {
-        loading.value = true;
-        stakeActivation.value = await connection.value!.getStakeActivation(
-          props.stakeAccount.pubkey,
-        );
-        loading.value = false;
-      });
-
-      return {
-        address: computed(() => props.stakeAccount.pubkey.toBase58()),
-        shortAddress: computed(() => shortenAddress(props.stakeAccount.pubkey.toBase58())),
-        amount: computed(() => {
-          return formatAmount(lamportsToSol(props.stakeAccount?.account?.lamports ?? 0));
-        }),
-        lamports: computed(() => props.stakeAccount?.account?.lamports),
-        state: computed(() => stakeActivation.value?.state),
-        stateColor: computed(() => {
-          switch (stakeActivation.value?.state) {
-            case 'active':
-              return 'positive';
-            case 'inactive':
-              return 'negative';
-            default:
-              return 'grey';
-          }
-        }),
-        loading,
-        deactivate(address: string) {
-          emit('deactivate', address);
-        },
-        withdraw(address: string, lamports: number) {
-          emit('withdraw', address, lamports);
-        },
-      };
-    },
-  });
-</script>

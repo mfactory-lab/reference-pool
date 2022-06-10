@@ -26,15 +26,39 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { computed, defineComponent } from 'vue'
+import { useStakePoolStore } from '@/store'
+import { formatPct } from '@/utils'
+
+export default defineComponent({
+  setup() {
+    const stakePool = useStakePoolStore()
+    const stakePoolAddress = computed(() => stakePool.stakePoolAddress)
+    const fees = computed(() => stakePool.fees)
+
+    return {
+      stakePoolAddress,
+      fees,
+      formatPct(v: number) {
+        return formatPct.format(v)
+      },
+    }
+  },
+})
+</script>
+
 <template>
   <q-page>
     <div class="container q-pb-xl">
-      <div class="page-title">Stake Pool Info</div>
+      <div class="page-title">
+        Stake Pool Info
+      </div>
 
       Stake Pool: <b>{{ stakePoolAddress?.toBase58() }}</b>
 
-      <br />
-      <br />
+      <br>
+      <br>
 
       <p>
         Epoch Fee: <b>{{ formatPct(fees.fee) }}</b> of epoch rewards
@@ -71,25 +95,3 @@
     </div>
   </q-page>
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent } from 'vue';
-  import { useStakePoolStore } from '@/store';
-  import { formatPct } from '@/utils';
-
-  export default defineComponent({
-    setup() {
-      const stakePool = useStakePoolStore();
-      const stakePoolAddress = computed(() => stakePool.stakePoolAddress);
-      const fees = computed(() => stakePool.fees);
-
-      return {
-        stakePoolAddress,
-        fees,
-        formatPct(v: number) {
-          return formatPct.format(v);
-        },
-      };
-    },
-  });
-</script>

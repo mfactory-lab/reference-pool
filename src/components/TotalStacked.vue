@@ -26,9 +26,38 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { formatAmount, lamportsToSol } from '@/utils'
+import { useCoinRateStore, useConnectionStore, useStakePoolStore } from '@/store'
+
+export default {
+  setup() {
+    const { endpoint } = storeToRefs(useConnectionStore())
+    const { stakePool } = storeToRefs(useStakePoolStore())
+    const { solPrice } = storeToRefs(useCoinRateStore())
+    const solStaked = computed(() =>
+      lamportsToSol(stakePool.value?.totalLamports.toNumber() ?? 0),
+    )
+    const usdStacked = computed(() => solStaked.value * solPrice.value)
+
+    return {
+      // reverse limit progress for rounded right part of progress bar
+      maxSolToStake: computed(() => endpoint.value?.stakeLimit),
+      solStaked,
+      usdStacked,
+      formatPrice: (v: number) => formatAmount(v, 1),
+    }
+  },
+}
+</script>
+
 <template>
   <div class="total-stacked">
-    <div class="total-stacked__label">Total Staked</div>
+    <div class="total-stacked__label">
+      Total Staked
+    </div>
     <div class="total-stacked__value">
       <div class="total-stacked__sol">
         {{ formatPrice(solStaked) }} /
@@ -36,37 +65,12 @@
           {{ formatPrice(maxSolToStake) }}
         </span>
       </div>
-      <div class="total-stacked__usd"> ≈&nbsp;${{ formatPrice(usdStacked) }} </div>
+      <div class="total-stacked__usd">
+        ≈&nbsp;${{ formatPrice(usdStacked) }}
+      </div>
     </div>
   </div>
 </template>
-
-<script lang="ts">
-  import { computed } from 'vue';
-  import { formatAmount, lamportsToSol } from '@/utils';
-  import { useCoinRateStore, useConnectionStore, useStakePoolStore } from '@/store';
-  import { storeToRefs } from 'pinia';
-
-  export default {
-    setup() {
-      const { endpoint } = storeToRefs(useConnectionStore());
-      const { stakePool } = storeToRefs(useStakePoolStore());
-      const { solPrice } = storeToRefs(useCoinRateStore());
-      const solStaked = computed(() =>
-        lamportsToSol(stakePool.value?.totalLamports.toNumber() ?? 0),
-      );
-      const usdStacked = computed(() => solStaked.value * solPrice.value);
-
-      return {
-        // reverse limit progress for rounded right part of progress bar
-        maxSolToStake: computed(() => endpoint.value?.stakeLimit),
-        solStaked,
-        usdStacked,
-        formatPrice: (v: number) => formatAmount(v, 1),
-      };
-    },
-  };
-</script>
 
 <style lang="scss" scoped>
   .total-stacked {

@@ -26,30 +26,30 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
+import { useStakePoolStore } from '@/store'
+
+export default {
+  setup() {
+    const { connectionLost } = storeToRefs(useStakePoolStore())
+    const forceHidden = ref(true)
+
+    setTimeout(() => (forceHidden.value = false), 3000)
+    return {
+      connectionLost,
+      forceHidden,
+    }
+  },
+}
+</script>
+
 <template>
   <div v-if="connectionLost && !forceHidden" class="connection-lost">
     Solana network overloaded. Data currently unavailable.
   </div>
 </template>
-
-<script lang="ts">
-  import { useStakePoolStore } from '@/store';
-  import { storeToRefs } from 'pinia';
-  import { ref } from 'vue';
-
-  export default {
-    setup() {
-      const { connectionLost } = storeToRefs(useStakePoolStore());
-      const forceHidden = ref(true);
-
-      setTimeout(() => (forceHidden.value = false), 3000);
-      return {
-        connectionLost,
-        forceHidden,
-      };
-    },
-  };
-</script>
 
 <style scoped lang="scss">
   .connection-lost {

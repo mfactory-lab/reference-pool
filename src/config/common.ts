@@ -26,42 +26,26 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-export interface RaydiumPair {
-  name: string;
-  pair_id: string;
-  lp_mint: string;
-  official: boolean;
-  liquidity: number;
-  market: string;
-  volume_24h: number;
-  volume_24h_quote: number;
-  fee_24h: number;
-  fee_24h_quote: number;
-  volume_7d: number;
-  volume_7d_quote: number;
-  fee_7d: number;
-  fee_7d_quote: number;
-  price: number;
-  lp_price: number;
-  amm_id: string;
-  token_amount_coin: number;
-  token_amount_pc: number;
-  token_amount_lp: number;
-  apy: number;
-}
+// apy
+export const DEFAULT_APY = 0.07
+export const APY_VALIDATOR_ID = '8BYmtxKY1LuvjesaMi1nkXcj6ghuq48iiGKq2jNpnrNY'
 
-export async function getRaydiumPairs(): Promise<RaydiumPair[]> {
-  return new Promise((resolve, reject) => {
-    fetch(`https://api.raydium.io/pairs`)
-      .then((res) => res.json())
-      .then(
-        (resp) => {
-          resolve(resp);
-        },
-        (error) => {
-          console.error(error);
-          reject(Error('Promise rejected'));
-        },
-      );
-  });
-}
+// intervals
+export const EPOCH_RELOAD_INTERVAL = 60000
+export const RATES_RELOAD_INTERVAL = 300000
+export const DEFI_RELOAD_INTERVAL = 120000
+export const POOL_RELOAD_INTERVAL = 30000
+
+// api
+export const API_URL = import.meta.env.VITE_API_URL
+export const API_COLLECTOR_URL = 'https://api.thevalidators.io'
+
+// misc
+// export const HOW_TO_STAKE_URL = 'https://www.youtube.com/embed/KXPPGC8iOPM'
+export const HOW_TO_STAKE_URL = 'https://www.youtube.com/channel/UCYG4ZRUBMgEPaBT1OrZKC-Q'
+
+export const JSOL_LOGO
+  = 'https://raw.githubusercontent.com/mfactory-lab/jpool-pub/main/assets/images/jsol.png'
+
+export const PASSWORD_PROTECT = import.meta.env.VITE_PASSWORD_PROTECT
+export const WITHDRAW_SOL_ACTIVE = true

@@ -26,10 +26,10 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import mitt from 'mitt';
+import mitt from 'mitt'
 
-const emitter = mitt<any>();
+const emitter = mitt<any>()
 
 export function useEmitter() {
-  return emitter;
+  return emitter
 }

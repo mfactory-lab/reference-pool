@@ -26,6 +26,55 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { computed, defineComponent, toRef } from 'vue'
+import {
+  useBalanceStore,
+  useCoinRateStore,
+  useStakeAccountStore,
+  useStakePoolStore,
+} from '@/store'
+import { formatMoney, longPriceFormatter } from '@/utils'
+import StakeAccountsDialog from '@/components/StakeAccountsDialog.vue'
+import TokenSvg from '@/components/Icons/TokenSvg.vue'
+
+export default defineComponent({
+  components: { StakeAccountsDialog, TokenSvg },
+  setup() {
+    const stakePoolStore = useStakePoolStore()
+    const balanceStore = useBalanceStore()
+    const stakeAccountStore = useStakeAccountStore()
+    const coinRateStore = useCoinRateStore()
+
+    const solBalance = toRef(balanceStore, 'solBalance')
+    const tokenBalance = toRef(balanceStore, 'tokenBalance')
+    const stakeSolBalance = toRef(stakeAccountStore, 'stakeSolBalance')
+    const dialog = toRef(stakeAccountStore, 'dialog')
+
+    const solUsd = computed(() => coinRateStore.solPrice * solBalance.value)
+    const tokenUsd = computed(
+      () => (coinRateStore.solPrice * tokenBalance.value) / stakePoolStore.exchangeRate,
+    )
+    const stackedUsd = computed(() => coinRateStore.solPrice * stakeSolBalance.value)
+
+    return {
+      solBalance,
+      tokenBalance,
+      solUsd,
+      tokenUsd,
+      stackedUsd,
+      totalUsd: computed(() => solUsd.value + tokenUsd.value + stackedUsd.value),
+      stakeSolBalance: computed(() => stakeSolBalance.value),
+      formatPrice: (v: number) => longPriceFormatter.format(v),
+      formatMoney: (v: number) => formatMoney(v),
+      openDetails() {
+        dialog.value = true
+      },
+    }
+  },
+})
+</script>
+
 <template>
   <q-card class="wallet-balance">
     <q-card-section class="wallet-balance__head">
@@ -41,7 +90,7 @@
           </q-item-section>
           <q-item-section side>
             <q-item-label>
-              <img alt="" src="@/assets/img/sol-logo.svg" />
+              <img alt="" src="@/assets/img/sol-logo.svg">
               <span>SOL</span>
             </q-item-label>
           </q-item-section>
@@ -53,13 +102,15 @@
           </q-item-section>
           <q-item-section side>
             <q-item-label>
-              <token-svg />
+              <TokenSvg />
               <span>xSOL</span>
             </q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
-      <div class="wallet-balance__staking__title">STAKING</div>
+      <div class="wallet-balance__staking__title">
+        STAKING
+      </div>
       <q-list dense separator>
         <q-item>
           <q-item-section side>
@@ -82,7 +133,7 @@
           </q-item-section>
           <q-item-section side>
             <q-item-label>
-              <img alt="" src="@/assets/img/sol-logo.svg" />
+              <img alt="" src="@/assets/img/sol-logo.svg">
               <span>SOL</span>
             </q-item-label>
           </q-item-section>
@@ -90,55 +141,5 @@
       </q-list>
     </q-card-section>
   </q-card>
-  <stake-accounts-dialog />
+  <StakeAccountsDialog />
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent, toRef } from 'vue';
-  import {
-    useBalanceStore,
-    useCoinRateStore,
-    useStakeAccountStore,
-    useStakePoolStore,
-  } from '@/store';
-  import { longPriceFormatter } from '@/utils';
-  import { formatMoney } from '@/utils/check-number';
-  import StakeAccountsDialog from '@/components/StakeAccountsDialog.vue';
-  import TokenSvg from '@/components/Icons/TokenSvg.vue';
-
-  export default defineComponent({
-    components: { StakeAccountsDialog, TokenSvg },
-    setup() {
-      const stakePoolStore = useStakePoolStore();
-      const balanceStore = useBalanceStore();
-      const stakeAccountStore = useStakeAccountStore();
-      const coinRateStore = useCoinRateStore();
-
-      const solBalance = toRef(balanceStore, 'solBalance');
-      const tokenBalance = toRef(balanceStore, 'tokenBalance');
-      const stakeSolBalance = toRef(stakeAccountStore, 'stakeSolBalance');
-      const dialog = toRef(stakeAccountStore, 'dialog');
-
-      const solUsd = computed(() => coinRateStore.solPrice * solBalance.value);
-      const tokenUsd = computed(
-        () => (coinRateStore.solPrice * tokenBalance.value) / stakePoolStore.exchangeRate,
-      );
-      const stackedUsd = computed(() => coinRateStore.solPrice * stakeSolBalance.value);
-
-      return {
-        solBalance,
-        tokenBalance,
-        solUsd,
-        tokenUsd,
-        stackedUsd,
-        totalUsd: computed(() => solUsd.value + tokenUsd.value + stackedUsd.value),
-        stakeSolBalance: computed(() => stakeSolBalance.value),
-        formatPrice: (v: number) => longPriceFormatter.format(v),
-        formatMoney: (v: number) => formatMoney(v),
-        openDetails() {
-          dialog.value = true;
-        },
-      };
-    },
-  });
-</script>

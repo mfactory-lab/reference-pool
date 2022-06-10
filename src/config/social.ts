@@ -26,17 +26,9 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-const style = `
-  background: #00BCD4;
-  border-radius: 0.5em;
-  color: white;
-  font-weight: bold;
-  padding: 2px 0.5em;
-`;
+export const TWITTER_URL = 'https://twitter.com/JPoolSolana'
+export const TELEGRAM_URL = 'https://t.me/jpool_solana'
+export const TELEGRAM_ANNOUNCEMENT_URL = 'https://t.me/jpoolsolana'
+export const DISCORD_URL = 'https://discord.gg/qR4BA9QXVR'
 
-function logger(...args: any): void {
-  // eslint-disable-next-line
-  console.info(`%c${new Date().toLocaleString()}`, style, ...args);
-}
-
-export default logger;
+export const GTAG_ID = import.meta.env.VITE_GTAG_ID

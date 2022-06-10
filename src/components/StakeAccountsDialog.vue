@@ -26,6 +26,119 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { computed, defineComponent, ref } from 'vue'
+import { evaClose } from '@quasar/extras/eva-icons'
+import { PublicKey, StakeProgram } from '@solana/web3.js'
+import { useAnchorWallet, useWallet } from 'solana-wallets-vue'
+import type { ProgramAccount } from '@/store'
+import {
+  useConnectionStore,
+  useStakeAccountStore,
+} from '@/store'
+import { useDeposit, useMonitorTransaction } from '@/hooks'
+import StakeAccountItem from '@/components/StakeAccountItem.vue'
+import { sendTransaction } from '@/utils'
+
+export default defineComponent({
+  components: { StakeAccountItem },
+  props: {
+    voter: {
+      type: String,
+      required: false,
+    },
+  },
+  emits: [
+    'beforeDeposit',
+    'afterDeposit',
+    'beforeDeactivate',
+    'afterDeactivate',
+    'beforeWithdraw',
+    'afterWithdraw',
+  ],
+  setup(props, { emit }) {
+    const connectionStore = useConnectionStore()
+    const { publicKey } = useWallet()
+    const anchorWallet = useAnchorWallet()
+    const stakeAccountStore = useStakeAccountStore()
+    const { monitorTransaction } = useMonitorTransaction()
+    const { depositStake } = useDeposit()
+
+    const dialog = computed(() => stakeAccountStore.dialog)
+    const loading = computed(() => stakeAccountStore.loading)
+    const loadingPubkey = ref()
+
+    return {
+      dialog,
+      loading,
+      loadingPubkey,
+
+      accounts: computed(() => {
+        if (props.voter) {
+          return stakeAccountStore.data.filter(
+            acc => acc.account.data?.parsed?.info?.stake?.delegation?.voter === props.voter,
+          )
+        }
+        return stakeAccountStore.data
+      }),
+
+      updateDialog: (v: boolean) => (stakeAccountStore.dialog = v),
+
+      deposit: async (stakeAccount: ProgramAccount) => {
+        emit('beforeDeposit')
+        loadingPubkey.value = stakeAccount.pubkey.toBase58()
+        await depositStake(stakeAccount)
+        loadingPubkey.value = null
+        await stakeAccountStore.load()
+        emit('afterDeposit')
+      },
+
+      deactivate: async (address: string) => {
+        emit('beforeDeactivate')
+        loadingPubkey.value = address
+        await monitorTransaction(
+          sendTransaction(
+            connectionStore.connection,
+            anchorWallet.value!,
+            StakeProgram.deactivate({
+              stakePubkey: new PublicKey(address),
+              authorizedPubkey: publicKey.value!,
+            }).instructions,
+            [],
+          ),
+        )
+        loadingPubkey.value = null
+        await stakeAccountStore.load()
+        emit('afterDeactivate')
+      },
+
+      withdraw: async (address: string, lamports: number) => {
+        emit('beforeWithdraw')
+        loadingPubkey.value = address
+        await monitorTransaction(
+          sendTransaction(
+            connectionStore.connection,
+            anchorWallet.value!,
+            StakeProgram.withdraw({
+              stakePubkey: new PublicKey(address),
+              authorizedPubkey: publicKey.value!,
+              toPubkey: publicKey.value!,
+              lamports,
+              // custodianPubkey: wallet.value!.publicKey!,
+            }).instructions,
+            [],
+          ),
+        )
+        loadingPubkey.value = null
+        await stakeAccountStore.load()
+        emit('afterWithdraw')
+      },
+      evaClose,
+    }
+  },
+})
+</script>
+
 <template>
   <q-dialog v-model="dialog" @update:model-value="updateDialog">
     <q-card>
@@ -35,7 +148,9 @@
 
       <template v-else>
         <q-card-section class="relative-position">
-          <div class="text-h6 text-center">Stake Accounts</div>
+          <div class="text-h6 text-center">
+            Stake Accounts
+          </div>
           <q-btn
             padding="md"
             color="transparent"
@@ -52,7 +167,7 @@
 
         <q-card-section>
           <q-list v-if="accounts.length > 0" separator style="width: 500px">
-            <stake-account-item
+            <StakeAccountItem
               v-for="acc in accounts"
               :key="acc.pubkey"
               :stake-account="acc"
@@ -64,7 +179,7 @@
           </q-list>
           <div v-else class="flex flex-center q-pa-lg">
             Your stake accounts will be shown here.
-            <br />
+            <br>
             You don't have any valid stake accounts.
           </div>
         </q-card-section>
@@ -72,117 +187,3 @@
     </q-card>
   </q-dialog>
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent, ref } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { evaClose } from '@quasar/extras/eva-icons';
-  // @ts-ignore
-  import { PublicKey, StakeProgram } from '@solana/web3.js';
-  import {
-    ProgramAccount,
-    sendTransaction,
-    useConnectionStore,
-    useStakeAccountStore,
-    useWalletStore,
-  } from '@/store';
-  import { useDeposit, useMonitorTransaction } from '@/hooks';
-  import StakeAccountItem from '@/components/StakeAccountItem.vue';
-
-  export default defineComponent({
-    components: { StakeAccountItem },
-    props: {
-      voter: {
-        type: String,
-        required: false,
-      },
-    },
-    emits: [
-      'beforeDeposit',
-      'afterDeposit',
-      'beforeDeactivate',
-      'afterDeactivate',
-      'beforeWithdraw',
-      'afterWithdraw',
-    ],
-    setup(props, { emit }) {
-      const connectionStore = useConnectionStore();
-      const { wallet } = storeToRefs(useWalletStore());
-      const stakeAccountStore = useStakeAccountStore();
-      const { monitorTransaction } = useMonitorTransaction();
-      const { depositStake } = useDeposit();
-
-      const dialog = computed(() => stakeAccountStore.dialog);
-      const loading = computed(() => stakeAccountStore.loading);
-      const loadingPubkey = ref();
-
-      return {
-        dialog,
-        loading,
-        loadingPubkey,
-
-        accounts: computed(() => {
-          if (props.voter) {
-            return stakeAccountStore.data.filter(
-              (acc) => acc.account.data?.parsed?.info?.stake?.delegation?.voter == props.voter,
-            );
-          }
-          return stakeAccountStore.data;
-        }),
-
-        updateDialog: (v: boolean) => (stakeAccountStore.dialog = v),
-
-        deposit: async (stakeAccount: ProgramAccount) => {
-          emit('beforeDeposit');
-          loadingPubkey.value = stakeAccount.pubkey.toBase58();
-          await depositStake(stakeAccount);
-          loadingPubkey.value = null;
-          await stakeAccountStore.load();
-          emit('afterDeposit');
-        },
-
-        deactivate: async (address: string) => {
-          emit('beforeDeactivate');
-          loadingPubkey.value = address;
-          await monitorTransaction(
-            sendTransaction(
-              connectionStore.connection,
-              wallet.value!,
-              StakeProgram.deactivate({
-                stakePubkey: new PublicKey(address),
-                authorizedPubkey: wallet.value!.publicKey!,
-              }).instructions,
-              [],
-            ),
-          );
-          loadingPubkey.value = null;
-          await stakeAccountStore.load();
-          emit('afterDeactivate');
-        },
-
-        withdraw: async (address: string, lamports: number) => {
-          emit('beforeWithdraw');
-          loadingPubkey.value = address;
-          await monitorTransaction(
-            sendTransaction(
-              connectionStore.connection,
-              wallet.value!,
-              StakeProgram.withdraw({
-                stakePubkey: new PublicKey(address),
-                authorizedPubkey: wallet.value!.publicKey!,
-                toPubkey: wallet.value!.publicKey!,
-                lamports: lamports,
-                // custodianPubkey: wallet.value!.publicKey!,
-              }).instructions,
-              [],
-            ),
-          );
-          loadingPubkey.value = null;
-          await stakeAccountStore.load();
-          emit('afterWithdraw');
-        },
-        evaClose,
-      };
-    },
-  });
-</script>

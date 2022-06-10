@@ -26,21 +26,21 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { createMemoryHistory, createRouter, createWebHashHistory } from 'vue-router';
-import routes from './routes';
-import type { App } from 'vue';
+import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
+import type { App } from 'vue'
+import routes from './routes'
 
 const router = createRouter({
-  // history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
-  history: import.meta.env.SSR ? createMemoryHistory() : createWebHashHistory(),
+  history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
+  // history: import.meta.env.SSR ? createMemoryHistory() : createWebHashHistory(),
   scrollBehavior: () => ({ left: 0, top: 0 }),
   strict: true,
   routes,
-});
+})
 
-export default router;
+export default router
 
 // config router
-export function setupRouter(app: App) {
-  app.use(router);
+export function setupRouter(app: App<Element>) {
+  app.use(router)
 }

@@ -26,36 +26,38 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useApyStore } from '@/store'
+import { formatPct } from '@/utils'
+
+export default {
+  props: {
+    selected: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  setup() {
+    const { apy, apyLoading } = storeToRefs(useApyStore())
+    return {
+      apyLoading,
+      apy: computed(() => formatPct.format(apy.value)),
+    }
+  },
+}
+</script>
+
 <template>
   <div class="apy" :class="{ 'apy--selected': selected }">
     APY
-    <div class="apy__value">≈{{ apy }}</div>
+    <div class="apy__value">
+      ≈{{ apy }}
+    </div>
     <q-inner-loading :showing="apyLoading" />
   </div>
 </template>
-
-<script lang="ts">
-  import { computed } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useApyStore } from '@/store';
-  import { formatPct } from '@/utils';
-
-  export default {
-    props: {
-      selected: {
-        type: Boolean,
-        required: true,
-      },
-    },
-    setup() {
-      const { apy, apyLoading } = storeToRefs(useApyStore());
-      return {
-        apyLoading,
-        apy: computed(() => formatPct.format(apy.value)),
-      };
-    },
-  };
-</script>
 
 <style scoped lang="scss">
   .apy {

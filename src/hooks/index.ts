@@ -26,8 +26,10 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-export * from './emitter';
-export * from './theme';
-export * from './monitor';
-export * from './airdrop';
-export * from './stake';
+export * from './emitter'
+export * from './theme'
+export * from './monitor'
+export * from './airdrop'
+export * from './stake'
+export * from './wallet'
+export * from './apy'

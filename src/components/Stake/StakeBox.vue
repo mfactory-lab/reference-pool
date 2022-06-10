@@ -26,9 +26,251 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { computed, defineComponent, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { useQuasar } from 'quasar'
+import { storeToRefs } from 'pinia'
+import { useWallet } from 'solana-wallets-vue'
+import ConnectWallet from '@/components/ConnectWallet.vue'
+import {
+  useApyStore,
+  useBalanceStore,
+  useConnectionStore,
+  useStakeAccountStore,
+  useStakePoolStore,
+} from '@/store'
+import { formatAmount, formatPct, lamportsToSol } from '@/utils'
+import { useDeposit, useWithdraw } from '@/hooks'
+import TokenSvg from '@/components/Icons/TokenSvg.vue'
+import { clickOutside } from '@/directives'
+import Apy from '@/components/Apy.vue'
+
+export default defineComponent({
+  components: {
+    TokenSvg,
+    ConnectWallet,
+    Apy,
+  },
+  directives: {
+    clickOutside,
+  },
+  setup() {
+    const { notify } = useQuasar()
+    const stakePoolStore = useStakePoolStore()
+    const connectionStore = useConnectionStore()
+    const { connected } = useWallet()
+    const balanceStore = useBalanceStore()
+    const stakeAccountStore = useStakeAccountStore()
+
+    const { depositFee, depositing, depositSol } = useDeposit()
+    const { withdrawFee, withdrawing, setAmount, withdraw, useWithdrawSol } = useWithdraw()
+    const { apy } = storeToRefs(useApyStore())
+
+    const cluster = computed(() => connectionStore.cluster)
+    const solBalance = computed(() => balanceStore.solBalance)
+    const tokenBalance = computed(() => balanceStore.tokenBalance)
+    const fees = computed(() => stakePoolStore.fees)
+    const exchangeRate = computed(() => stakePoolStore.exchangeRate)
+    const connectionLost = computed(() => stakePoolStore.connectionLost)
+
+    const stake = reactive<{ from: any; to: any; factor: number }>({
+      from: null,
+      to: null,
+      factor: 0,
+    })
+
+    const unstake = reactive<{ from: any; to: any }>({
+      from: null,
+      to: null,
+    })
+
+    const tab = ref('stake')
+    const stakeFromInput = ref<any>(null)
+    const unstakeFromInput = ref<any>(null)
+
+    onMounted(() => {
+      nextTick(() => {
+        if (stakeFromInput.value) {
+          stakeFromInput.value.focus()
+        }
+      })
+    })
+
+    const depositAmount = computed(() => {
+      const sol = Number(stake.from)
+      if (sol <= 0) {
+        return 0
+      }
+      let value = (sol - lamportsToSol(depositFee.value)) * exchangeRate.value
+      value -= value * fees.value.solDepositFee
+      return value > 0 ? value : 0
+    })
+
+    const withdrawAmount = computed(() => {
+      const sol = Number(unstake.from)
+      if (sol <= 0) {
+        return 0
+      }
+      let value = (sol - lamportsToSol(withdrawFee.value)) * (1 / exchangeRate.value)
+      value
+          -= value * (useWithdrawSol.value ? fees.value.solWithdrawalFee : fees.value.withdrawalFee)
+      return value > 0 ? value : 0
+    })
+
+    watch(
+      () => stake.from,
+      () => {
+        if (!stake.from) {
+          stake.to = null
+          return
+        }
+        stake.to = depositAmount.value > 0 ? depositAmount.value.toFixed(5) : 0
+      },
+    )
+
+    watch(withdrawAmount, () => {
+      if (!unstake.from) {
+        unstake.to = null
+        return
+      }
+      setAmount(unstake.from)
+      unstake.to = withdrawAmount.value > 0 ? withdrawAmount.value.toFixed(5) : 0
+    })
+
+    const stakePercent = ref(0)
+    watch(stakePercent, () => {
+      const value = solBalance.value * stakePercent.value
+      stake.from = value ? formatAmount(value / 100) : value
+    })
+    const unstakePercent = ref(0)
+    watch(unstakePercent, () => {
+      const value = tokenBalance.value * unstakePercent.value
+      unstake.from = value ? formatAmount(value / 100) : value
+    })
+
+    const highlightFix = ref(true)
+
+    return {
+      tab,
+      stake,
+      unstake,
+      cluster,
+      connected,
+      depositing,
+      withdrawing,
+      stakeFromInput,
+      unstakeFromInput,
+      stakePercent,
+      unstakePercent,
+      connectionLost,
+      useWithdrawSol,
+      apy: computed(() => formatPct.format(apy.value)),
+      availableSol: computed(() => (solBalance.value ? formatAmount(solBalance.value) : '0')),
+      availableXsol: computed(() =>
+        tokenBalance.value ? formatAmount(tokenBalance.value) : '0',
+      ),
+      solDepositFee: computed(() => fees?.value.solDepositFee),
+      withdrawalFee: computed(() => fees?.value.withdrawalFee),
+      solToXsolRate: computed(() =>
+        exchangeRate.value === 1 ? 1 : formatAmount(exchangeRate.value),
+      ),
+      xSolToSolRate: computed(() =>
+        exchangeRate.value === 1 ? 1 : formatAmount(1 / exchangeRate.value),
+      ),
+
+      stakeMax() {
+        if (!connected.value) {
+          notify({
+            message: 'Wallet is not connected',
+            caption: 'Please connect your wallet',
+          })
+          return
+        }
+        stake.from = formatAmount(solBalance.value)
+      },
+
+      unstakeMax() {
+        if (!connected.value) {
+          notify({
+            message: 'Wallet is not connected',
+            caption: 'Please connect your wallet',
+          })
+          return
+        }
+        unstake.from = formatAmount(tokenBalance.value)
+      },
+
+      stakeHandler: async () => {
+        if (depositAmount.value <= 0) {
+          stakeFromInput.value?.focus()
+          return
+        }
+        await depositSol(stake.from - lamportsToSol(depositFee.value))
+        stake.from = 0
+        stake.to = 0
+      },
+
+      unstakeHandler: async () => {
+        if (withdrawAmount.value <= 0) {
+          unstakeFromInput.value?.focus()
+          return
+        }
+        await withdraw()
+        unstake.from = 0
+        unstake.to = 0
+        stakeAccountStore.load()
+      },
+
+      formatPct(v: number) {
+        return formatPct.format(v)
+      },
+
+      onlyNumber(e: any) {
+        const keyCode = e.keyCode ? e.keyCode : e.which
+        if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
+          e.preventDefault()
+        }
+        if (keyCode === 46 && String(e.target.value).includes('.')) {
+          e.preventDefault()
+        }
+      },
+
+      stakeInfoData: computed(() => {
+        if (tab.value === 'stake') {
+          const from = stake.from
+          const depositFeeVal = lamportsToSol(depositFee.value)
+          const value = from ? (from - depositFeeVal) * exchangeRate.value : 0
+          return {
+            networkFee: `${depositFeeVal} SOL`,
+            poolFee: `${formatAmount((value > 0 ? value : 0) * fees.value.solDepositFee)} xSOL`,
+          }
+        }
+        const from = unstake.from
+        const withdrawRealFee = useWithdrawSol.value
+          ? fees.value.solWithdrawalFee
+          : fees.value.withdrawalFee
+        const withdrawFeeVal = from * withdrawRealFee
+        return {
+          networkFee: `${lamportsToSol(withdrawFee.value)} SOL`,
+          poolFee: `${formatAmount(withdrawFeeVal)} xSOL`,
+        }
+      }),
+
+      highlightFix,
+      onFocus() {
+        highlightFix.value = true
+      },
+      onBlur() {
+        highlightFix.value = false
+      },
+    }
+  },
+})
+</script>
+
 <template>
   <q-card class="stake-box shadow-sm">
-    <apy :selected="tab === 'stake'" @click="() => (tab = 'stake')" />
+    <Apy :selected="tab === 'stake'" @click="() => (tab = 'stake')" />
     <q-tabs
       v-model="tab"
       align="justify"
@@ -49,8 +291,7 @@
                 }}<span
                   v-if="connected && Number(stake.from) > Number(availableSol)"
                   class="stake-box__warning gt-xs"
-                  >Insufficient funds to run the transaction</span
-                >
+                >Insufficient funds to run the transaction</span>
               </div>
             </div>
             <div>
@@ -74,8 +315,9 @@
         <q-card-section class="with-arrow">
           <q-input
             ref="stakeFromInput"
-            :maxlength="14"
             v-model="stake.from"
+            v-click-outside="onBlur"
+            :maxlength="14"
             label="Amount to stake"
             class="stake-box__input"
             :class="{ 'stake-box__input--highlight-fix': highlightFix }"
@@ -84,7 +326,6 @@
             stack-label
             :readonly="connectionLost"
             @focus="onFocus"
-            v-click-outside="onBlur"
             @keypress="onlyNumber"
           >
             <template #append>
@@ -99,7 +340,7 @@
               >
                 MAX
               </q-btn>
-              <img alt="" class="stake-field__icon" src="@/assets/img/sol-logo.svg" />
+              <img alt="" class="stake-field__icon" src="@/assets/img/sol-logo.svg">
               <span class="stake-field__symbol">SOL</span>
             </template>
           </q-input>
@@ -118,7 +359,7 @@
             @keypress="onlyNumber"
           >
             <template #append>
-              <token-svg class="stake-field__icon" />
+              <TokenSvg class="stake-field__icon" />
               <span class="stake-field__symbol">xSOL</span>
             </template>
           </q-input>
@@ -127,8 +368,12 @@
         <q-card-section>
           <div class="row items-between">
             <div class="column col-sm-6 col-xs-12 q-pr-sm">
-              <div class="stake-box__stake-info">Network Fee: {{ stakeInfoData.networkFee }}</div>
-              <div class="stake-box__stake-info">Pool Fee: {{ stakeInfoData.poolFee }}</div>
+              <div class="stake-box__stake-info">
+                Network Fee: {{ stakeInfoData.networkFee }}
+              </div>
+              <div class="stake-box__stake-info">
+                Pool Fee: {{ stakeInfoData.poolFee }}
+              </div>
             </div>
             <div class="column justify-between col-sm-6 col-xs-12 q-pl-sm">
               <q-btn
@@ -145,7 +390,7 @@
                 STAKE NOW
               </q-btn>
               <div v-else class="text-right">
-                <connect-wallet class="q-px-lg" size="lg" />
+                <ConnectWallet class="q-px-lg" size="lg" />
               </div>
             </div>
           </div>
@@ -161,8 +406,7 @@
                 }}<span
                   v-if="connected && Number(unstake.from) > Number(availableXsol)"
                   class="stake-box__warning gt-xs"
-                  >Insufficient funds to run the transaction</span
-                >
+                >Insufficient funds to run the transaction</span>
               </div>
             </div>
             <div>
@@ -186,8 +430,8 @@
         <q-card-section class="with-arrow">
           <q-input
             ref="unstakeFromInput"
-            :maxlength="14"
             v-model="unstake.from"
+            :maxlength="14"
             class="stake-box__input"
             label="Staked xSOL"
             outlined
@@ -208,7 +452,7 @@
               >
                 MAX
               </q-btn>
-              <token-svg class="stake-field__icon" />
+              <TokenSvg class="stake-field__icon" />
               <span class="stake-field__symbol">xSOL</span>
             </template>
           </q-input>
@@ -226,7 +470,7 @@
             bg-color="transparent"
           >
             <template #append>
-              <img alt="" class="stake-field__icon" src="@/assets/img/sol-logo.svg" />
+              <img alt="" class="stake-field__icon" src="@/assets/img/sol-logo.svg">
               <span class="stake-field__symbol">SOL</span>
             </template>
           </q-input>
@@ -235,8 +479,12 @@
         <q-card-section>
           <div class="row items-between">
             <div class="column col-sm-6 col-xs-12 q-pr-sm">
-              <div class="stake-box__stake-info">Pool Fee: {{ stakeInfoData.poolFee }}</div>
-              <div class="stake-box__stake-info">Network Fee: {{ stakeInfoData.networkFee }}</div>
+              <div class="stake-box__stake-info">
+                Pool Fee: {{ stakeInfoData.poolFee }}
+              </div>
+              <div class="stake-box__stake-info">
+                Network Fee: {{ stakeInfoData.networkFee }}
+              </div>
             </div>
 
             <div class="column col-sm-6 col-xs-12 q-pl-sm">
@@ -253,7 +501,7 @@
               >
                 <div>UNSTAKE NOW</div>
               </q-btn>
-              <connect-wallet v-else class="q-px-lg" size="lg" />
+              <ConnectWallet v-else class="q-px-lg" size="lg" />
             </div>
           </div>
         </q-card-section>
@@ -261,247 +509,3 @@
     </q-tab-panels>
   </q-card>
 </template>
-
-<script lang="ts">
-  import { computed, defineComponent, nextTick, onMounted, reactive, ref, watch } from 'vue';
-  import { useQuasar } from 'quasar';
-  import { storeToRefs } from 'pinia';
-  import ConnectWallet from '@/components/ConnectWallet.vue';
-  import {
-    useApyStore,
-    useBalanceStore,
-    useConnectionStore,
-    useStakeAccountStore,
-    useStakePoolStore,
-    useWalletStore,
-  } from '@/store';
-  import { formatAmount, formatPct, lamportsToSol } from '@/utils';
-  import { useDeposit, useWithdraw } from '@/hooks';
-  import TokenSvg from '@/components/Icons/TokenSvg.vue';
-  import { clickOutside } from '@/directives';
-  import Apy from '@/components/Apy.vue';
-
-  export default defineComponent({
-    components: {
-      TokenSvg,
-      ConnectWallet,
-      Apy,
-    },
-    directives: {
-      clickOutside,
-    },
-    setup() {
-      const { notify } = useQuasar();
-      const stakePoolStore = useStakePoolStore();
-      const connectionStore = useConnectionStore();
-      const walletStore = useWalletStore();
-      const balanceStore = useBalanceStore();
-      const stakeAccountStore = useStakeAccountStore();
-
-      const { depositFee, depositing, depositSol } = useDeposit();
-      const { withdrawFee, withdrawing, setAmount, withdraw, useWithdrawSol } = useWithdraw();
-      const { apy } = storeToRefs(useApyStore());
-
-      const cluster = computed(() => connectionStore.cluster);
-      const connected = computed(() => walletStore.connected);
-      const solBalance = computed(() => balanceStore.solBalance);
-      const tokenBalance = computed(() => balanceStore.tokenBalance);
-      const fees = computed(() => stakePoolStore.fees);
-      const exchangeRate = computed(() => stakePoolStore.exchangeRate);
-      const connectionLost = computed(() => stakePoolStore.connectionLost);
-
-      const stake = reactive<{ from: any; to: any; factor: number }>({
-        from: null,
-        to: null,
-        factor: 0,
-      });
-
-      const unstake = reactive<{ from: any; to: any }>({
-        from: null,
-        to: null,
-      });
-
-      const tab = ref('stake');
-      const stakeFromInput = ref<any>(null);
-      const unstakeFromInput = ref<any>(null);
-
-      onMounted(() => {
-        nextTick(() => {
-          if (stakeFromInput.value) {
-            stakeFromInput.value.focus();
-          }
-        });
-      });
-
-      const depositAmount = computed(() => {
-        const sol = Number(stake.from);
-        if (sol <= 0) {
-          return 0;
-        }
-        let value = (sol - lamportsToSol(depositFee.value)) * exchangeRate.value;
-        value -= value * fees.value.solDepositFee;
-        return value > 0 ? value : 0;
-      });
-
-      const withdrawAmount = computed(() => {
-        const sol = Number(unstake.from);
-        if (sol <= 0) {
-          return 0;
-        }
-        let value = (sol - lamportsToSol(withdrawFee.value)) * (1 / exchangeRate.value);
-        value -=
-          value * (useWithdrawSol.value ? fees.value.solWithdrawalFee : fees.value.withdrawalFee);
-        return value > 0 ? value : 0;
-      });
-
-      watch(
-        () => stake.from,
-        () => {
-          if (!stake.from) {
-            stake.to = null;
-            return;
-          }
-          stake.to = depositAmount.value > 0 ? depositAmount.value.toFixed(5) : 0;
-        },
-      );
-
-      watch(withdrawAmount, () => {
-        if (!unstake.from) {
-          unstake.to = null;
-          return;
-        }
-        setAmount(unstake.from);
-        unstake.to = withdrawAmount.value > 0 ? withdrawAmount.value.toFixed(5) : 0;
-      });
-
-      const stakePercent = ref(0);
-      watch(stakePercent, () => {
-        const value = solBalance.value * stakePercent.value;
-        stake.from = value ? formatAmount(value / 100) : value;
-      });
-      const unstakePercent = ref(0);
-      watch(unstakePercent, () => {
-        const value = tokenBalance.value * unstakePercent.value;
-        unstake.from = value ? formatAmount(value / 100) : value;
-      });
-
-      const highlightFix = ref(true);
-
-      return {
-        tab,
-        stake,
-        unstake,
-        cluster,
-        connected,
-        depositing,
-        withdrawing,
-        stakeFromInput,
-        unstakeFromInput,
-        stakePercent,
-        unstakePercent,
-        connectionLost,
-        useWithdrawSol,
-        apy: computed(() => formatPct.format(apy.value)),
-        availableSol: computed(() => (solBalance.value ? formatAmount(solBalance.value) : '0')),
-        availableXsol: computed(() =>
-          tokenBalance.value ? formatAmount(tokenBalance.value) : '0',
-        ),
-        solDepositFee: computed(() => fees?.value.solDepositFee),
-        withdrawalFee: computed(() => fees?.value.withdrawalFee),
-        solToXsolRate: computed(() =>
-          exchangeRate.value == 1 ? 1 : formatAmount(exchangeRate.value),
-        ),
-        xSolToSolRate: computed(() =>
-          exchangeRate.value == 1 ? 1 : formatAmount(1 / exchangeRate.value),
-        ),
-
-        stakeMax() {
-          if (!connected.value) {
-            notify({
-              message: 'Wallet is not connected',
-              caption: 'Please connect your wallet',
-            });
-            return;
-          }
-          stake.from = formatAmount(solBalance.value);
-        },
-
-        unstakeMax() {
-          if (!connected.value) {
-            notify({
-              message: 'Wallet is not connected',
-              caption: 'Please connect your wallet',
-            });
-            return;
-          }
-          unstake.from = formatAmount(tokenBalance.value);
-        },
-
-        stakeHandler: async () => {
-          if (depositAmount.value <= 0) {
-            // @ts-ignore
-            stakeFromInput.value?.focus();
-            return;
-          }
-          await depositSol(stake.from - lamportsToSol(depositFee.value));
-          stake.from = 0;
-          stake.to = 0;
-        },
-
-        unstakeHandler: async () => {
-          if (withdrawAmount.value <= 0) {
-            unstakeFromInput.value?.focus();
-            return;
-          }
-          await withdraw();
-          unstake.from = 0;
-          unstake.to = 0;
-          stakeAccountStore.load();
-        },
-
-        formatPct(v: number) {
-          return formatPct.format(v);
-        },
-
-        onlyNumber(e: any) {
-          let keyCode = e.keyCode ? e.keyCode : e.which;
-          if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
-            e.preventDefault();
-          }
-          if (keyCode == 46 && String(e.target.value).includes('.')) {
-            e.preventDefault();
-          }
-        },
-
-        stakeInfoData: computed(() => {
-          if (tab.value === 'stake') {
-            const from = stake.from;
-            const depositFeeVal = lamportsToSol(depositFee.value);
-            const value = from ? (from - depositFeeVal) * exchangeRate.value : 0;
-            return {
-              networkFee: depositFeeVal + ' SOL',
-              poolFee: formatAmount((value > 0 ? value : 0) * fees.value.solDepositFee) + ' xSOL',
-            };
-          }
-          const from = unstake.from;
-          const withdrawRealFee = useWithdrawSol.value
-            ? fees.value.solWithdrawalFee
-            : fees.value.withdrawalFee;
-          const withdrawFeeVal = from * withdrawRealFee;
-          return {
-            networkFee: lamportsToSol(withdrawFee.value) + ' SOL',
-            poolFee: formatAmount(withdrawFeeVal) + ' xSOL',
-          };
-        }),
-
-        highlightFix,
-        onFocus() {
-          highlightFix.value = true;
-        },
-        onBlur() {
-          highlightFix.value = false;
-        },
-      };
-    },
-  });
-</script>
