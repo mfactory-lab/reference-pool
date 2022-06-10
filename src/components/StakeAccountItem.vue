@@ -27,38 +27,45 @@
   -->
 
 <script lang="ts">
-import type { StakeActivationData } from '@solana/web3.js'
 import { computed, defineComponent, ref, watchEffect } from 'vue'
-import type { StakePoolAccount } from '@solana/spl-stake-pool'
+import type { StakeActivationData } from '@solana/web3.js'
+import type { ProgramAccount } from '@/store'
+import { useConnectionStore } from '@/store'
 import { formatAmount, lamportsToSol, shortenAddress } from '@/utils'
 import CopyToClipboard from '@/components/CopyToClipboard.vue'
-import { useConnectionStore } from '@/store'
 
 export default defineComponent({
   components: { CopyToClipboard },
   props: {
+    loading: Boolean,
+    onlyDeposit: {
+      type: Boolean,
+      default: false,
+    },
     stakeAccount: {
-      type: Object as () => StakePoolAccount,
+      type: Object as () => ProgramAccount,
       required: true,
     },
   },
   emits: ['deposit', 'deactivate', 'withdraw'],
   setup(props, { emit }) {
     const connectionStore = useConnectionStore()
-
     const stakeActivation = ref<StakeActivationData>()
-    const loading = ref(true)
+    const stateLoading = ref(true)
 
     watchEffect(async () => {
-      loading.value = true
+      stateLoading.value = true
       stakeActivation.value = await connectionStore.connection!.getStakeActivation(
         props.stakeAccount.pubkey,
       )
-      loading.value = false
+      stateLoading.value = false
     })
 
     return {
       address: computed(() => props.stakeAccount.pubkey.toBase58()),
+      voter: computed(
+        () => props.stakeAccount.account.data?.parsed?.info?.stake?.delegation?.voter,
+      ),
       shortAddress: computed(() => shortenAddress(props.stakeAccount.pubkey.toBase58())),
       amount: computed(() => {
         return formatAmount(lamportsToSol(props.stakeAccount?.account?.lamports ?? 0))
@@ -75,7 +82,10 @@ export default defineComponent({
             return 'grey'
         }
       }),
-      loading,
+      stateLoading,
+      deposit() {
+        emit('deposit', props.stakeAccount)
+      },
       deactivate(address: string) {
         emit('deactivate', address)
       },
@@ -88,11 +98,12 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-item>
-    <q-item-section>
-      <q-item-label class="items-center">
+  <div class="q-item q-item-type row">
+    <div class="col-12 col-sm-6">
+      <q-item-label>
         <CopyToClipboard :text="address" />
         <span class="q-mx-sm">{{ shortAddress }}</span>
+        <!-- {{ voter }} -->
         <q-badge :color="stateColor">
           {{ state }}
         </q-badge>
@@ -100,30 +111,56 @@ export default defineComponent({
       <q-item-label caption>
         {{ amount }} SOL
       </q-item-label>
-    </q-item-section>
+    </div>
+    <div class="col-12 col-sm-6">
+      <q-btn-group rounded unelevated>
+        <template v-if="state === 'active'">
+          <q-btn color="primary" @click="deposit">
+            DEPOSIT
+          </q-btn>
+          <template v-if="!onlyDeposit">
+            <q-btn color="primary-gray" @click="deactivate(address)">
+              DEACTIVATE
+            </q-btn>
+          </template>
+        </template>
+        <template v-else>
+          <q-btn
+            :disabled="state === 'deactivating'"
+            color="secondary"
+            text-color="dark"
+            @click="withdraw(address, lamports)"
+          >
+            WITHDRAW
+          </q-btn>
+        </template>
+      </q-btn-group>
+    </div>
 
-    <q-item-section side>
-      <template v-if="state === 'active'">
-        <q-btn color="accent" rounded style="width: 120px" unelevated @click="deactivate(address)">
-          DEACTIVATE
-        </q-btn>
-      </template>
-      <template v-else>
-        <q-btn
-          :disabled="state === 'deactivating'"
-          color="primary"
-          rounded
-          style="width: 120px"
-          unelevated
-          @click="withdraw(address, lamports)"
-        >
-          WITHDRAW
-        </q-btn>
-      </template>
-    </q-item-section>
-
-    <q-inner-loading :showing="loading">
+    <q-inner-loading :showing="loading || stateLoading">
       <q-spinner color="primary" />
     </q-inner-loading>
-  </q-item>
+  </div>
 </template>
+
+<style scoped lang="scss">
+  .q-item {
+    .q-btn-group {
+      margin-left: 1.5rem;
+    }
+    .q-btn {
+      font-size: 0.7rem;
+    }
+    @media (max-width: $breakpoint-xs-max) {
+      text-align: center;
+      .q-btn-group {
+        margin: 0.5rem 0 0;
+      }
+    }
+    @media (min-width: $breakpoint-xs) {
+      .q-btn-group {
+        float: right;
+      }
+    }
+  }
+</style>

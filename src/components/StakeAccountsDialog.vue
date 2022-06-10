@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
-import { evaClose } from '@quasar/extras/eva-icons'
+import { evaClose, evaRefresh } from '@quasar/extras/eva-icons'
 import { PublicKey, StakeProgram } from '@solana/web3.js'
 import { useAnchorWallet, useWallet } from 'solana-wallets-vue'
 import type { ProgramAccount } from '@/store'
@@ -37,11 +37,9 @@ import {
   useStakeAccountStore,
 } from '@/store'
 import { useDeposit, useMonitorTransaction } from '@/hooks'
-import StakeAccountItem from '@/components/StakeAccountItem.vue'
 import { sendTransaction } from '@/utils'
 
 export default defineComponent({
-  components: { StakeAccountItem },
   props: {
     voter: {
       type: String,
@@ -60,12 +58,12 @@ export default defineComponent({
     const connectionStore = useConnectionStore()
     const { publicKey } = useWallet()
     const anchorWallet = useAnchorWallet()
-    const stakeAccountStore = useStakeAccountStore()
+    const stakeAccounts = useStakeAccountStore()
     const { monitorTransaction } = useMonitorTransaction()
     const { depositStake } = useDeposit()
 
-    const dialog = computed(() => stakeAccountStore.dialog)
-    const loading = computed(() => stakeAccountStore.loading)
+    const dialog = computed(() => stakeAccounts.dialog)
+    const loading = computed(() => stakeAccounts.loading)
     const loadingPubkey = ref()
 
     return {
@@ -75,21 +73,23 @@ export default defineComponent({
 
       accounts: computed(() => {
         if (props.voter) {
-          return stakeAccountStore.data.filter(
+          return stakeAccounts.data.filter(
             acc => acc.account.data?.parsed?.info?.stake?.delegation?.voter === props.voter,
           )
         }
-        return stakeAccountStore.data
+        return stakeAccounts.data
       }),
 
-      updateDialog: (v: boolean) => (stakeAccountStore.dialog = v),
+      updateDialog: (v: boolean) => (stakeAccounts.dialog = v),
 
       deposit: async (stakeAccount: ProgramAccount) => {
         emit('beforeDeposit')
         loadingPubkey.value = stakeAccount.pubkey.toBase58()
-        await depositStake(stakeAccount)
+        const success = await depositStake(stakeAccount)
+        if (success) {
+          stakeAccounts.removeAccount(stakeAccount.pubkey.toBase58())
+        }
         loadingPubkey.value = null
-        await stakeAccountStore.load()
         emit('afterDeposit')
       },
 
@@ -106,9 +106,11 @@ export default defineComponent({
             }).instructions,
             [],
           ),
+          {
+            commitment: 'finalized',
+          },
         )
         loadingPubkey.value = null
-        await stakeAccountStore.load()
         emit('afterDeactivate')
       },
 
@@ -128,12 +130,21 @@ export default defineComponent({
             }).instructions,
             [],
           ),
+          {
+            onSuccess: () => stakeAccounts.removeAccount(address),
+          },
         )
         loadingPubkey.value = null
-        await stakeAccountStore.load()
         emit('afterWithdraw')
       },
-      evaClose,
+
+      refresh() {
+        stakeAccounts.load()
+      },
+      icons: {
+        close: evaClose,
+        refresh: evaRefresh,
+      },
     }
   },
 })
@@ -150,6 +161,7 @@ export default defineComponent({
         <q-card-section class="relative-position">
           <div class="text-h6 text-center">
             Stake Accounts
+            <q-btn rounded unelevated dense size="sm" :icon="icons.refresh" @click="refresh" />
           </div>
           <q-btn
             padding="md"
@@ -157,7 +169,7 @@ export default defineComponent({
             text-color="primary-gray"
             unelevated
             class="absolute-right"
-            :icon="evaClose"
+            :icon="icons.close"
             size="md"
             @click="updateDialog(false)"
           />
@@ -165,7 +177,7 @@ export default defineComponent({
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section class="scroll" style="max-height: 70vh">
           <q-list v-if="accounts.length > 0" separator style="width: 500px">
             <StakeAccountItem
               v-for="acc in accounts"
