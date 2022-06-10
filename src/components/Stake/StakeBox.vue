@@ -149,6 +149,7 @@ export default defineComponent({
     })
 
     const highlightFix = ref(true)
+    const unstakeType = ref('')
 
     return {
       tab,
@@ -158,6 +159,7 @@ export default defineComponent({
       connected,
       depositing,
       withdrawing,
+      unstakeType,
       stakeFromInput,
       unstakeFromInput,
       stakePercent,
@@ -165,10 +167,8 @@ export default defineComponent({
       connectionLost,
       useWithdrawSol,
       apy: computed(() => formatPct.format(apy.value)),
-      availableSol: computed(() => (solBalance.value ? formatAmount(solBalance.value) : '0')),
-      availableXsol: computed(() =>
-        tokenBalance.value ? formatAmount(tokenBalance.value) : '0',
-      ),
+      availableSol: computed(() => solBalance.value ? solBalance.value : '0'),
+      availableXsol: computed(() => tokenBalance.value ? tokenBalance.value : '0'),
       solDepositFee: computed(() => fees?.value.solDepositFee),
       withdrawalFee: computed(() => fees?.value.withdrawalFee),
       solToXsolRate: computed(() =>
@@ -210,12 +210,14 @@ export default defineComponent({
         stake.to = 0
       },
 
-      unstakeHandler: async () => {
+      unstakeHandler: async (forceDelayed = false) => {
         if (withdrawAmount.value <= 0) {
           unstakeFromInput.value?.focus()
           return
         }
-        await withdraw()
+        unstakeType.value = forceDelayed ? 'delayed' : 'instant'
+        await withdraw(forceDelayed)
+        unstakeType.value = ''
         unstake.from = 0
         unstake.to = 0
         stakeAccountStore.load()
@@ -235,20 +237,29 @@ export default defineComponent({
         }
       },
 
-      stakeInfoData: computed(() => {
-        if (tab.value === 'stake') {
-          const from = stake.from
-          const depositFeeVal = lamportsToSol(depositFee.value)
-          const value = from ? (from - depositFeeVal) * exchangeRate.value : 0
-          return {
-            networkFee: `${depositFeeVal} SOL`,
-            poolFee: `${formatAmount((value > 0 ? value : 0) * fees.value.solDepositFee)} xSOL`,
-          }
+      stakeInfo: computed(() => {
+        const from = stake.from
+        const depositFeeVal = lamportsToSol(depositFee.value)
+        const value = from ? (from - depositFeeVal) * exchangeRate.value : 0
+        return {
+          networkFee: `${depositFeeVal} SOL`,
+          poolFee: `${formatAmount((value > 0 ? value : 0) * fees.value.solDepositFee)} xSOL`,
         }
+      }),
+
+      unstakeInfo: computed(() => {
         const from = unstake.from
-        const withdrawRealFee = useWithdrawSol.value
-          ? fees.value.solWithdrawalFee
-          : fees.value.withdrawalFee
+        const withdrawRealFee = fees.value.withdrawalFee
+        const withdrawFeeVal = from * withdrawRealFee
+        return {
+          networkFee: `${lamportsToSol(withdrawFee.value)} SOL`,
+          poolFee: `${formatAmount(withdrawFeeVal)} xSOL`,
+        }
+      }),
+
+      unstakeNowInfo: computed(() => {
+        const from = unstake.from
+        const withdrawRealFee = fees.value.solWithdrawalFee
         const withdrawFeeVal = from * withdrawRealFee
         return {
           networkFee: `${lamportsToSol(withdrawFee.value)} SOL`,
@@ -369,10 +380,10 @@ export default defineComponent({
           <div class="row items-between">
             <div class="column col-sm-6 col-xs-12 q-pr-sm">
               <div class="stake-box__stake-info">
-                Network Fee: {{ stakeInfoData.networkFee }}
+                Network Fee: {{ stakeInfo.networkFee }}
               </div>
               <div class="stake-box__stake-info">
-                Pool Fee: {{ stakeInfoData.poolFee }}
+                Pool Fee: {{ stakeInfo.poolFee }}
               </div>
             </div>
             <div class="column justify-between col-sm-6 col-xs-12 q-pl-sm">
@@ -480,28 +491,55 @@ export default defineComponent({
           <div class="row items-between">
             <div class="column col-sm-6 col-xs-12 q-pr-sm">
               <div class="stake-box__stake-info">
-                Pool Fee: {{ stakeInfoData.poolFee }}
+                Pool Fee: {{ unstakeNowInfo.poolFee }}
               </div>
               <div class="stake-box__stake-info">
-                Network Fee: {{ stakeInfoData.networkFee }}
+                Network Fee: {{ unstakeNowInfo.networkFee }}
               </div>
             </div>
 
             <div class="column col-sm-6 col-xs-12 q-pl-sm">
               <q-btn
                 v-if="connected"
-                :loading="withdrawing"
+                :loading="withdrawing && unstakeType === 'instant'"
                 class="stake-box__btn"
                 color="primary"
                 rounded
                 size="lg"
                 text-color="primary-gray"
-                :disable="connectionLost || Number(unstake.from) > Number(availableXsol)"
+                :disable="connectionLost || Number(unstake.from) > Number(availableXsol) || unstakeType === 'delayed' || !useWithdrawSol"
                 @click="unstakeHandler(false)"
               >
                 <div>UNSTAKE NOW</div>
               </q-btn>
               <ConnectWallet v-else />
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-section v-if="connected">
+          <div class="row items-between q-mt-sm">
+            <div class="column col-sm-6 col-xs-12 q-pr-sm">
+              <div class="stake-box__stake-info">
+                Pool Fee: {{ unstakeInfo.poolFee }}
+              </div>
+              <div class="stake-box__stake-info">
+                Network Fee: {{ unstakeInfo.networkFee }}
+              </div>
+            </div>
+
+            <div class="column col-sm-6 col-xs-12 q-pl-sm">
+              <q-btn
+                :loading="withdrawing && unstakeType === 'delayed'"
+                class="stake-box__btn"
+                color="primary"
+                rounded
+                size="lg"
+                text-color="primary-gray"
+                :disable="connectionLost || Number(unstake.from) > Number(availableXsol) || unstakeType === 'instant'"
+                @click="unstakeHandler(true)"
+              >
+                <div>UNSTAKE DELAYED</div>
+              </q-btn>
             </div>
           </div>
         </q-card-section>
