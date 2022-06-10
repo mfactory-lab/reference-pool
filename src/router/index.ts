@@ -31,7 +31,8 @@ import type { App } from 'vue'
 import routes from './routes'
 
 const router = createRouter({
-  history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(),
+  // TODO: fix
+  history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(import.meta.env.BASE_URL),
   // history: import.meta.env.SSR ? createMemoryHistory() : createWebHashHistory(),
   scrollBehavior: () => ({ left: 0, top: 0 }),
   strict: true,
