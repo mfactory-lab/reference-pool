@@ -42,7 +42,7 @@
             </p>
             <p>
               Read more at
-              <a href="https://docs.solana.com/staking">https://docs.solana.com/staking</a>
+              <a href="https://docs.solana.com/staking" target="blank">https://docs.solana.com/staking</a>
             </p>
           </div>
         </div>
@@ -57,33 +57,37 @@
               without managing stakes. Users deposit SOL in exchange for SPL tokens (staking
               derivatives) that represent their ownership in the stake pool. The pool manager stakes
               deposited SOL according to their strategy, perhaps using a variant of an
-              auto-delegation bot as described above. As stakes earn rewards, the pool and pool
-              tokens grow proportionally in value. Finally, pool token holders can send SPL tokens
-              back to the stake pool to redeem SOL, thereby participating in decentralization with
-              much less work required."
-            </p>
-            <p>
-              To put it short: You have all the advantages of direct staking at top efficiency –
-              without the fuss of selecting and carefully watching the validator(s) you stake with.
-            </p>
-            <p>
-              Plus, you help improve the Solana network, which increases the value of your SOL!
+              auto-delegation bot as described above.
             </p>
           </div>
         </div>
         <div class="faq-item">
           <div class="faq-item__title">
-            What is a xSOL token?
+            How do I get my rewards?
           </div>
           <div class="faq-item__body">
             <p>
-              When you delegate your SOL to a Stake Pool, you get xSOL tokens in return. These
-              tokens are your proof of a share ownership in the stake pool, and they can be traded
-              back for SOL at the end of any epoch.
+              Your JSOL represents your share in the pool’s total stake, which grows constantly as
+              rewards are accrued. This reflects in the JSOL-SOL exchange rate which will be used to
+              calculate the SOL you get back when you unstake. Total JSOL price growth is equal to
+              the pool’s APY.
             </p>
             <p>
-              Obviously, you get more SOL than you staked in the first place, including your APY
-              accrued over the staking period.
+              Read more at
+              <a href="https://docs.solana.com/staking" target="blank">https://docs.solana.com/staking</a>
+            </p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-item__title">
+            Who is a Delegator?
+          </div>
+          <div class="faq-item__body">
+            <p>
+              Any user who delegates their SOL to a Validator (either directly or via Stake Pool),
+              enabling them to validate new blocks and keep the network alive, becomes a Delegator.
+              <br>
+              Anyone who has some SOL in their wallet may delegate it – and earn rewards by doing so
             </p>
           </div>
         </div>
