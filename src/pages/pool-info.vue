@@ -54,44 +54,45 @@ export default defineComponent({
       <div class="page-title">
         Stake Pool Info
       </div>
+      <div class="container q-pb-xl">
+        Stake Pool: <b>{{ stakePoolAddress?.toBase58() }}</b>
 
-      Stake Pool: <b>{{ stakePoolAddress?.toBase58() }}</b>
+        <br>
+        <br>
 
-      <br>
-      <br>
-
-      <p>
-        Epoch Fee: <b>{{ formatPct(fees.fee) }}</b> of epoch rewards
-      </p>
-      <p>
-        Epoch Fee, starting next epoch: <b>{{ formatPct(fees.feeNext) }}</b> of epoch rewards
-      </p>
-      <p>
-        Withdrawal: <b>{{ formatPct(fees.withdrawalFee) }}</b> of withdrawal amount
-      </p>
-      <p>
-        Withdrawal, starting next epoch: <b>{{ formatPct(fees.nextWithdrawalFee) }}</b> of
-        withdrawal amount
-      </p>
-      <p>
-        Instant Withdrawal: <b>{{ formatPct(fees.solWithdrawalFee) }}</b> of withdrawal amount
-      </p>
-      <p>
-        Instant Withdrawal, starting next epoch:
-        <b>{{ formatPct(fees.nextSolWithdrawalFee) }}</b> of withdrawal amount
-      </p>
-      <p>
-        Stake Deposit Fee: <b>{{ formatPct(fees.stakeDepositFee) }}</b>
-      </p>
-      <p>
-        SOL Deposit Fee: <b>{{ formatPct(fees.solDepositFee) }}</b> of deposit amount
-      </p>
-      <p>
-        SOL Deposit Referral Fee: <b>{{ formatPct(fees.solReferralFee) }}</b>
-      </p>
-      <p>
-        Stake Deposit Referral Fee: <b>{{ formatPct(fees.stakeReferralFee) }}</b>
-      </p>
+        <p>
+          Epoch Fee: <b>{{ formatPct(fees.fee) }}</b> of epoch rewards
+        </p>
+        <p>
+          Epoch Fee, starting next epoch: <b>{{ formatPct(fees.feeNext) }}</b> of epoch rewards
+        </p>
+        <p>
+          Withdrawal: <b>{{ formatPct(fees.withdrawalFee) }}</b> of withdrawal amount
+        </p>
+        <p>
+          Withdrawal, starting next epoch: <b>{{ formatPct(fees.nextStakeWithdrawalFee) }}</b> of
+          withdrawal amount
+        </p>
+        <p>
+          Instant Withdrawal: <b>{{ formatPct(fees.solWithdrawalFee) }}</b> of withdrawal amount
+        </p>
+        <p>
+          Instant Withdrawal, starting next epoch:
+          <b>{{ formatPct(fees.nextSolWithdrawalFee) }}</b> of withdrawal amount
+        </p>
+        <p>
+          Stake Deposit Fee: <b>{{ formatPct(fees.stakeDepositFee) }}</b>
+        </p>
+        <p>
+          SOL Deposit Fee: <b>{{ formatPct(fees.solDepositFee) }}</b> of deposit amount
+        </p>
+        <p>
+          SOL Deposit Referral Fee: <b>{{ formatPct(fees.solReferralFee) }}</b>
+        </p>
+        <p>
+          Stake Deposit Referral Fee: <b>{{ formatPct(fees.stakeReferralFee) }}</b>
+        </p>
+      </div>
     </div>
   </q-page>
 </template>
