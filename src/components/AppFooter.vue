@@ -26,13 +26,25 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  setup() {
+    return {
+      year: new Date().getFullYear(),
+    }
+  },
+})
+</script>
+
 <template>
   <q-footer :class="$style.footer">
     <div class="container">
       <div class="row q-col-gutter-lg">
         <div class="col justify-between d-flex column">
           <div class="text-caption">
-            © Copyright 2021 xxx. All rights reserved.
+            © Copyright {{ year }} xxx. All rights reserved.
             <br>
             Powered by
             <a href="https://mfactory.tech/" target="_blank">mFactory GmbH</a>

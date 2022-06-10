@@ -38,14 +38,11 @@ export const POOL_RELOAD_INTERVAL = 30000
 
 // api
 export const API_URL = import.meta.env.VITE_API_URL
-export const API_COLLECTOR_URL = 'https://api.thevalidators.io'
+export const API_COLLECTOR_URL = import.meta.env.VITE_API_COLLECTOR_URL
 
 // misc
 // export const HOW_TO_STAKE_URL = 'https://www.youtube.com/embed/KXPPGC8iOPM'
 export const HOW_TO_STAKE_URL = 'https://www.youtube.com/channel/UCYG4ZRUBMgEPaBT1OrZKC-Q'
-
-export const JSOL_LOGO
-  = 'https://raw.githubusercontent.com/mfactory-lab/jpool-pub/main/assets/images/jsol.png'
 
 export const PASSWORD_PROTECT = import.meta.env.VITE_PASSWORD_PROTECT
 export const WITHDRAW_SOL_ACTIVE = true

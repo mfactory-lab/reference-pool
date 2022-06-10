@@ -390,7 +390,7 @@ export default defineComponent({
                 STAKE NOW
               </q-btn>
               <div v-else class="text-right">
-                <ConnectWallet class="q-px-lg" size="lg" />
+                <ConnectWallet />
               </div>
             </div>
           </div>
@@ -501,7 +501,7 @@ export default defineComponent({
               >
                 <div>UNSTAKE NOW</div>
               </q-btn>
-              <ConnectWallet v-else class="q-px-lg" size="lg" />
+              <ConnectWallet v-else />
             </div>
           </div>
         </q-card-section>

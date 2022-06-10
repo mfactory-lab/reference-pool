@@ -26,69 +26,104 @@
  */
 
 import { resolve } from 'path'
-import type { BuildOptions, DepOptimizationOptions } from 'vite'
-import { defineConfig } from 'vite'
+import type { BuildOptions, DepOptimizationOptions, PluginOption } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
-import Vue from '@vitejs/plugin-vue'
+import vue from '@vitejs/plugin-vue'
+import checker from 'vite-plugin-checker'
+import visualizer from 'rollup-plugin-visualizer'
+import components from 'unplugin-vue-components/vite'
+import inject from '@rollup/plugin-inject'
+import { chunkSplitPlugin } from 'vite-plugin-chunk-split'
+import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 
 export default defineConfig(({ mode }) => {
-  const isDev = mode === 'development'
+  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
+
   const isProd = mode === 'production'
+  const isReport = mode === 'report'
 
   // TODO: fix
   const base = isProd ? '/reference-pool/' : '/'
 
-  const plugins = [
+  const plugins: (PluginOption | PluginOption[])[] = [
+    vue({
+      include: [/\.vue$/, /\.md$/],
+      template: { transformAssetUrls },
+      // reactivityTransform: true,
+    }),
+    quasar(),
+    checker({
+      // typescript: true,
+      eslint: {
+        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+      },
+    }),
     createHtmlPlugin({
-      minify: true,
-      entry: 'src/main.ts',
       inject: {
         data: {
-          title: 'xPool – Solana Stake Pool',
-          description:
-            'xPool is a Stake Pool on the Solana blockchain ensuring high rewards at low risk level, while also providing a DeFi token.',
-          keywords: 'Solana, DeFi, Stake pool, Proof of Stake, Blockchain, SOL',
+          title: process.env.VITE_APP_TITLE,
+          description: process.env.VITE_APP_DESCRIPTION,
+          keywords: process.env.VITE_APP_KEYWORDS,
         },
       },
     }),
-    Vue({
-      include: [/\.vue$/, /\.md$/],
+    chunkSplitPlugin({
+      // strategy: 'unbundle',
+    }),
+    // https://github.com/antfu/unplugin-vue-components
+    components({
+      extensions: ['vue', 'md'],
+      dts: 'types/components.d.ts',
     }),
   ]
 
   const build: BuildOptions = {
-    manifest: false,
-    cssCodeSplit: false, // true,
-    sourcemap: false,
-    polyfillDynamicImport: false,
-    brotliSize: false,
-    chunkSizeWarningLimit: 2000, // 550
-    assetsInlineLimit: 4096,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        // drop_console: true,
-        drop_debugger: true,
-      },
+    manifest: isProd,
+    // sourcemap: false,
+    // brotliSize: false,
+    // cssCodeSplit: false,
+    // polyfillDynamicImport: false,
+    // assetsInlineLimit: 4096,
+    chunkSizeWarningLimit: 1024,
+    rollupOptions: {
+      plugins: [inject({ Buffer: ['buffer', 'Buffer'] })],
+      // treeshake: true,
+      // output: {
+      //   manualChunks(id) {
+      //     if (id.includes('/node_modules/')) {
+      //       return 'vendors';
+      //     }
+      //   },
+      // },
     },
   }
 
-  if (isProd) {
-    build.manifest = true
+  if (isReport) {
+    plugins.push(
+      visualizer({
+        filename: './dist/report.html',
+        open: true,
+        brotliSize: true,
+      }),
+    )
   }
 
-  let optimizeDeps: DepOptimizationOptions = {}
-
-  if (isDev) {
-    optimizeDeps = {
-      include: ['quasar', 'lodash', '@vue/runtime-core', '@vueuse/core', '@vueuse/head'],
-      exclude: ['vue-demi'],
-    }
+  const optimizeDeps: DepOptimizationOptions = {
+    include: [
+      'vue',
+      '@quasar/extras/eva-icons',
+      'bn.js',
+      'lodash-es',
+    ],
+    exclude: ['vue-demi'],
+    esbuildOptions: {
+      minify: true,
+    },
   }
 
   return {
     base,
-
     build,
     plugins,
     optimizeDeps,
@@ -97,14 +132,40 @@ export default defineConfig(({ mode }) => {
       preprocessorOptions: {
         scss: {
           charset: false,
-          additionalData: '@import "@/assets/scss/_variables.scss";\n',
+          additionalData: '@import "@/assets/scss/global.scss";\n',
         },
-        // TODO https://github.com/vitejs/vite/issues/5833
-        charset: false,
       },
+      postcss: {
+        plugins: [
+          {
+            postcssPlugin: 'internal:charset-removal',
+            AtRule: {
+              charset: (atRule) => {
+                if (atRule.name === 'charset') {
+                  atRule.remove()
+                }
+              },
+            },
+          },
+        ],
+      },
+      // TODO https://github.com/vitejs/vite/issues/5833
+      charset: false,
     },
 
     resolve: {
+      // browser: true,
+      // preferBuiltins: false,
+      dedupe: [
+        'bn.js',
+        'bs58',
+        'lodash',
+        'buffer',
+        'buffer-layout',
+        'eventemitter3',
+        '@solana/web3.js',
+        '@solana/buffer-layout',
+      ],
       alias: [
         {
           find: /~(.+)/,
@@ -114,16 +175,9 @@ export default defineConfig(({ mode }) => {
       ],
     },
 
-    server: {
-      fs: {
-        strict: true,
-      },
-    },
-
-    // support node libraries
     define: {
       'process.env': process.env,
-      'global': 'window',
+      // global: 'globalThis',
     },
   }
 })

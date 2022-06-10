@@ -18,8 +18,9 @@
   "license": "AGPL-3.0",
   "homepage": "https://github.com/mfactory-lab/reference-pool#readme",
   "scripts": {
-    "dev": "vite --port 3333 --open",
+    "dev": "vite --port 3333",
     "build": "vite build --mode production",
+    "build:staging": "vite build --mode staging",
     "serve": "vite preview",
     "lint": "eslint ./src",
     "lint:fix": "eslint --ext .js,.vue,.ts --fix ./src",

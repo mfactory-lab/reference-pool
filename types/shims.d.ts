@@ -26,9 +26,19 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-export const TELEGRAM_ANNOUNCEMENT_URL = 'https://t.me/jpoolsolana'
-// export const TWITTER_URL = 'https://twitter.com/JPoolSolana'
-// export const TELEGRAM_URL = 'https://t.me/jpool_solana'
-// export const DISCORD_URL = 'https://discord.gg/qR4BA9QXVR'
+// declare interface Window {
+//   // extend the window
+// }
 
-export const GTAG_ID = import.meta.env.VITE_GTAG_ID
+// with vite-plugin-md, markdowns can be treat as Vue components
+declare module '*.md' {
+  import type { DefineComponent } from 'vue';
+  const component: DefineComponent<{}, {}, any>;
+  export default component;
+}
+
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue';
+  const component: DefineComponent<{}, {}, any>;
+  export default component;
+}

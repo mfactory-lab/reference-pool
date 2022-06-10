@@ -53,7 +53,7 @@ const time = computed(() => {
       size="106px"
       :thickness="0.2"
       color="natural-gray"
-      track-color="secondary"
+      track-color="primary"
       center-color="white"
     >
       <div class="epoch__label">
