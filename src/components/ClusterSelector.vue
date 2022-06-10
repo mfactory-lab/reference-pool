@@ -27,49 +27,59 @@
   -->
 
 <script lang="ts">
-import { computed, watch } from 'vue'
-import { ENDPOINTS } from '@/config'
+import { computed, defineComponent } from 'vue'
+import { useWallet } from 'solana-wallets-vue'
 import type { Endpoint } from '@/store'
-import { useConnectionStore, useValidatorStore } from '@/store'
-
-export default {
+import { useConnectionStore } from '@/store'
+import { ENDPOINTS } from '@/config'
+export default defineComponent({
   setup() {
     const connectionStore = useConnectionStore()
-    const validatorStore = useValidatorStore()
-
-    const cluster = computed(() => connectionStore.cluster)
-
-    watch(cluster, validatorStore.load)
-
+    const { connected, connect, disconnect, autoConnect } = useWallet()
     return {
-      cluster,
-      items: ENDPOINTS,
-      select: (e: Endpoint) => connectionStore.setCluster(e.name),
-      filter: (name: string) => name.replace('-beta', ''),
+      groups: [
+        ENDPOINTS.filter(e => e.cluster === 'mainnet-beta'),
+        ENDPOINTS.filter(e => e.cluster !== 'mainnet-beta'),
+      ],
+      endpoint: computed(() => connectionStore.endpoint),
+      select: (e: Endpoint) => {
+        if (connected && connectionStore.cluster !== e.cluster) {
+          disconnect()
+          if (autoConnect.value) {
+            connect()
+          }
+        }
+        connectionStore.setRpc(e.id)
+      },
     }
   },
-}
+})
 </script>
 
 <template>
   <q-btn-dropdown
     class="app-header__cluster-btn"
-    :label="filter(cluster)"
+    :label="endpoint.name"
     :model-value="false"
     auto-close
     color="white"
     text-color="black"
     rounded
+    unelevated
+    :ripple="false"
   >
     <q-list>
-      <q-item v-for="item in items" :key="item.name" clickable @click="select(item)">
-        <q-item-section>
-          <q-item-label>
-            <b>{{ filter(item.name) }}</b>
-          </q-item-label>
-          {{ item.url }}
-        </q-item-section>
-      </q-item>
+      <template v-for="(items, index) in groups" :key="`${index}-cluster-group`">
+        <q-item v-for="item in items" :key="item.id" clickable @click="select(item)">
+          <q-item-section>
+            <q-item-label>
+              <b>{{ item.name }}</b>
+            </q-item-label>
+            {{ item.url }}
+          </q-item-section>
+        </q-item>
+        <q-separator v-if="index !== groups.length - 1" />
+      </template>
     </q-list>
   </q-btn-dropdown>
 </template>

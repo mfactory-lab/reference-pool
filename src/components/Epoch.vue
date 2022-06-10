@@ -26,40 +26,34 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import { storeToRefs } from 'pinia'
+<script lang="ts" setup>
 import { computed } from 'vue'
 import { useEpochStore } from '@/store'
 
-export default {
-  setup() {
-    const { epochTimeRemaining, epochProgress, epochNumber } = storeToRefs(useEpochStore())
-    return {
-      epochNumber,
-      epochProgress,
-      time: computed(() => {
-        const timeInMs = epochTimeRemaining.value
-        const _h = timeInMs / 1000 / 60 / 60
-        const h = Math.floor(_h)
-        const m = Math.floor((_h - h) * 60)
-        const s = Math.ceil(((_h - h) * 60 - m) * 60)
-        return { h, m: m < 10 ? `0${m}` : m, s: s < 10 ? `0${s}` : s }
-      }),
-    }
-  },
-}
+const epochStore = useEpochStore()
+const epochNumber = computed(() => epochStore.epochNumber)
+const epochProgress = computed(() => +epochStore.epochProgress)
+
+const time = computed(() => {
+  const timeInMs = epochStore.epochTimeRemaining
+  const _h = timeInMs / 1000 / 60 / 60
+  const h = Math.floor(_h)
+  const m = Math.floor((_h - h) * 60)
+  const s = Math.ceil(((_h - h) * 60 - m) * 60)
+  return { h, m: m < 10 ? `0${m}` : m, s: s < 10 ? `0${s}` : s }
+})
 </script>
 
 <template>
   <div class="epoch">
     <q-circular-progress
       show-value
-      class="q-mt-xs q-ma-mdepoch__progress"
+      class="q-mt-xs epoch__progress"
       :value="epochProgress"
       size="106px"
       :thickness="0.2"
       color="natural-gray"
-      track-color="primary"
+      track-color="secondary"
       center-color="white"
     >
       <div class="epoch__label">
@@ -79,6 +73,9 @@ export default {
 
 <style scoped lang="scss">
   .epoch {
+    @media (max-width: $breakpoint-sm) {
+      margin-bottom: 16px;
+    }
     &__progress {
       @media (max-width: $breakpoint-sm) {
         width: 95px;
@@ -93,7 +90,7 @@ export default {
         font-size: 10px;
         line-height: 12px;
         text-transform: uppercase;
-        color: #5c5c5c;
+        color: $gray;
       }
 
       &-value {

@@ -45,7 +45,7 @@ import '@/assets/scss/app.scss'
 //     { name: 'twitter:title', content: SITE_TITLE },
 //     { name: 'twitter:creator', content: '@JPoolSolana' },
 //   ],
-// });
+// })
 
 onBeforeMount(() => {
   initWallet()

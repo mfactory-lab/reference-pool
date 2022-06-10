@@ -29,7 +29,6 @@
 <script lang="ts">
 import { computed, defineComponent, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
-import { storeToRefs } from 'pinia'
 import { useWallet } from 'solana-wallets-vue'
 import ConnectWallet from '@/components/ConnectWallet.vue'
 import {
@@ -64,7 +63,8 @@ export default defineComponent({
 
     const { depositFee, depositing, depositSol } = useDeposit()
     const { withdrawFee, withdrawing, setAmount, withdraw, useWithdrawSol } = useWithdraw()
-    const { apy } = storeToRefs(useApyStore())
+    const apyStore = useApyStore()
+    const apy = computed(() => apyStore.apy)
 
     const cluster = computed(() => connectionStore.cluster)
     const solBalance = computed(() => balanceStore.solBalance)

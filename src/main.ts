@@ -9,7 +9,7 @@
  * of the License, or (at your option) any later version.
  *
  * Solana Reference Stake Pool is distributed in the hope that it
- * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * will be useful, but WITHOUT ANY WARRANTY without even the implied
  * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details.
  *
@@ -29,8 +29,8 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { setupRouter } from '@/router'
-// import { ViteSSG } from 'vite-ssg';
-// import routes from '@/router/routes';
+// import { ViteSSG } from 'vite-ssg'
+// import routes from '@/router/routes'
 
 async function bootstrap() {
   const app = createApp(App)
@@ -43,5 +43,5 @@ bootstrap().then()
 
 // https://github.com/antfu/vite-ssg
 // export const createApp = ViteSSG(App, { routes, base: import.meta.env.BASE_URL }, (ctx) => {
-//   Object.values(import.meta.globEager('./plugins/*.ts')).forEach((i) => i.install?.(ctx));
-// });
+//   Object.values(import.meta.globEager('./plugins/*.ts')).forEach((i) => i.install?.(ctx))
+// })

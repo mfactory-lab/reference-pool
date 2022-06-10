@@ -27,34 +27,26 @@
   -->
 
 <script lang="ts">
-import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
+import { computed, defineComponent } from 'vue'
 import { useStakePoolStore } from '@/store'
 import { lamportsToSol, priceFormatter } from '@/utils'
-import TotalStacked from '@/components/TotalStacked.vue'
 
-export default {
-  components: {
-    TotalStacked,
-  },
+export default defineComponent({
   setup() {
     const stakePoolStore = useStakePoolStore()
-    const { reserveStakeBalance } = storeToRefs(stakePoolStore)
-
-    function formatAmount(val: number) {
-      return priceFormatter.format(val)
-    }
     return {
-      reserveStakeBalance: computed(() => formatAmount(lamportsToSol(reserveStakeBalance.value))),
+      reserveStakeBalance: computed(() =>
+        priceFormatter.format(lamportsToSol(stakePoolStore.reserveStakeBalance)),
+      ),
     }
   },
-}
+})
 </script>
 
 <template>
   <TotalStacked />
   <div class="total-stacked__reserved-balance">
-    Available Liquidity: <b>{{ reserveStakeBalance }} SOL</b>
+    Available liquidity: <b>{{ reserveStakeBalance }} SOL</b>
   </div>
 </template>
 

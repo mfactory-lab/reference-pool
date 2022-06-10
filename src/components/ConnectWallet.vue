@@ -111,29 +111,28 @@ export default defineComponent({
 <template>
   <q-btn
     v-if="connected"
-    v-bind="$attrs"
+    class="app-header__wallet-btn"
     :class="$style.btn"
-    :ripple="false"
-    color="primary-gray"
-    text-color="white"
+    color="primary"
+    text-color="primary-gray"
     rounded
     unelevated
     @click="dialog = true"
   >
     {{ walletShortAddress }}
   </q-btn>
-
   <q-btn
     v-else
-    v-bind="$attrs"
-    color="primary-gray"
-    text-color="white"
+    class="app-header__wallet-btn"
+    :class="$style.btn"
+    color="primary"
+    text-color="primary-gray"
     rounded
-    unelevated
-    :ripple="false"
-    @click="dialog = true"
+    @click="connect"
   >
-    CONNECT WALLET
+    <div class="row items-center no-wrap">
+      <span>CONNECT WALLET</span>
+    </div>
   </q-btn>
 
   <q-dialog

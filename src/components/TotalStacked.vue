@@ -27,24 +27,26 @@
   -->
 
 <script lang="ts">
-import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
+import { computed, toRef } from 'vue'
 import { formatAmount, lamportsToSol } from '@/utils'
 import { useCoinRateStore, useConnectionStore, useStakePoolStore } from '@/store'
 
 export default {
   setup() {
-    const { endpoint } = storeToRefs(useConnectionStore())
-    const { stakePool } = storeToRefs(useStakePoolStore())
-    const { solPrice } = storeToRefs(useCoinRateStore())
+    const coinRateStore = useCoinRateStore()
+    const connectionStore = useConnectionStore()
+    const stakePoolStore = useStakePoolStore()
+    const stakePool = toRef(stakePoolStore, 'stakePool')
+
     const solStaked = computed(() =>
       lamportsToSol(stakePool.value?.totalLamports.toNumber() ?? 0),
     )
-    const usdStacked = computed(() => solStaked.value * solPrice.value)
+    const usdStacked = computed(() => solStaked.value * coinRateStore.solPrice)
+
+    const maxSolToStake = computed(() => connectionStore.stakeLimit ?? 0)
 
     return {
-      // reverse limit progress for rounded right part of progress bar
-      maxSolToStake: computed(() => endpoint.value?.stakeLimit),
+      maxSolToStake,
       solStaked,
       usdStacked,
       formatPrice: (v: number) => formatAmount(v, 1),

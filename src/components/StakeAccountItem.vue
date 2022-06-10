@@ -29,7 +29,6 @@
 <script lang="ts">
 import type { StakeActivationData } from '@solana/web3.js'
 import { computed, defineComponent, ref, watchEffect } from 'vue'
-import { storeToRefs } from 'pinia'
 import type { StakePoolAccount } from '@solana/spl-stake-pool'
 import { formatAmount, lamportsToSol, shortenAddress } from '@/utils'
 import CopyToClipboard from '@/components/CopyToClipboard.vue'
@@ -45,14 +44,14 @@ export default defineComponent({
   },
   emits: ['deposit', 'deactivate', 'withdraw'],
   setup(props, { emit }) {
-    const { connection } = storeToRefs(useConnectionStore())
+    const connectionStore = useConnectionStore()
 
     const stakeActivation = ref<StakeActivationData>()
     const loading = ref(true)
 
     watchEffect(async () => {
       loading.value = true
-      stakeActivation.value = await connection.value!.getStakeActivation(
+      stakeActivation.value = await connectionStore.connection!.getStakeActivation(
         props.stakeAccount.pubkey,
       )
       loading.value = false

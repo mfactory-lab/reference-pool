@@ -131,7 +131,7 @@ export function useMonitorTransaction() {
       dismiss()
 
       if (res.value.err) {
-        // console.error(res.value.err);
+        // console.error(res.value.err)
         // noinspection ExceptionCaughtLocallyJS
         throw new Error(JSON.stringify(res.value.err))
       }

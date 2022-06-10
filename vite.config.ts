@@ -25,17 +25,18 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { resolve } from 'path';
-import { BuildOptions, DepOptimizationOptions, defineConfig } from 'vite';
-import { createHtmlPlugin } from 'vite-plugin-html';
-import Vue from '@vitejs/plugin-vue';
+import { resolve } from 'path'
+import type { BuildOptions, DepOptimizationOptions } from 'vite'
+import { defineConfig } from 'vite'
+import { createHtmlPlugin } from 'vite-plugin-html'
+import Vue from '@vitejs/plugin-vue'
 
 export default defineConfig(({ mode }) => {
-  const isDev = mode === 'development';
-  const isProd = mode === 'production';
+  const isDev = mode === 'development'
+  const isProd = mode === 'production'
 
   // TODO: fix
-  const base = isProd ? '/reference-pool/' : '/';
+  const base = isProd ? '/reference-pool/' : '/'
 
   const plugins = [
     createHtmlPlugin({
@@ -53,7 +54,7 @@ export default defineConfig(({ mode }) => {
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),
-  ];
+  ]
 
   const build: BuildOptions = {
     manifest: false,
@@ -61,7 +62,7 @@ export default defineConfig(({ mode }) => {
     sourcemap: false,
     polyfillDynamicImport: false,
     brotliSize: false,
-    chunkSizeWarningLimit: 2000, //550
+    chunkSizeWarningLimit: 2000, // 550
     assetsInlineLimit: 4096,
     minify: 'terser',
     terserOptions: {
@@ -70,19 +71,19 @@ export default defineConfig(({ mode }) => {
         drop_debugger: true,
       },
     },
-  };
-
-  if (isProd) {
-    build.manifest = true;
   }
 
-  let optimizeDeps: DepOptimizationOptions = {};
+  if (isProd) {
+    build.manifest = true
+  }
+
+  let optimizeDeps: DepOptimizationOptions = {}
 
   if (isDev) {
     optimizeDeps = {
       include: ['quasar', 'lodash', '@vue/runtime-core', '@vueuse/core', '@vueuse/head'],
       exclude: ['vue-demi'],
-    };
+    }
   }
 
   return {
@@ -122,7 +123,7 @@ export default defineConfig(({ mode }) => {
     // support node libraries
     define: {
       'process.env': process.env,
-      global: 'window',
+      'global': 'window',
     },
-  };
-});
+  }
+})

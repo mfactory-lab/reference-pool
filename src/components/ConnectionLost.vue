@@ -27,13 +27,13 @@
   -->
 
 <script lang="ts">
-import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { ref, toRef } from 'vue'
 import { useStakePoolStore } from '@/store'
 
 export default {
   setup() {
-    const { connectionLost } = storeToRefs(useStakePoolStore())
+    const stakePoolStore = useStakePoolStore()
+    const connectionLost = toRef(stakePoolStore, 'connectionLost')
     const forceHidden = ref(true)
 
     setTimeout(() => (forceHidden.value = false), 3000)

@@ -27,8 +27,7 @@
   -->
 
 <script lang="ts">
-import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
+import { computed, toRef } from 'vue'
 import { useApyStore } from '@/store'
 import { formatPct } from '@/utils'
 
@@ -40,7 +39,9 @@ export default {
     },
   },
   setup() {
-    const { apy, apyLoading } = storeToRefs(useApyStore())
+    const apyStore = useApyStore()
+    const apy = toRef(apyStore, 'apy')
+    const apyLoading = toRef(apyStore, 'apyLoading')
     return {
       apyLoading,
       apy: computed(() => formatPct.format(apy.value)),
