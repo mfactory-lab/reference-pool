@@ -75,6 +75,11 @@ export function useMonitorTransaction() {
 
     sending.value = true
 
+    const closeAction = {
+      label: 'Close',
+      color: 'white',
+    }
+
     let signature = ''
     try {
       signature = String(await signatureOrPromise)
@@ -87,6 +92,7 @@ export function useMonitorTransaction() {
           caption: e?.message,
           type: 'negative',
           timeout: 0,
+          actions: [closeAction],
         })
       }
       return
@@ -108,11 +114,6 @@ export function useMonitorTransaction() {
       color: 'white',
       target: '_blank',
       href: TELEGRAM_ANNOUNCEMENT_URL,
-    }
-
-    const closeAction = {
-      label: 'Close',
-      color: 'white',
     }
 
     try {
