@@ -24,7 +24,8 @@
     "build:report": "vite build --mode report",
     "preview": "vite preview",
     "lint": "eslint ./src",
-    "lint:fix": "eslint --ext .js,.vue,.ts --fix ./src"
+    "lint:fix": "eslint --ext .js,.vue,.ts --fix ./src",
+    "deploy:gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup"
   },
   "dependencies": {
     "@quasar/extras": "^1.13.6",
