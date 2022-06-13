@@ -28,13 +28,14 @@
 
 // apy
 export const DEFAULT_APY = 0.07
-export const APY_VALIDATOR_ID = '8BYmtxKY1LuvjesaMi1nkXcj6ghuq48iiGKq2jNpnrNY'
+// export const APY_VALIDATOR_ID = '8BYmtxKY1LuvjesaMi1nkXcj6ghuq48iiGKq2jNpnrNY'
+export const APY_VALIDATOR_ID = ''
 
 // intervals
 export const EPOCH_RELOAD_INTERVAL = 60000
 export const RATES_RELOAD_INTERVAL = 300000
-export const DEFI_RELOAD_INTERVAL = 120000
 export const POOL_RELOAD_INTERVAL = 30000
+export const VALIDATORS_RELOAD_INTERVAL = 1800000
 
 // api
 export const API_URL = import.meta.env.VITE_API_URL

@@ -26,19 +26,22 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { ref, toRef, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { shortenAddress } from '@/utils'
-import { getValidatorsStats } from '@/utils/api'
+import type { Connection, ParsedAccountData } from '@solana/web3.js'
+import { PublicKey, ValidatorInfo } from '@solana/web3.js'
+import { findWithdrawAuthorityProgramAddress } from '@solana/spl-stake-pool/src/utils'
+import { STAKE_POOL_PROGRAM_ID } from '@solana/spl-stake-pool/src'
+import { getStakeAccountsByWithdrawAuthority, shortenAddress } from '@/utils'
 import { useConnectionStore } from '@/store'
+import { VALIDATORS_RELOAD_INTERVAL } from '@/config'
+
+const CONFIG_PROGRAM_ID = new PublicKey('Config1111111111111111111111111111111111111')
 
 export interface ValidatorData {
   id: string
-  fee: number
-  apyNum: number
   voter: string
   lamports: number
-  totalStake: number
   name: string
   details: string | undefined
   website: string | undefined
@@ -49,55 +52,101 @@ export interface ValidatorData {
 
 export const useValidatorStore = defineStore('validators', () => {
   const connectionStore = useConnectionStore()
-  const loading = ref(false)
+  const loading = ref<boolean>(false)
   const data = ref<ValidatorData[]>([])
   const voteIds = ref<string[]>([])
 
-  const stakePoolAddress = toRef(connectionStore, 'stakePoolAddress')
-
-  async function load() {
-    if (loading.value) {
+  const load = async (force = false) => {
+    if (loading.value && !force) {
       return
     }
-
     loading.value = true
-    const network = connectionStore.cluster.replace('-beta', '')
-    const validatorsStats = await getValidatorsStats(network, 'true')
 
-    // console.log('[Validators] validatorsStats', validatorsStats);
+    console.log('[Validators] Loading stake accounts...')
+    const stakeAccounts = await getStakeAccounts(
+      connectionStore.connection,
+      connectionStore.stakePoolAddress!,
+    )
+
+    console.log('[Validators] StakeAccounts')
+    console.log(stakeAccounts.map(acc => acc.pubkey.toBase58()).join('\n'))
+
+    const accountStakeMap
+      = stakeAccounts.reduce((map, acc) => {
+        const id = (acc.account.data as ParsedAccountData).parsed?.info?.stake?.delegation?.voter
+        if (id) {
+          if (!map[id]) {
+            map[id] = 0
+          }
+          map[id] += acc.account.lamports
+        }
+        return map
+      }, {} as Record<string, number>) ?? {}
+
+    voteIds.value = Object.keys(accountStakeMap)
+
+    console.log('[Validators] Vote ids', voteIds.value)
+
+    const [voteAccountStatus, validatorInfos] = await Promise.all([
+      connectionStore.connection.getVoteAccounts(),
+      getValidatorInfos(connectionStore.connection),
+    ])
+
+    // const voteAccountStatus = await connection.value.getVoteAccounts();
+    const delinquent = voteAccountStatus.delinquent.filter(acc =>
+      voteIds.value.includes(acc.votePubkey),
+    )
+    const current = voteAccountStatus.current.filter(acc =>
+      voteIds.value.includes(acc.votePubkey),
+    )
+    const voteAccountInfos = [...delinquent, ...current]
+
+    console.log('[Validators] voteAccountInfos:', voteAccountInfos.length)
+    console.log('[Validators] validatorInfos:', validatorInfos.length)
+
+    // const validatorInfos = await getValidatorInfos(connection.value);
 
     const items: ValidatorData[] = []
-    voteIds.value = validatorsStats.map((item) => {
-      const pubKey = item.validatorId
+    for (const voteAccountInfo of voteAccountInfos) {
+      const validatorInfo = validatorInfos.find(info =>
+        info.key.equals(new PublicKey(voteAccountInfo.nodePubkey)),
+      )
+
+      const pubKey = voteAccountInfo.nodePubkey
+      const lamports = accountStakeMap[voteAccountInfo.votePubkey] ?? 0
+      const network = connectionStore.cluster.replace('-beta', '')
+
       items.push({
         id: pubKey,
-        fee: item.fee,
-        voter: item.voteId,
-        apyNum: item.apy,
-        totalStake: Number(item.totalStake),
-        name: item.name ?? shortenAddress(pubKey),
-        details: item.details,
-        website: item.website,
-        keybaseUsername: item.keybaseUsername,
-        image: item.keybaseUsername
-          ? `https://keybase.io/${item.keybaseUsername}/picture`
+        voter: voteAccountInfo.votePubkey,
+        name: validatorInfo?.info?.name ?? shortenAddress(pubKey),
+        details: validatorInfo?.info?.details,
+        website: validatorInfo?.info?.website,
+        keybaseUsername: validatorInfo?.info?.keybaseUsername,
+        image: validatorInfo?.info?.keybaseUsername
+          ? `https://keybase.io/${validatorInfo.info.keybaseUsername}/picture`
           : undefined,
         url: `https://www.validators.app/validators/${network}/${pubKey}`,
-        lamports: Number(item.jpoolLamports),
+        lamports,
       })
-      return item.voteId
-    })
-    // console.log('[Validators] Vote ids', voteIds.value);
+    }
 
     data.value = items
       .sort((a, b) => a.name.localeCompare(b.name))
       .sort((a, b) => b.lamports - a.lamports)
 
-    console.log('[Validators] data', data.value)
     loading.value = false
   }
 
-  watch(stakePoolAddress, load, { immediate: true })
+  const cluster = computed(() => connectionStore.cluster)
+
+  watch(cluster, () => {
+    load(true)
+  }, { immediate: true })
+
+  setInterval(() => {
+    load()
+  }, VALIDATORS_RELOAD_INTERVAL)
 
   return {
     loading,
@@ -107,3 +156,24 @@ export const useValidatorStore = defineStore('validators', () => {
     clear: () => (data.value = []),
   }
 })
+
+async function getStakeAccounts(connection: Connection, stakePoolAddress: PublicKey) {
+  const poolWithdrawAuthority = await findWithdrawAuthorityProgramAddress(
+    STAKE_POOL_PROGRAM_ID,
+    stakePoolAddress,
+  )
+  const items = await getStakeAccountsByWithdrawAuthority(
+    connection,
+    poolWithdrawAuthority,
+  )
+  return items.sort((a, b) => b.account.lamports - a.account.lamports)
+  // .slice(0, VALIDATORS_LIMIT)
+}
+
+async function getValidatorInfos(connection: Connection) {
+  const validatorInfoAccounts = await connection.getProgramAccounts(CONFIG_PROGRAM_ID)
+  return validatorInfoAccounts.flatMap((validatorInfoAccount) => {
+    const validatorInfo = ValidatorInfo.fromConfigData(validatorInfoAccount.account.data)
+    return validatorInfo ? [validatorInfo] : []
+  })
+}
