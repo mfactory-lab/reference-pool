@@ -1,1 +1,0 @@
-import{bK as s,bL as a,bM as t,bU as r,bO as e}from"./vendor.df20c6c8.js";import{_ as c}from"./index.7ca32a14.js";const o={},n=e("div",{class:"container q-pb-xl"},[e("div",{class:"page-title"}," Impressum ")],-1);function _(i,l){return s(),a(r,null,{default:t(()=>[n]),_:1})}var d=c(o,[["render",_]]);export{d as default};
