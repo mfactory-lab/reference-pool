@@ -37,10 +37,6 @@ export const RATES_RELOAD_INTERVAL = 300000
 export const POOL_RELOAD_INTERVAL = 30000
 export const VALIDATORS_RELOAD_INTERVAL = 1800000
 
-// api
-export const API_URL = import.meta.env.VITE_API_URL
-export const API_COLLECTOR_URL = import.meta.env.VITE_API_COLLECTOR_URL
-
 // misc
 // export const HOW_TO_STAKE_URL = 'https://www.youtube.com/embed/KXPPGC8iOPM'
 export const HOW_TO_STAKE_URL = 'https://www.youtube.com/channel/UCYG4ZRUBMgEPaBT1OrZKC-Q'
