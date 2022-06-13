@@ -40,10 +40,10 @@ const DEV_STAKE_POOL_ADDRESS = 'vU5rGXWuLTqFbxtz89TXEbJ59wYHJiLHNmtbXdSB7UF'
 
 export const ENDPOINTS: Endpoint[] = [
   {
-    id: 'jpool-mainnet',
-    name: 'Jpool RPC',
+    id: 'genesys-mainnet',
+    name: 'Genesys RPC',
     cluster: 'mainnet-beta',
-    url: 'https://jpoolone.genesysgo.net/',
+    url: 'https://ssc-dao.genesysgo.net/',
     stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
     stakeLimit: MAIN_STAKE_LIMIT,
   },
