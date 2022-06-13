@@ -34,9 +34,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string
   readonly VITE_APP_DESCRIPTION: string
   readonly VITE_APP_KEYWORDS: string
-  readonly VITE_API_URL: string
   readonly VITE_PASSWORD_PROTECT: string
   readonly VITE_GTAG_ID: string
-  readonly VITE_SENTRY_DSN: string
   readonly VITE_BASE_PATH: string
 }
