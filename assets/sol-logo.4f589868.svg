@@ -1,0 +1,33 @@
+<!--
+  - This file is part of Solana Reference Stake Pool code.
+  -
+  - Copyright © 2021, mFactory GmbH
+  -
+  - Solana Reference Stake Pool is free software: you can redistribute it
+  - and/or modify it under the terms of the GNU Affero General Public License
+  - as published by the Free Software Foundation, either version 3
+  - of the License, or (at your option) any later version.
+  -
+  - Solana Reference Stake Pool is distributed in the hope that it
+  - will be useful, but WITHOUT ANY WARRANTY; without even the implied
+  - warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  - See the GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.
+  - If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+  -
+  - You can be released from the requirements of the Affero GNU General Public License
+  - by purchasing a commercial license. The purchase of such a license is
+  - mandatory as soon as you develop commercial activities using the
+  - Solana Reference Stake Pool code without disclosing the source code of
+  - your own applications.
+  -
+  - The developer of this program can be contacted at <info@mfactory.ch>.
+  -->
+
+<svg width="42" height="33" viewBox="0 0 42 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6.82387 25.1867C7.0773 24.9326 7.42577 24.7844 7.79536 24.7844H41.3115C41.924 24.7844 42.2302 25.5255 41.7972 25.9596L35.1764 32.5977C34.9229 32.8518 34.5745 33 34.2049 33H0.688753C0.0762967 33 -0.229931 32.2589 0.203012 31.8248L6.82387 25.1867Z" fill="#1CE4B0"/>
+<path d="M6.82362 0.40231C7.08761 0.148219 7.43608 0 7.79511 0H41.3112C41.9237 0 42.2299 0.741097 41.797 1.17517L35.1761 7.81328C34.9227 8.06737 34.5742 8.21559 34.2046 8.21559H0.688502C0.0760458 8.21559 -0.230182 7.47449 0.202761 7.04042L6.82362 0.40231Z" fill="#1CE4B0"/>
+<path d="M35.1764 12.7151C34.9229 12.461 34.5745 12.3128 34.2049 12.3128H0.688753C0.0762967 12.3128 -0.229931 13.0539 0.203012 13.488L6.82387 20.1261C7.0773 20.3802 7.42577 20.5284 7.79536 20.5284H41.3115C41.924 20.5284 42.2302 19.7873 41.7972 19.3532L35.1764 12.7151Z" fill="#1CE4B0"/>
+</svg>

@@ -1,0 +1,31 @@
+<!--
+  - This file is part of Solana Reference Stake Pool code.
+  -
+  - Copyright © 2021, mFactory GmbH
+  -
+  - Solana Reference Stake Pool is free software: you can redistribute it
+  - and/or modify it under the terms of the GNU Affero General Public License
+  - as published by the Free Software Foundation, either version 3
+  - of the License, or (at your option) any later version.
+  -
+  - Solana Reference Stake Pool is distributed in the hope that it
+  - will be useful, but WITHOUT ANY WARRANTY; without even the implied
+  - warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  - See the GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.
+  - If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+  -
+  - You can be released from the requirements of the Affero GNU General Public License
+  - by purchasing a commercial license. The purchase of such a license is
+  - mandatory as soon as you develop commercial activities using the
+  - Solana Reference Stake Pool code without disclosing the source code of
+  - your own applications.
+  -
+  - The developer of this program can be contacted at <info@mfactory.ch>.
+  -->
+
+<svg width="24" height="27" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.9393 26.0607C11.5251 26.6464 12.4749 26.6464 13.0607 26.0607L22.6066 16.5147C23.1924 15.9289 23.1924 14.9792 22.6066 14.3934C22.0208 13.8076 21.0711 13.8076 20.4853 14.3934L12 22.8787L3.51472 14.3934C2.92893 13.8076 1.97918 13.8076 1.3934 14.3934C0.807611 14.9792 0.807611 15.9289 1.3934 16.5147L10.9393 26.0607ZM10.5 -6.55671e-08L10.5 25L13.5 25L13.5 6.55671e-08L10.5 -6.55671e-08Z" fill="white"/>
+</svg>

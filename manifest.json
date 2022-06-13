@@ -1,0 +1,176 @@
+{
+  "index.html": {
+    "file": "assets/index.caccac82.js",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "_vendor.7b48a676.js"
+    ],
+    "dynamicImports": [
+      "src/pages/404.vue",
+      "src/pages/500.vue",
+      "src/pages/about.vue",
+      "src/pages/home.vue",
+      "src/pages/impressum.vue",
+      "src/pages/pool-info.vue",
+      "src/pages/privacy.vue",
+      "src/pages/terms.vue",
+      "src/layouts/default.vue"
+    ],
+    "css": [
+      "assets/index.47c66ee8.css"
+    ],
+    "assets": [
+      "assets/logo.d39b3616.svg",
+      "assets/Eva-Icons.f19a427f.woff2",
+      "assets/Eva-Icons.ba7db2a0.woff",
+      "assets/KFOkCnqEu92Fr1MmgVxIIzQ.a38ad0b6.woff",
+      "assets/KFOlCnqEu92Fr1MmSU5fBBc-.855a0697.woff",
+      "assets/KFOmCnqEu92Fr1Mu4mxM.ea50ac7f.woff",
+      "assets/KFOlCnqEu92Fr1MmEU9fBBc-.bd811625.woff",
+      "assets/KFOlCnqEu92Fr1MmWUlfBBc-.a01a632e.woff",
+      "assets/KFOlCnqEu92Fr1MmYUtfBBc-.d33864e0.woff",
+      "assets/arr-down.75109130.svg",
+      "assets/bg-sol-part.939467ee.svg"
+    ]
+  },
+  "_vendor.7b48a676.js": {
+    "file": "assets/vendor.7b48a676.js",
+    "dynamicImports": [
+      "_async-vendor.d290f954.js"
+    ]
+  },
+  "_async-vendor.d290f954.js": {
+    "file": "assets/async-vendor.d290f954.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.7b48a676.js"
+    ]
+  },
+  "_lodash.e7b015f5.js": {
+    "file": "assets/lodash.e7b015f5.js"
+  },
+  "src/pages/404.vue": {
+    "file": "assets/404.8bbec59d.js",
+    "src": "src/pages/404.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_ErrorContainer.b3db33de.js",
+      "index.html",
+      "_vendor.7b48a676.js"
+    ]
+  },
+  "_ErrorContainer.b3db33de.js": {
+    "file": "assets/ErrorContainer.b3db33de.js",
+    "imports": [
+      "index.html",
+      "_vendor.7b48a676.js"
+    ],
+    "css": [
+      "assets/ErrorContainer.4c438dd9.css"
+    ]
+  },
+  "src/pages/500.vue": {
+    "file": "assets/500.b9cac1f2.js",
+    "src": "src/pages/500.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_ErrorContainer.b3db33de.js",
+      "index.html",
+      "_vendor.7b48a676.js"
+    ]
+  },
+  "src/pages/about.vue": {
+    "file": "assets/about.0e3e1a61.js",
+    "src": "src/pages/about.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.7b48a676.js",
+      "index.html"
+    ]
+  },
+  "src/pages/home.vue": {
+    "file": "assets/home.e2b1f1ca.js",
+    "src": "src/pages/home.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "index.html",
+      "_vendor.7b48a676.js",
+      "_StackedAndLiquidity.bf4222d7.js",
+      "_async-vendor.d290f954.js"
+    ],
+    "css": [
+      "assets/home.0b89fbb7.css"
+    ],
+    "assets": [
+      "assets/sol-logo.4f589868.svg"
+    ]
+  },
+  "_StackedAndLiquidity.bf4222d7.js": {
+    "file": "assets/StackedAndLiquidity.bf4222d7.js",
+    "imports": [
+      "_async-vendor.d290f954.js",
+      "_vendor.7b48a676.js",
+      "index.html"
+    ],
+    "css": [
+      "assets/StackedAndLiquidity.60f76d18.css"
+    ],
+    "assets": [
+      "assets/ledger.40cf6861.svg",
+      "assets/mathwallet.922f2931.svg",
+      "assets/sol-gray-logo.1a43d38d.svg",
+      "assets/sol-logo.4f589868.svg"
+    ]
+  },
+  "src/pages/impressum.vue": {
+    "file": "assets/impressum.64e781e1.js",
+    "src": "src/pages/impressum.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.7b48a676.js",
+      "index.html"
+    ]
+  },
+  "src/pages/pool-info.vue": {
+    "file": "assets/pool-info.a39a342f.js",
+    "src": "src/pages/pool-info.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.7b48a676.js",
+      "index.html"
+    ]
+  },
+  "src/pages/privacy.vue": {
+    "file": "assets/privacy.58db0ced.js",
+    "src": "src/pages/privacy.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.7b48a676.js",
+      "index.html"
+    ]
+  },
+  "src/pages/terms.vue": {
+    "file": "assets/terms.0618876e.js",
+    "src": "src/pages/terms.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.7b48a676.js",
+      "index.html"
+    ]
+  },
+  "src/layouts/default.vue": {
+    "file": "assets/default.9b592024.js",
+    "src": "src/layouts/default.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor.7b48a676.js",
+      "_async-vendor.d290f954.js",
+      "index.html",
+      "_StackedAndLiquidity.bf4222d7.js"
+    ],
+    "css": [
+      "assets/default.c6a9c99c.css"
+    ]
+  }
+}
