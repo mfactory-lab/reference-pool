@@ -1,0 +1,1 @@
+import{bK as e,bL as c,bM as t,bU as r,bO as a}from"./vendor.df20c6c8.js";import{_ as s}from"./index.7ca32a14.js";const o={},i=a("div",{class:"container q-pb-xl"},[a("div",{class:"page-title"}," Privacy Policy ")],-1);function n(_,l){return e(),c(r,null,{default:t(()=>[i]),_:1})}var p=s(o,[["render",n]]);export{p as default};
