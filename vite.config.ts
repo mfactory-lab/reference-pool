@@ -1,4 +1,5 @@
-/* This file is part of Solana Reference Stake Pool code.
+/*
+ * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
  *
@@ -42,9 +43,6 @@ export default defineConfig(({ mode }) => {
 
   const isProd = mode === 'production'
   const isReport = mode === 'report'
-
-  // TODO: fix
-  const base = isProd ? '/reference-pool/' : '/'
 
   const plugins: (PluginOption | PluginOption[])[] = [
     vue({
@@ -123,7 +121,8 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    base,
+    base: process.env.VITE_BASE_PATH,
+
     build,
     plugins,
     optimizeDeps,

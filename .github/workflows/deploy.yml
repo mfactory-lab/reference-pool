@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - public/**
+      - src/**
+
+#env:
+#  URL: example.com
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+#    environment:
+#      name: production
+#      url: https://${{ env.URL }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: yarn
+
+      - name: Install
+        run: yarn install
+
+      - name: Build
+        run: |
+          yarn run build:staging
+          cp dist/index.html dist/404.html
+#          echo ${{ env.URL }} > dist/CNAME
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages
+          folder: dist
