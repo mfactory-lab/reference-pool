@@ -52,6 +52,12 @@ $ yarn install
 
 # build and serve with vite dev server
 $ yarn dev
+
+# production build
+$ yarn build
+
+# run build locally
+$ yarn preview
 ```
 
 ## Community
