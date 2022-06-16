@@ -128,7 +128,7 @@ VITE_APP_KEYWORDS = <your app’s meta keywords>
 
 3) .env.production
 ```
-   VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
+VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
 ```
 4) /public/img: replace website favicon with your own logo files keeping the same filenames.
 
