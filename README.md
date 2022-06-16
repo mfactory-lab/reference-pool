@@ -120,7 +120,8 @@ TEST_STAKE_LIMIT = <maximum allowed stake for TestNet>
 2) .env includes website metadata: title, description, keyword.
    These can be configured with following variables:
 
-```VITE_APP_TITLE = <your app’s meta title>
+```
+VITE_APP_TITLE = <your app’s meta title>
 VITE_APP_DESCRIPTION = <your app’s meta description>
 VITE_APP_KEYWORDS = <your app’s meta keywords>
 ```
