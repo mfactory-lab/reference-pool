@@ -145,9 +145,9 @@ VITE_APP_KEYWORDS = <your app’s meta keywords>
 
 8) ```/src/assets/scss/_variables.scss``` can be changed if you want to play around with the theme colors.
 
-9) ```/src/components/AppFooter.vue``` copyright message that goes into the webpage footer (replace “xxx” with your projectname), as well as a link to your documentation (replace # with an appropriate URL in the <a href=”#”> tag).
+9) ```/src/components/AppFooter.vue``` copyright message that goes into the webpage footer (replace “xxx” with your projectname), as well as a link to your documentation (replace # with an appropriate URL in the \<a href=”#”> tag).
 
-10) ```/src/page/: the files terms.vue```, impressum.vue, and privacy.vue hold the content for the respective pages linked in the page footer.
+10) ```/src/page/```: the files terms.vue, impressum.vue, and privacy.vue hold the content for the respective pages linked in the page footer.
 
 
 
