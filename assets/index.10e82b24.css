@@ -102,7 +102,7 @@
  * your own applications.
  *
  * The developer of this program can be contacted at <info@mfactory.ch>.
- */.app-header{display:flex;align-items:center;background-color:#455a64!important;padding:10px 0}.app-header .q-toolbar{padding:0}.app-header__epoch{position:absolute;right:calc(50% - 53px);bottom:-42px;z-index:-1}@media (max-width: 1023px){.app-header__epoch{display:none}}.app-header .app-header__wallet-btn{font-size:14px;height:38px;min-height:auto;font-weight:400;padding-top:8px}@media (min-width: 1023px){.app-header .app-header__wallet-btn{margin-left:-30px;padding-left:40px}}.app-header__cluster-btn{min-height:auto;padding-top:8px;font-size:14px;height:38px;z-index:1}.app-header__logo{margin-left:-24px}/*!
+ */.app-header{display:flex;align-items:center;background-color:#455a64!important;padding:10px 0}.app-header .q-toolbar{padding:0}.app-header__epoch{position:absolute;right:calc(50% - 53px);bottom:-42px;z-index:-1}@media (max-width: 1023px){.app-header__epoch{display:none}}.app-header .app-header__wallet-btn{font-size:14px;height:38px;min-height:auto;font-weight:400;padding-top:8px}@media (min-width: 1023px){.app-header .app-header__wallet-btn{margin-left:-30px;padding-left:40px}}.app-header__cluster-btn{min-height:auto;padding-top:8px;font-size:14px;height:38px;z-index:1}/*!
  * This file is part of Solana Reference Stake Pool code.
  *
  * Copyright © 2021, mFactory GmbH
@@ -206,4 +206,4 @@
  * your own applications.
  *
  * The developer of this program can be contacted at <info@mfactory.ch>.
- */.text-new-gray{color:#5c5c5c!important}.text-primary-gray{color:#455a64!important}.bg-primary-gray{background:#455A64!important}.text-light-gray{color:#9eb3bd!important}.bg-light-gray{background:#9EB3BD!important}.text-transparent{color:#0000!important}.bg-transparent{background:#00000000!important}.text-natural-gray{color:#e7e7e7!important}.bg-natural-light-gray{background:#E9E9E9!important}body.body--dark .q-header,body.body--dark .q-footer{background-color:#1d1d1d;color:#fff}.q-toolbar__title{font-size:1.6rem;font-weight:700}.q-toolbar__title a{text-decoration:none;color:inherit}.page-title{margin:4.5rem 0 1.5rem;font-size:3rem}
+ */.text-new-gray{color:#5c5c5c!important}.text-primary-gray{color:#455a64!important}.bg-primary-gray{background:#455A64!important}.text-light-gray{color:#9eb3bd!important}.bg-light-gray{background:#9EB3BD!important}.text-transparent{color:#0000!important}.bg-transparent{background:#00000000!important}.text-natural-gray{color:#e7e7e7!important}.bg-natural-light-gray{background:#E9E9E9!important}body.body--dark .q-header,body.body--dark .q-footer{background-color:#1d1d1d;color:#fff}.q-toolbar__title{font-size:1.6rem;font-weight:700}.q-toolbar__title a{text-decoration:none;color:inherit}.page-title{padding-top:1.5rem;margin:0 0 1.5rem;font-size:3rem}

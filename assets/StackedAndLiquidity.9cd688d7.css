@@ -50,7 +50,7 @@
 * your own applications.
 *
 * The developer of this program can be contacted at <info@mfactory.ch>.
-*/.total-stacked[data-v-6d6777a1]{position:relative;padding-left:25px;z-index:2;margin-top:2px}.total-stacked__label[data-v-6d6777a1]{text-transform:uppercase;font-size:11px;color:#fff}.total-stacked__value[data-v-6d6777a1]{padding-right:15px;padding-left:50px;font-weight:700;position:relative}@media (min-width: 1439px){.total-stacked__value[data-v-6d6777a1]{min-width:150px;width:220px}}.total-stacked__value[data-v-6d6777a1]:before{content:"";background:url(/reference-pool/assets/sol-gray-logo.1a43d38d.svg) no-repeat center center;background-size:contain;width:33px;height:100%;position:absolute;left:0}@media (max-width: 599px){.total-stacked__value[data-v-6d6777a1]:before{background:url(/reference-pool/assets/sol-logo.4f589868.svg) no-repeat center center;background-size:contain}}.total-stacked__sol[data-v-6d6777a1]{white-space:nowrap;color:#fff;font-size:16px;line-height:1}.total-stacked__usd[data-v-6d6777a1]{color:#9eb3bd;font-size:12px;line-height:1;margin-top:1px;margin-bottom:2px}.total-stacked-alter .total-stacked__label[data-v-6d6777a1],.total-stacked-alter .total-stacked__usd[data-v-6d6777a1],.total-stacked-alter .total-stacked__sol[data-v-6d6777a1]{color:#000}/*!
+*/.total-stacked[data-v-6d6777a1]{position:relative;padding-left:25px;z-index:2;margin-top:2px}.total-stacked__label[data-v-6d6777a1]{text-transform:uppercase;font-size:11px;color:#fff}.total-stacked__value[data-v-6d6777a1]{padding-right:15px;padding-left:50px;font-weight:700;position:relative}@media (min-width: 1439px){.total-stacked__value[data-v-6d6777a1]{min-width:150px;width:220px}}.total-stacked__value[data-v-6d6777a1]:before{content:"";background:url(/reference-pool/assets/sol-gray-logo.1a43d38d.svg) no-repeat center center;background-size:contain;width:33px;height:100%;position:absolute;left:0}@media (max-width: 599px){.total-stacked__value[data-v-6d6777a1]:before{background:url(/reference-pool/assets/no-wallet-icon.4f589868.svg) no-repeat center center;background-size:contain}}.total-stacked__sol[data-v-6d6777a1]{white-space:nowrap;color:#fff;font-size:16px;line-height:1}.total-stacked__usd[data-v-6d6777a1]{color:#9eb3bd;font-size:12px;line-height:1;margin-top:1px;margin-bottom:2px}.total-stacked-alter .total-stacked__label[data-v-6d6777a1],.total-stacked-alter .total-stacked__usd[data-v-6d6777a1],.total-stacked-alter .total-stacked__sol[data-v-6d6777a1]{color:#000}/*!
 * This file is part of Solana Reference Stake Pool code.
 *
 * Copyright © 2021, mFactory GmbH
@@ -76,7 +76,7 @@
 * your own applications.
 *
 * The developer of this program can be contacted at <info@mfactory.ch>.
-*/.total-stacked__reserved-balance[data-v-219712ca]{padding:0 0 0 23px;font-size:12px;color:#fff}@media (max-width: 1023px){.total-stacked__reserved-balance[data-v-219712ca]{width:270px}}@media (max-width: 599px){.total-stacked__reserved-balance[data-v-219712ca]{width:auto}}.total-stacked-alter .total-stacked__reserved-balance[data-v-219712ca]{color:#000}/*!
+*/.total-stacked__reserved-balance[data-v-d2b5d960]{padding:0 0 0 23px;font-size:12px;color:#fff}@media (max-width: 1023px){.total-stacked__reserved-balance[data-v-d2b5d960]{width:270px}}@media (max-width: 599px){.total-stacked__reserved-balance[data-v-d2b5d960]{width:auto}}.total-stacked-alter .total-stacked__reserved-balance[data-v-d2b5d960]{color:#000}/*!
 * This file is part of Solana Reference Stake Pool code.
 *
 * Copyright © 2021, mFactory GmbH

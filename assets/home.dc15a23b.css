@@ -1,4 +1,4 @@
-._footer_14phz_83{background-color:#455a64!important;color:#fff!important;padding:2rem 0 1rem}@media (max-width: 1023px){._footer_14phz_83{text-align:center}}._footer_14phz_83 a{color:#fff;text-decoration:none}._nav_14phz_98{justify-content:center;text-align:center}._nav_14phz_98 a{margin:0 .5em}/*!
+.apy[data-v-64726ed8]{position:absolute;color:#455a64;background-color:#1ce4b0;display:flex;flex-direction:column;align-items:center;left:calc(50% - 108px);border-radius:50%!important;width:96px;height:96px;top:-23px;justify-content:center;z-index:1;line-height:14px;cursor:pointer;transition:color .3s,background-color .3s}.apy--selected[data-v-64726ed8]{background-color:#455a64;color:#fff}@media (max-width: 599px){.apy[data-v-64726ed8]{border-radius:50% 50% 0 0!important;height:60px;top:-35px}}.apy__value[data-v-64726ed8]{font-size:22px;line-height:22px;font-weight:500}@media (max-width: 599px){.apy__value[data-v-64726ed8]{font-size:20px;line-height:20px}}.apy .q-inner-loading[data-v-64726ed8]{background:none}/*!
 * This file is part of Solana Reference Stake Pool code.
 *
 * Copyright © 2021, mFactory GmbH
@@ -50,4 +50,4 @@
  * your own applications.
  *
  * The developer of this program can be contacted at <info@mfactory.ch>.
- */.contact-title{text-align:right;font-size:12px;font-weight:500;text-transform:uppercase;padding-right:93px;margin-top:-15px;margin-bottom:-10px}@media (max-width: 1023px){.contact-title{text-align:center;margin-bottom:5px;padding-right:0}}@media (max-width: 1023px){.footer-links{margin-top:10px}}
+ */.q-item .q-btn-group[data-v-cda9ef8e]{margin-left:1.5rem}.q-item .q-btn[data-v-cda9ef8e]{font-size:.7rem}@media (max-width: 599.98px){.q-item[data-v-cda9ef8e]{text-align:center}.q-item .q-btn-group[data-v-cda9ef8e]{margin:.5rem 0 0}}@media (min-width: 599px){.q-item .q-btn-group[data-v-cda9ef8e]{float:right}}

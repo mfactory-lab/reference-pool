@@ -1,0 +1,42 @@
+<!--
+  - This file is part of Solana Reference Stake Pool code.
+  -
+  - Copyright © 2021, mFactory GmbH
+  -
+  - Solana Reference Stake Pool is free software: you can redistribute it
+  - and/or modify it under the terms of the GNU Affero General Public License
+  - as published by the Free Software Foundation, either version 3
+  - of the License, or (at your option) any later version.
+  -
+  - Solana Reference Stake Pool is distributed in the hope that it
+  - will be useful, but WITHOUT ANY WARRANTY; without even the implied
+  - warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  - See the GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.
+  - If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+  -
+  - You can be released from the requirements of the Affero GNU General Public License
+  - by purchasing a commercial license. The purchase of such a license is
+  - mandatory as soon as you develop commercial activities using the
+  - Solana Reference Stake Pool code without disclosing the source code of
+  - your own applications.
+  -
+  - The developer of this program can be contacted at <info@mfactory.ch>.
+  -->
+
+<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M30 15C30 23.2843 23.2843 30 15 30C6.71573 30 0 23.2843 0 15C0 6.71573 6.71573 0 15 0C23.2843 0 30 6.71573 30 15Z"
+    fill="#1CE4B0"/>
+  <path
+    d="M26 15C26 21.0751 21.0751 26 15 26C8.92487 26 4 21.0751 4 15C4 8.92487 8.92487 4 15 4C21.0751 4 26 8.92487 26 15Z"
+    fill="white"/>
+  <path
+    d="M11.4255 16.3333L9.18018 12.9167H10.4969L12.0353 15.5L13.5738 12.9167H14.8904L12.6451 16.3333L15.0706 19.8611H13.7401L12.0353 17.0833L10.3305 19.8611H9L11.4255 16.3333Z"
+    fill="#005B44"/>
+  <path
+    d="M18.84 20C18.2116 20 17.6203 19.8657 17.0659 19.5972C16.5207 19.3287 16.0818 18.9583 15.7492 18.4861L16.5254 17.7083C16.8118 18.0787 17.1722 18.3796 17.6064 18.6111C18.0407 18.8333 18.4704 18.9444 18.8954 18.9444C19.4405 18.9444 19.8794 18.8056 20.2121 18.5278C20.554 18.25 20.7249 17.8843 20.7249 17.4306C20.7249 17.1343 20.6648 16.875 20.5447 16.6528C20.4338 16.4306 20.2352 16.2176 19.9487 16.0139C19.6715 15.8009 19.2742 15.5694 18.7568 15.3194C17.7681 14.838 17.0705 14.3843 16.664 13.9583C16.2666 13.5231 16.068 13.0185 16.068 12.4444C16.068 11.7037 16.3359 11.1111 16.8719 10.6667C17.4078 10.2222 18.1192 10 19.0063 10C19.6253 10 20.189 10.1343 20.6972 10.4028C21.2146 10.6713 21.5888 11.0324 21.8198 11.4861L20.9882 12.0972C20.7665 11.7731 20.48 11.5185 20.1289 11.3333C19.7778 11.1481 19.4082 11.0556 19.0201 11.0556C18.5027 11.0556 18.0915 11.1806 17.7866 11.4306C17.4909 11.6713 17.3431 12 17.3431 12.4167C17.3431 12.6667 17.3985 12.8796 17.5094 13.0556C17.6203 13.2315 17.8236 13.4167 18.1192 13.6111C18.4242 13.7963 18.9 14.0509 19.5468 14.375C20.4246 14.8102 21.0529 15.2593 21.4317 15.7222C21.8106 16.1759 22 16.713 22 17.3333C22 17.8611 21.866 18.3287 21.5981 18.7361C21.3393 19.1343 20.9698 19.4444 20.4893 19.6667C20.018 19.8889 19.4683 20 18.84 20Z"
+    fill="#005B44"/>
+</svg>
