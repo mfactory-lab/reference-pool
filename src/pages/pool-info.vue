@@ -34,7 +34,7 @@ import { formatPct } from '@/utils'
 export default defineComponent({
   setup() {
     const stakePool = useStakePoolStore()
-    const stakePoolAddress = computed(() => stakePool.stakePoolAddress)
+    const stakePoolAddress = computed(() => stakePool.stakePoolAddress?.toBase58() ?? '')
     const fees = computed(() => stakePool.fees)
 
     return {
@@ -55,7 +55,7 @@ export default defineComponent({
         Stake Pool Info
       </div>
       <div class="container q-pb-xl">
-        Stake Pool: <b>{{ stakePoolAddress?.toBase58() }}</b>
+        Stake Pool: <b :style="{ wordBreak: 'break-all' }">{{ stakePoolAddress }}</b> <copy-to-clipboard :text="stakePoolAddress" />
 
         <br>
         <br>
