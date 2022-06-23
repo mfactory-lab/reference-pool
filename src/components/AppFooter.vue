@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { COPYRIGHT, COPYRIGHT_BY, FOOTER_LINKS, POWERED_BY, POWERED_LINK } from '@/config'
 
-const fLinks = JSON.parse(FOOTER_LINKS)
+const fLinks = FOOTER_LINKS ? JSON.parse(FOOTER_LINKS) : {}
 const footerLinks = Object.keys(fLinks).map(title => ({ title, url: fLinks[title] }))
 const year = new Date().getFullYear()
 </script>
@@ -61,7 +61,7 @@ const year = new Date().getFullYear()
   .footer {
     background-color: $gray !important;
     color: #fff !important;
-    padding: 2rem 0 1rem;
+    padding: 1rem 0 1rem;
     @media (max-width: $breakpoint-sm) {
       text-align: center;
     }
