@@ -27,20 +27,9 @@
   -->
 
 <script lang="ts">
-import { computed } from 'vue'
 import { useWallet } from 'solana-wallets-vue'
-import StakeBox from '@/components/Stake/StakeBox.vue'
-import WalletBalance from '@/components/WalletBalance.vue'
-import StackedAndLiquidity from '@/components/StackedAndLiquidity.vue'
-import Epoch from '@/components/Epoch.vue'
 
 export default {
-  components: {
-    WalletBalance,
-    Epoch,
-    StakeBox,
-    StackedAndLiquidity,
-  },
   setup() {
     const { connected } = useWallet()
 
@@ -57,24 +46,24 @@ export default {
       <div class="firstlook__body">
         <div class="lt-sm flex">
           <div class="total-stacked-alter flex justify-center q-mx-auto">
-            <StackedAndLiquidity />
+            <stacked-and-liquidity />
           </div>
         </div>
         <div class="lt-md flex">
           <div class="firstlook__epoch">
-            <Epoch />
+            <epoch />
           </div>
         </div>
         <div class="row justify-between relative-position">
           <div v-if="connected" class="col col-12 col-md-4 q-pr-md firstlook__wallet">
-            <WalletBalance />
+            <wallet-balance />
           </div>
           <div v-else class="firstlook__placeholder">
             <img alt="" class="firstlook__placeholder__icon" src="@/assets/img/sol-logo.svg">
           </div>
 
           <div class="col col-12 col-md-8 q-pl-md q-ml-auto firstlook__stake-box">
-            <StakeBox />
+            <stake-box />
           </div>
         </div>
       </div>

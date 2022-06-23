@@ -179,9 +179,9 @@ export default defineComponent({
 
         <q-card-section class="scroll" style="max-height: 70vh">
           <q-list v-if="accounts.length > 0" separator style="width: 500px">
-            <StakeAccountItem
+            <stake-account-item
               v-for="acc in accounts"
-              :key="acc.pubkey"
+              :key="acc.pubkey.toBase58()"
               :stake-account="acc"
               :loading="acc.pubkey.toBase58() === loadingPubkey"
               @deactivate="deactivate"

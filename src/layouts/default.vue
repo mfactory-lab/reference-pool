@@ -26,23 +26,17 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import AppHeader from '@/components/AppHeader.vue'
-import AppFooter from '@/components/AppFooter.vue'
-import CookieModal from '@/components/CookieModal.vue'
-
-export default {
-  components: { CookieModal, AppHeader, AppFooter },
-}
+<script setup lang="ts">
 </script>
 
 <template>
   <q-layout view="lfh Lpr lff">
-    <AppHeader />
+    <app-header />
     <q-page-container>
+      <connection-lost />
       <router-view />
     </q-page-container>
-    <AppFooter />
-    <CookieModal />
+    <app-footer />
+    <cookie-modal />
   </q-layout>
 </template>

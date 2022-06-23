@@ -4,6 +4,10 @@
     "curly": ["error", "all"],
     "antfu/if-newline": "off",
     "@typescript-eslint/brace-style": ["error", "1tbs"],
-    "no-console": "off"
+    "no-console": "off",
+    "vue/component-name-in-template-casing": ["error", "kebab-case", {
+      "registeredComponentsOnly": false,
+      "ignores": []
+    }]
   }
 }

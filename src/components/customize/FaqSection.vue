@@ -87,7 +87,7 @@
               Any user who delegates their SOL to a Validator (either directly or via Stake Pool),
               enabling them to validate new blocks and keep the network alive, becomes a Delegator.
               <br>
-              Anyone who has some SOL in their wallet may delegate it – and earn rewards by doing so
+              Anyone who has some SOL in their wallet may delegate it – and earn rewards by doing so
             </p>
           </div>
         </div>

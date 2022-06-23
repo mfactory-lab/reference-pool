@@ -30,7 +30,6 @@
 import { computed, defineComponent, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { useWallet } from 'solana-wallets-vue'
-import ConnectWallet from '@/components/ConnectWallet.vue'
 import {
   useApyStore,
   useBalanceStore,
@@ -40,16 +39,9 @@ import {
 } from '@/store'
 import { formatAmount, formatPct, lamportsToSol } from '@/utils'
 import { useDeposit, useWithdraw } from '@/hooks'
-import TokenSvg from '@/components/Icons/TokenSvg.vue'
 import { clickOutside } from '@/directives'
-import Apy from '@/components/Apy.vue'
 
 export default defineComponent({
-  components: {
-    TokenSvg,
-    ConnectWallet,
-    Apy,
-  },
   directives: {
     clickOutside,
   },
@@ -281,7 +273,7 @@ export default defineComponent({
 
 <template>
   <q-card class="stake-box shadow-sm">
-    <Apy :selected="tab === 'stake'" @click="() => (tab = 'stake')" />
+    <apy :selected="tab === 'stake'" @click="() => (tab = 'stake')" />
     <q-tabs
       v-model="tab"
       align="justify"
@@ -370,7 +362,7 @@ export default defineComponent({
             @keypress="onlyNumber"
           >
             <template #append>
-              <TokenSvg class="stake-field__icon" />
+              <token-svg class="stake-field__icon" />
               <span class="stake-field__symbol">xSOL</span>
             </template>
           </q-input>
@@ -401,7 +393,7 @@ export default defineComponent({
                 STAKE NOW
               </q-btn>
               <div v-else class="text-right">
-                <ConnectWallet />
+                <connect-wallet />
               </div>
             </div>
           </div>
@@ -463,7 +455,7 @@ export default defineComponent({
               >
                 MAX
               </q-btn>
-              <TokenSvg class="stake-field__icon" />
+              <token-svg class="stake-field__icon" />
               <span class="stake-field__symbol">xSOL</span>
             </template>
           </q-input>
@@ -512,7 +504,7 @@ export default defineComponent({
               >
                 <div>UNSTAKE NOW</div>
               </q-btn>
-              <ConnectWallet v-else />
+              <connect-wallet v-else />
             </div>
           </div>
         </q-card-section>

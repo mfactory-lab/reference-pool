@@ -32,10 +32,8 @@ import type { StakeActivationData } from '@solana/web3.js'
 import type { ProgramAccount } from '@/store'
 import { useConnectionStore } from '@/store'
 import { formatAmount, lamportsToSol, shortenAddress } from '@/utils'
-import CopyToClipboard from '@/components/CopyToClipboard.vue'
 
 export default defineComponent({
-  components: { CopyToClipboard },
   props: {
     loading: Boolean,
     onlyDeposit: {
@@ -101,7 +99,7 @@ export default defineComponent({
   <div class="q-item q-item-type row">
     <div class="col-12 col-sm-6">
       <q-item-label>
-        <CopyToClipboard :text="address" />
+        <copy-to-clipboard :text="address" />
         <span class="q-mx-sm">{{ shortAddress }}</span>
         <!-- {{ voter }} -->
         <q-badge :color="stateColor">

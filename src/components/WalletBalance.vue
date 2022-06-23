@@ -35,11 +35,8 @@ import {
   useStakePoolStore,
 } from '@/store'
 import { formatMoney, longPriceFormatter } from '@/utils'
-import StakeAccountsDialog from '@/components/StakeAccountsDialog.vue'
-import TokenSvg from '@/components/Icons/TokenSvg.vue'
 
 export default defineComponent({
-  components: { StakeAccountsDialog, TokenSvg },
   setup() {
     const stakePoolStore = useStakePoolStore()
     const balanceStore = useBalanceStore()
@@ -102,7 +99,7 @@ export default defineComponent({
           </q-item-section>
           <q-item-section side>
             <q-item-label>
-              <TokenSvg />
+              <token-svg />
               <span>xSOL</span>
             </q-item-label>
           </q-item-section>
@@ -141,5 +138,5 @@ export default defineComponent({
       </q-list>
     </q-card-section>
   </q-card>
-  <StakeAccountsDialog />
+  <stake-accounts-dialog />
 </template>

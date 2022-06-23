@@ -26,22 +26,7 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import AppLogo from '@/components/AppLogo.vue'
-import ClusterSelector from '@/components/ClusterSelector.vue'
-import StackedAndLiquidity from '@/components/StackedAndLiquidity.vue'
-import ConnectWallet from '@/components/ConnectWallet.vue'
-import Epoch from '@/components/Epoch.vue'
-
-export default {
-  components: {
-    Epoch,
-    AppLogo,
-    ClusterSelector,
-    StackedAndLiquidity,
-    ConnectWallet,
-  },
-}
+<script setup lang="ts">
 </script>
 
 <template>
@@ -49,20 +34,20 @@ export default {
     <div class="container">
       <q-toolbar>
         <router-link class="app-header__logo" to="/">
-          <AppLogo />
+          <app-logo />
         </router-link>
         <div class="xs-hide">
-          <StackedAndLiquidity />
+          <stacked-and-liquidity />
         </div>
         <q-space />
         <div class="app-header__epoch">
-          <Epoch />
+          <epoch />
         </div>
         <q-space />
         <div class="text-right">
           <div class="q-gutter-sm justify-end flex wrap">
-            <ClusterSelector />
-            <ConnectWallet />
+            <cluster-selector />
+            <connect-wallet />
           </div>
         </div>
       </q-toolbar>

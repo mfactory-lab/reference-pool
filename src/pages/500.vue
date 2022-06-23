@@ -26,16 +26,9 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import ErrorContainer from '@/components/ErrorContainer.vue'
-
-export default {
-  components: {
-    ErrorContainer,
-  },
-}
+<script setup lang="ts">
 </script>
 
 <template>
-  <ErrorContainer />
+  <error-container />
 </template>

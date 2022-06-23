@@ -26,16 +26,9 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import ErrorContainer from '@/components/ErrorContainer.vue'
-
-export default {
-  components: {
-    ErrorContainer,
-  },
-}
+<script setup lang="ts">
 </script>
 
 <template>
-  <ErrorContainer :code="404" message="Page not found" />
+  <error-container :code="404" message="Page not found" />
 </template>
