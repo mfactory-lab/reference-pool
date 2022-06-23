@@ -40,6 +40,7 @@ import {
 import { formatAmount, formatPct, lamportsToSol } from '@/utils'
 import { useDeposit, useWithdraw } from '@/hooks'
 import { clickOutside } from '@/directives'
+import { XSOL_NAME } from '@/config'
 
 export default defineComponent({
   directives: {
@@ -144,6 +145,7 @@ export default defineComponent({
     const unstakeType = ref('')
 
     return {
+      XSOL_NAME,
       tab,
       stake,
       unstake,
@@ -235,7 +237,7 @@ export default defineComponent({
         const value = from ? (from - depositFeeVal) * exchangeRate.value : 0
         return {
           networkFee: `${depositFeeVal} SOL`,
-          poolFee: `${formatAmount((value > 0 ? value : 0) * fees.value.solDepositFee)} xSOL`,
+          poolFee: `${formatAmount((value > 0 ? value : 0) * fees.value.solDepositFee)} ${XSOL_NAME}`,
         }
       }),
 
@@ -245,7 +247,7 @@ export default defineComponent({
         const withdrawFeeVal = from * withdrawRealFee
         return {
           networkFee: `${lamportsToSol(withdrawFee.value)} SOL`,
-          poolFee: `${formatAmount(withdrawFeeVal)} xSOL`,
+          poolFee: `${formatAmount(withdrawFeeVal)} ${XSOL_NAME}`,
         }
       }),
 
@@ -255,7 +257,7 @@ export default defineComponent({
         const withdrawFeeVal = from * withdrawRealFee
         return {
           networkFee: `${lamportsToSol(withdrawFee.value)} SOL`,
-          poolFee: `${formatAmount(withdrawFeeVal)} xSOL`,
+          poolFee: `${formatAmount(withdrawFeeVal)} ${XSOL_NAME}`,
         }
       }),
 
@@ -303,7 +305,7 @@ export default defineComponent({
                 <span> SOL</span>
                 <span class="q-px-sm">≈</span>
                 <span class="text-dark">{{ solToXsolRate }}</span>
-                <span> xSOL</span>
+                <span>&nbsp;{{ XSOL_NAME }}</span>
               </div>
             </div>
           </div>
@@ -352,7 +354,7 @@ export default defineComponent({
         <q-card-section class="stake-to-input">
           <q-input
             v-model="stake.to"
-            label="xSOL"
+            :label="XSOL_NAME"
             outlined
             placeholder="0.0"
             class="stake-box__input-to"
@@ -363,7 +365,7 @@ export default defineComponent({
           >
             <template #append>
               <token-svg class="stake-field__icon" />
-              <span class="stake-field__symbol">xSOL</span>
+              <span class="stake-field__symbol">{{ XSOL_NAME }}</span>
             </template>
           </q-input>
         </q-card-section>
@@ -415,7 +417,7 @@ export default defineComponent({
             <div>
               <div class="stake-box__rate">
                 <span class="text-dark">1</span>
-                <span> xSOL</span>
+                <span> {{ XSOL_NAME }}</span>
                 <span class="q-px-sm">≈</span>
                 <span class="text-dark">{{ xSolToSolRate }}</span>
                 <span> SOL</span>
@@ -436,7 +438,7 @@ export default defineComponent({
             v-model="unstake.from"
             :maxlength="14"
             class="stake-box__input"
-            label="Staked xSOL"
+            :label="`Staked ${XSOL_NAME}`"
             outlined
             placeholder="0.0"
             stack-label
@@ -456,7 +458,7 @@ export default defineComponent({
                 MAX
               </q-btn>
               <token-svg class="stake-field__icon" />
-              <span class="stake-field__symbol">xSOL</span>
+              <span class="stake-field__symbol">{{ XSOL_NAME }}</span>
             </template>
           </q-input>
         </q-card-section>

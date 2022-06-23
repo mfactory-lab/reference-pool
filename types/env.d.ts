@@ -37,4 +37,14 @@ interface ImportMetaEnv {
   readonly VITE_PASSWORD_PROTECT: string
   readonly VITE_GTAG_ID: string
   readonly VITE_BASE_PATH: string
+  readonly VITE_XSOL_NAME: string
+  readonly VITE_APP_LOGO: string
+  readonly VITE_XSOL_LOGO: string
+  readonly VITE_BIG_PIC: string
+  readonly VITE_TELEGRAM_ANNOUNCEMENT_UR: string
+  readonly VITE_COPYRIGHT_BY: string
+  readonly VITE_COPYRIGHT: string
+  readonly VITE_POWERED_BY: string
+  readonly VITE_POWERED_LINK: string
+  readonly VITE_FOOTER_LINKS: string
 }

@@ -35,6 +35,7 @@ import {
   useStakePoolStore,
 } from '@/store'
 import { formatMoney, longPriceFormatter } from '@/utils'
+import { XSOL_NAME } from '@/config'
 
 export default defineComponent({
   setup() {
@@ -55,6 +56,7 @@ export default defineComponent({
     const stackedUsd = computed(() => coinRateStore.solPrice * stakeSolBalance.value)
 
     return {
+      XSOL_NAME,
       solBalance,
       tokenBalance,
       solUsd,
@@ -100,7 +102,7 @@ export default defineComponent({
           <q-item-section side>
             <q-item-label>
               <token-svg />
-              <span>xSOL</span>
+              <span>{{ XSOL_NAME }}</span>
             </q-item-label>
           </q-item-section>
         </q-item>

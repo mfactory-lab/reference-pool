@@ -32,7 +32,7 @@ import routes from './routes'
 
 const router = createRouter({
   // TODO: fix
-  history: import.meta.env.SSR ? createMemoryHistory() : createWebHistory(import.meta.env.BASE_URL),
+  history: import.meta.env.SSR ? createMemoryHistory(import.meta.env.BASE_URL) : createWebHistory(import.meta.env.BASE_URL),
   // history: import.meta.env.SSR ? createMemoryHistory() : createWebHashHistory(),
   scrollBehavior: () => ({ left: 0, top: 0 }),
   strict: true,

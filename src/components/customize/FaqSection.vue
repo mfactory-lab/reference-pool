@@ -26,6 +26,10 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script setup lang="ts">
+import { XSOL_NAME } from '@/config'
+</script>
+
 <template>
   <section class="faq-section">
     <div class="container">
@@ -67,9 +71,9 @@
           </div>
           <div class="faq-item__body">
             <p>
-              Your JSOL represents your share in the pool’s total stake, which grows constantly as
-              rewards are accrued. This reflects in the JSOL-SOL exchange rate which will be used to
-              calculate the SOL you get back when you unstake. Total JSOL price growth is equal to
+              Your {{ XSOL_NAME }} represents your share in the pool’s total stake, which grows constantly as
+              rewards are accrued. This reflects in the {{ XSOL_NAME }}-SOL exchange rate which will be used to
+              calculate the SOL you get back when you unstake. Total {{ XSOL_NAME }} price growth is equal to
               the pool’s APY.
             </p>
             <p>

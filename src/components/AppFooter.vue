@@ -26,16 +26,12 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { COPYRIGHT, COPYRIGHT_BY, FOOTER_LINKS, POWERED_BY, POWERED_LINK } from '@/config'
 
-export default defineComponent({
-  setup() {
-    return {
-      year: new Date().getFullYear(),
-    }
-  },
-})
+const fLinks = JSON.parse(FOOTER_LINKS)
+const footerLinks = Object.keys(fLinks).map(title => ({ title, url: fLinks[title] }))
+const year = new Date().getFullYear()
 </script>
 
 <template>
@@ -44,27 +40,16 @@ export default defineComponent({
       <div class="row q-col-gutter-lg">
         <div class="col justify-between d-flex column">
           <div class="text-caption">
-            © Copyright {{ year }} xxx. All rights reserved.
-            <br>
-            Powered by
-            <a href="https://mfactory.tech/" target="_blank">mFactory GmbH</a>
+            <span v-if="COPYRIGHT_BY">© Copyright {{ year }} {{ COPYRIGHT_BY }}. All rights reserved.</span>
+            <span v-if="COPYRIGHT">{{ COPYRIGHT }}</span>
+            <br v-if="POWERED_BY && (COPYRIGHT || COPYRIGHT_BY)">
+            <a v-if="POWERED_LINK && POWERED_BY" :href="POWERED_LINK" target="_blank">{{ POWERED_BY }}</a>
+            <span v-if="POWERED_BY && !POWERED_LINK">{{ POWERED_BY }}</span>
           </div>
         </div>
         <div class="col col-12 col-md-auto justify-between q-mt-auto d-flex column">
           <div :class="$style.nav" class="row text-caption footer-links">
-            <a href="#" target="_blank">Documentation</a>
-            <router-link to="/terms">
-              Terms of Service
-            </router-link>
-            <router-link to="/impressum">
-              Legal Disclosure
-            </router-link>
-            <router-link to="/privacy">
-              Privacy
-            </router-link>
-            <router-link to="/pool-info">
-              Pool Info
-            </router-link>
+            <app-footer-link v-for="link in footerLinks" :key="link.title" :url="link.url" :title="link.title" />
           </div>
         </div>
       </div>

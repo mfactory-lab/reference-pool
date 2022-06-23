@@ -26,33 +26,20 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script setup lang="ts">
-import { APP_LOGO } from '@/config'
+<script lang="ts" setup>
+defineProps({
+  title: String,
+  url: {
+    type: String,
+    required: true,
+  },
+})
+const isRoute = (str: string) => str[0] === '/'
 </script>
 
 <template>
-  <q-header :class="!$q.dark.isActive ? 'bg-white text-dark' : null" class="app-header">
-    <div class="container">
-      <q-toolbar>
-        <router-link class="app-header__logo" to="/">
-          <img v-if="!!APP_LOGO" alt="app-logo" :src="APP_LOGO">
-          <img v-else alt="app-logo" src="@/assets/img/customize/app-logo.svg">
-        </router-link>
-        <div class="xs-hide">
-          <stacked-and-liquidity />
-        </div>
-        <q-space />
-        <div class="app-header__epoch">
-          <epoch />
-        </div>
-        <q-space />
-        <div class="text-right">
-          <div class="q-gutter-sm justify-end flex wrap">
-            <cluster-selector />
-            <connect-wallet />
-          </div>
-        </div>
-      </q-toolbar>
-    </div>
-  </q-header>
+  <router-link v-if="isRoute(url)" :to="url">
+    {{ title }}
+  </router-link>
+  <a v-else :href="url" target="_blank">{{ title }}</a>
 </template>

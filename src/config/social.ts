@@ -26,9 +26,6 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-export const TELEGRAM_ANNOUNCEMENT_URL = 'https://t.me/jpoolsolana'
-// export const TWITTER_URL = 'https://twitter.com/JPoolSolana'
-// export const TELEGRAM_URL = 'https://t.me/jpool_solana'
-// export const DISCORD_URL = 'https://discord.gg/qR4BA9QXVR'
+export const TELEGRAM_ANNOUNCEMENT_URL = import.meta.env.VITE_TELEGRAM_ANNOUNCEMENT_URL
 
 export const GTAG_ID = import.meta.env.VITE_GTAG_ID

@@ -6,8 +6,8 @@ import '@vue/runtime-core'
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AppFooter: typeof import('./../src/components/AppFooter.vue')['default']
+    AppFooterLink: typeof import('./../src/components/AppFooterLink.vue')['default']
     AppHeader: typeof import('./../src/components/AppHeader.vue')['default']
-    AppLogo: typeof import('./../src/components/AppLogo.vue')['default']
     Apy: typeof import('./../src/components/Apy.vue')['default']
     ClusterSelector: typeof import('./../src/components/ClusterSelector.vue')['default']
     ConnectionLost: typeof import('./../src/components/ConnectionLost.vue')['default']
