@@ -99,86 +99,100 @@ $ yarn build
 $ yarn preview
 ```
 
-#### Following parameters can (and some of them should) be configured:
+### Configure the Frontend App
 
-1) .env
-    Configure these Stake Pool variables:
+Many parameters and visual features can (and some of them should) be configured.
 
+#### Important Stake Pool variables
+
+File: ```.env```
+
+Variables to set:
 ```
-VITE_MAIN_STAKE_POOL_ADDRESS = [See Stake Pool Address]
+VITE_MAIN_STAKE_POOL_ADDRESS = [See Stake Pool Address] (required)
 VITE_TEST_STAKE_POOL_ADDRESS = <optional: stake pool address on TestNet>
 VITE_DEV_STAKE_POOL_ADDRESS = <optional: stake pool address on DevNet>
 ```
 
-You can also set staking limits here (displayed in the top bar):
+You can also set staking limits here (if set, these are displayed in the top bar):
 
 ```
 VITE_MAIN_STAKE_LIMIT = <maximum allowed stake for MainNet>
 VITE_TEST_STAKE_LIMIT = <maximum allowed stake for TestNet>
 ```
 
-2) .env includes website metadata: title, description, keyword.
-   These can be configured with following variables:
+#### Frontend design configuration
 
+##### Web App metadata
+File: ```.env```
+
+Variables to set:
 ```
 VITE_APP_TITLE = <your app’s meta title>
 VITE_APP_DESCRIPTION = <your app’s meta description>
 VITE_APP_KEYWORDS = <your app’s meta keywords>
 ```
 
-3) ```/public/img```: replace website favicon with your own logo files (do not change filenames).
+##### Various logo images
 
-4) Images:
+If you prefer to use remotely stored images, set the variables below to corresponding URLs.
+If left empty, internal SVG images in default locations (see below) will be used.
 
-4.1) ```/src/assets/img/customize/app-logo.svg```: replace the svg in this file to change the header logo.
+File: ```.env```
 
-4.2) ```/src/assets/img/customize/xsol.svg```: replace the svg to change the token icon.
-
-4.3) ```/src/assets/img/customize/no-wallet-icon.svg```: replace the large SOL logo (displayed if the wallet is not connected).
-
-Insert links here if you want to use remotely stored images; if left empty, internal SVG images (see above) will be used:
-
+Variables to set:
 ```
-VITE_APP_LOGO = <URL of your header logo file (see 5.1)>
-VITE_XSOL_LOGO = <URL of your token logo file (see 5.2)>
-VITE_NO_WALLET_ICON = <URL of your graphics file to replace the large SOL logo (see 5.3)>
+VITE_APP_LOGO = <URL of your header logo file>
+VITE_XSOL_LOGO = <URL of your token logo file>
+VITE_NO_WALLET_ICON = <URL of your graphics file to replace the large SOL logo>
 ```
 
-5) .env
-    Contains the variable for the URL pointing to your Telegram channel:
-   
+If using internal images:
+
+Folder: ```/public/img```
+Replace website favicon files with your own logo files (do not change filenames).
+
+File: ```/src/assets/img/customize/app-logo.svg```
+Replace the svg in this file to change your header logo.
+
+File: ```/src/assets/img/customize/xsol.svg```
+Replace the svg to change the token icon.
+
+File: ```/src/assets/img/customize/no-wallet-icon.svg```
+Replace the large SOL logo (displayed as long as no wallet is connected).
+
+##### Text, links, and color theme
+
+File: ```.env```
+
+URL pointing to your Telegram channel (_displayed in case of an error, so that the user can contact you for support_):
 ```
 TELEGRAM_ANNOUNCEMENT_URL = <URL of your Telegram channel or group>
 ```
 
-_This URL is displayed in case of an error, so that the user can contact you for support._
-   
-
-6) ```/src/assets/scss/_variables.scss``` can be changed if you want to play around with the theme colors.
-
-7) Customizing the footer in .env:
-
+Footer text and links:
 ```
 VITE_COPYRIGHT_BY = <replace “xxx” with your project name>
 VITE_COPYRIGHT = <replace the whole line>
 ```
-Leave both variables empty if no copyright message is needed  
+_Leave both variables empty if no copyright message is needed._
 
 ```
 VITE_POWERED_BY = <if left empty, the POWERED_BY line is not displayed>
 VITE_POWERED_LINK = <URL; if left empty, the POWERED_BY line will not have a link>
 ```
-
-Links in the footer can point to internal or external pages.
-If the first symbol of a URL is "/", it is considered an internal URL, otherwise external.
+_Links in the footer can point to internal or external pages.
+If the first symbol of a URL is "/", it is considered an internal URL, otherwise external._
    
 ```
 VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "link1 url", "link2 name": "link2 url", ... }>
 ```
 
-8) ```/src/pages/```: the files ```terms.vue```, ```impressum.vue```, and ```privacy.vue``` hold the content for the respective pages linked in the page footer.
+Folder: ```/src/pages/```
+The files ```terms.vue```, ```impressum.vue```, and ```privacy.vue``` hold the content for the respective pages linked in the page footer.
 
-9) ```/src/components/customize/FaqSection.vue``` You can change the FAQ contents by editing the html code in this file. If you don’t want a FAQ section, replace this file’s whole content with:
+File: ```/src/components/customize/FaqSection.vue```
+You can change the FAQ contents by editing the html code in this file. If you don’t want a FAQ section, replace this file’s whole content with:
 ```
 <template>
   <section class="custom-section">
@@ -187,16 +201,17 @@ VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "lin
 </template>
 ```
 
-10) ```/src/components/customize/CustomSection.vue``` Any content you want to add past the FAQ section (or replacing it if you removed the FAQ section) can be added to this file.
+File: ```/src/components/customize/CustomSection.vue```
+Any content you want to add past the FAQ section (or replacing it if you removed the FAQ section) can be added to this file.
 
-11) .env.production
-
+File: ```.env.production```
+Variable to set:
 ```
 VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
 ```
 
-
-
+File: ```/src/assets/scss/_variables.scss```
+Change this one if you want to play around with the theme colors.
 
 ## Community
 
