@@ -132,7 +132,7 @@ VITE_APP_KEYWORDS = <your app’s meta keywords>
 VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
 ```
 
-4) /public/img: replace website favicon with your own logo files (do not change filenames).
+4) ```/public/img```: replace website favicon with your own logo files (do not change filenames).
 
 5) Images:
 
@@ -182,7 +182,7 @@ If the first symbol of a URL is "/", it is considered an internal URL, otherwise
 VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "link1 url", "link2 name": "link2 url", ... }>
 ```
 
-9) ```/src/pages/```: the files terms.vue, impressum.vue, and privacy.vue hold the content for the respective pages linked in the page footer.
+9) ```/src/pages/```: the files ```terms.vue```, ```impressum.vue```, and ```privacy.vue``` hold the content for the respective pages linked in the page footer.
 
 10) ```/src/components/customize/FaqSection.vue``` You can change the FAQ contents by editing the html code in this file. If you don’t want a FAQ section, replace this file’s whole content with:
 ```
