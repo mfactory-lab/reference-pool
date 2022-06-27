@@ -150,15 +150,19 @@ VITE_NO_WALLET_ICON = <URL of your graphics file to replace the large SOL logo>
 If using internal images:
 
 Folder: ```/public/img```
+
 Replace website favicon files with your own logo files (do not change filenames).
 
 File: ```/src/assets/img/customize/app-logo.svg```
+
 Replace the svg in this file to change your header logo.
 
 File: ```/src/assets/img/customize/xsol.svg```
+
 Replace the svg to change the token icon.
 
 File: ```/src/assets/img/customize/no-wallet-icon.svg```
+
 Replace the large SOL logo (displayed as long as no wallet is connected).
 
 ##### Text, links, and color theme
@@ -189,9 +193,11 @@ VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "lin
 ```
 
 Folder: ```/src/pages/```
+
 The files ```terms.vue```, ```impressum.vue```, and ```privacy.vue``` hold the content for the respective pages linked in the page footer.
 
 File: ```/src/components/customize/FaqSection.vue```
+
 You can change the FAQ contents by editing the html code in this file. If you don’t want a FAQ section, replace this file’s whole content with:
 ```
 <template>
@@ -202,15 +208,18 @@ You can change the FAQ contents by editing the html code in this file. If you do
 ```
 
 File: ```/src/components/customize/CustomSection.vue```
+
 Any content you want to add past the FAQ section (or replacing it if you removed the FAQ section) can be added to this file.
 
 File: ```.env.production```
+
 Variable to set:
 ```
 VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
 ```
 
 File: ```/src/assets/scss/_variables.scss```
+
 Change this one if you want to play around with the theme colors.
 
 ## Community
