@@ -48,7 +48,7 @@ export const XSOL_NAME = import.meta.env.VITE_XSOL_NAME
 
 export const APP_LOGO = import.meta.env.VITE_APP_LOGO
 export const XSOL_LOGO = import.meta.env.VITE_XSOL_LOGO
-export const BIG_PIC = import.meta.env.VITE_BIG_PIC
+export const NO_WALLET_ICON = import.meta.env.VITE_NO_WALLET_ICON
 
 export const COPYRIGHT = import.meta.env.VITE_COPYRIGHT
 export const COPYRIGHT_BY = import.meta.env.VITE_COPYRIGHT_BY

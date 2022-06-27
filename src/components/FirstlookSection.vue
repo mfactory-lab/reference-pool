@@ -28,14 +28,14 @@
 
 <script lang="ts">
 import { useWallet } from 'solana-wallets-vue'
-import { BIG_PIC } from '@/config'
+import { NO_WALLET_ICON } from '@/config'
 
 export default {
   setup() {
     const { connected } = useWallet()
 
     return {
-      BIG_PIC,
+      NO_WALLET_ICON,
       connected,
     }
   },
@@ -61,7 +61,7 @@ export default {
             <wallet-balance />
           </div>
           <div v-else class="firstlook__placeholder">
-            <img v-if="BIG_PIC" alt="" class="firstlook__placeholder__icon" :src="BIG_PIC">
+            <img v-if="NO_WALLET_ICON" alt="" class="firstlook__placeholder__icon" :src="NO_WALLET_ICON">
             <img v-else alt="" class="firstlook__placeholder__icon" src="@/assets/img/customize/no-wallet-icon.svg">
           </div>
 

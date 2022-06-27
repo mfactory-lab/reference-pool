@@ -30,13 +30,13 @@ import type { Commitment } from '@solana/web3.js'
 import { clusterApiUrl } from '@solana/web3.js'
 import type { Endpoint } from '@/store'
 
-const MAIN_STAKE_POOL_ADDRESS = 'CtMyWsrUtAwXWiGr9WjHT5fC3p3fgV8cyGpLTo2LJzG1'
-const MAIN_STAKE_LIMIT = 1500000
+const MAIN_STAKE_POOL_ADDRESS = import.meta.env.VITE_MAIN_STAKE_POOL_ADDRESS
+const MAIN_STAKE_LIMIT = import.meta.env.VITE_MAIN_STAKE_LIMIT
 
-const TEST_STAKE_POOL_ADDRESS = 'AeuEVJrnL5SwftWzchEfqMkKXPxLcZjrFtShdAZ7FwKy'
-const TEST_STAKE_LIMIT = 1500000
+const TEST_STAKE_POOL_ADDRESS = import.meta.env.VITE_TEST_STAKE_POOL_ADDRESS
+const TEST_STAKE_LIMIT = import.meta.env.VITE_TEST_STAKE_LIMIT
 
-const DEV_STAKE_POOL_ADDRESS = 'vU5rGXWuLTqFbxtz89TXEbJ59wYHJiLHNmtbXdSB7UF'
+const DEV_STAKE_POOL_ADDRESS = import.meta.env.VITE_DEV_STAKE_POOL_ADDRESS
 
 export const ENDPOINTS: Endpoint[] = [
   {
@@ -45,7 +45,7 @@ export const ENDPOINTS: Endpoint[] = [
     cluster: 'mainnet-beta',
     url: 'https://ssc-dao.genesysgo.net/',
     stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
-    stakeLimit: MAIN_STAKE_LIMIT,
+    stakeLimit: Number(MAIN_STAKE_LIMIT),
   },
   {
     id: 'serum-mainnet',
@@ -53,7 +53,7 @@ export const ENDPOINTS: Endpoint[] = [
     cluster: 'mainnet-beta',
     url: 'https://solana-api.projectserum.com/',
     stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
-    stakeLimit: MAIN_STAKE_LIMIT,
+    stakeLimit: Number(MAIN_STAKE_LIMIT),
   },
   {
     id: 'rpcpool-mainnet',
@@ -61,7 +61,7 @@ export const ENDPOINTS: Endpoint[] = [
     cluster: 'mainnet-beta',
     url: 'https://mainnet.rpcpool.com/',
     stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
-    stakeLimit: MAIN_STAKE_LIMIT,
+    stakeLimit: Number(MAIN_STAKE_LIMIT),
   },
   {
     id: 'mainnet',
@@ -69,7 +69,7 @@ export const ENDPOINTS: Endpoint[] = [
     cluster: 'mainnet-beta',
     url: clusterApiUrl('mainnet-beta'),
     stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
-    stakeLimit: MAIN_STAKE_LIMIT,
+    stakeLimit: Number(MAIN_STAKE_LIMIT),
   },
   {
     id: 'testnet',
@@ -77,7 +77,7 @@ export const ENDPOINTS: Endpoint[] = [
     cluster: 'testnet',
     url: 'https://testnet.rpcpool.com/',
     stakePoolAddress: TEST_STAKE_POOL_ADDRESS,
-    stakeLimit: TEST_STAKE_LIMIT,
+    stakeLimit: Number(TEST_STAKE_LIMIT),
   },
   {
     id: 'devnet',

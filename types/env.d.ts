@@ -40,11 +40,16 @@ interface ImportMetaEnv {
   readonly VITE_XSOL_NAME: string
   readonly VITE_APP_LOGO: string
   readonly VITE_XSOL_LOGO: string
-  readonly VITE_BIG_PIC: string
+  readonly VITE_NO_WALLET_ICON: string
   readonly VITE_TELEGRAM_ANNOUNCEMENT_UR: string
   readonly VITE_COPYRIGHT_BY: string
   readonly VITE_COPYRIGHT: string
   readonly VITE_POWERED_BY: string
   readonly VITE_POWERED_LINK: string
   readonly VITE_FOOTER_LINKS: string
+  readonly VITE_MAIN_STAKE_POOL_ADDRESS: string
+  readonly VITE_TEST_STAKE_POOL_ADDRESS: string
+  readonly VITE_DEV_STAKE_POOL_ADDRESS: string
+  readonly VITE_MAIN_STAKE_LIMIT: string
+  readonly VITE_TEST_STAKE_LIMIT: string
 }

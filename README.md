@@ -101,20 +101,20 @@ $ yarn preview
 
 #### Following parameters can (and some of them should) be configured:
 
-1) /src/config/connection.ts holds pool addresses.
-    Configure these variables:
+1) .env
+    Configure these Stake Pool variables:
 
 ```
-MAIN_STAKE_POOL_ADDRESS = [See Stake Pool Address] 
-TEST_STAKE_POOL_ADDRESS = <optional: stake pool address on TestNet>
-DEV_STAKE_POOL_ADDRESS = <optional: stake pool address on DevNet>
+VITE_MAIN_STAKE_POOL_ADDRESS = [See Stake Pool Address]
+VITE_TEST_STAKE_POOL_ADDRESS = <optional: stake pool address on TestNet>
+VITE_DEV_STAKE_POOL_ADDRESS = <optional: stake pool address on DevNet>
 ```
 
 You can also set staking limits here (displayed in the top bar):
 
 ```
-MAIN_STAKE_LIMIT = <maximum allowed stake for MainNet>
-TEST_STAKE_LIMIT = <maximum allowed stake for TestNet>
+VITE_MAIN_STAKE_LIMIT = <maximum allowed stake for MainNet>
+VITE_TEST_STAKE_LIMIT = <maximum allowed stake for TestNet>
 ```
 
 2) .env includes website metadata: title, description, keyword.
@@ -127,29 +127,73 @@ VITE_APP_KEYWORDS = <your app’s meta keywords>
 ```
 
 3) .env.production
+
 ```
 VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
 ```
-4) /public/img: replace website favicon with your own logo files keeping the same filenames.
 
-5) /src/components/AppLogo.vue: replace the svg in this file to change the header logo.
+4) /public/img: replace website favicon with your own logo files (do not change filenames).
 
-6) /src/components/icons/TokenSvg.vue: replace the svg to change the token icon.
+5) Images:
 
+5.1) ```/src/assets/img/customize/app-logo.svg```: replace the svg in this file to change the header logo.
 
+5.2) ```/src/assets/img/customize/xsol.svg```: replace the svg to change the token icon.
 
-7) /src/config/social.ts contains the variable that should point to your Telegram channel:
-   ```
-   TELEGRAM_ANNOUNCEMENT_URL = <URL of your Telegram channel or group>
-   ```
-   _This URL is displayed in case of an error, so that the user can contact you for support._ <br><br>
+5.3) ```/src/assets/img/customize/no-wallet-icon.svg```: replace the large SOL logo (displayed if the wallet is not connected).
 
-8) ```/src/assets/scss/_variables.scss``` can be changed if you want to play around with the theme colors.
+Insert links here if you want to use remotely stored images; if left empty, internal SVG images (see above) will be used:
 
-9) ```/src/components/AppFooter.vue``` copyright message that goes into the webpage footer (replace “xxx” with your projectname), as well as a link to your documentation (replace # with an appropriate URL in the \<a href=”#”> tag).
+```
+VITE_APP_LOGO = <URL of your header logo file (see 5.1)>
+VITE_XSOL_LOGO = <URL of your token logo file (see 5.2)>
+VITE_NO_WALLET_ICON = <URL of your graphics file to replace the large SOL logo (see 5.3)>
+```
 
-10) ```/src/page/```: the files terms.vue, impressum.vue, and privacy.vue hold the content for the respective pages linked in the page footer.
+6) .env
+    Contains the variable for the URL pointing to your Telegram channel:
+   
+```
+TELEGRAM_ANNOUNCEMENT_URL = <URL of your Telegram channel or group>
+```
 
+_This URL is displayed in case of an error, so that the user can contact you for support._
+   
+
+7) ```/src/assets/scss/_variables.scss``` can be changed if you want to play around with the theme colors.
+
+8) Customizing the footer in .env:
+
+```
+VITE_COPYRIGHT_BY = <replace “xxx” with your project name>
+VITE_COPYRIGHT = <replace the whole line>
+```
+Leave both variables empty if no copyright message is needed  
+
+```
+VITE_POWERED_BY = <if left empty, the POWERED_BY line is not displayed>
+VITE_POWERED_LINK = <URL; if left empty, the POWERED_BY line will not have a link>
+```
+
+Links in the footer can point to internal or external pages.
+If the first symbol of a URL is "/", it is considered an internal URL, otherwise external.
+   
+```
+VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "link1 url", "link2 name": "link2 url", ... }>
+```
+
+9) ```/src/pages/```: the files terms.vue, impressum.vue, and privacy.vue hold the content for the respective pages linked in the page footer.
+
+10) ```/src/components/customize/FaqSection.vue``` You can change the FAQ contents by editing the html code in this file. If you don’t want a FAQ section, replace this file’s whole content with:
+```
+<template>
+  <section class="custom-section">
+    <div class="container" />
+  </section>
+</template>
+```
+
+11) ```/src/components/customize/CustomSection.vue``` Any content you want to add past the FAQ section (or replacing it if you removed the FAQ section) can be added to this file.
 
 
 
@@ -168,8 +212,8 @@ You can contact us via following channels:
 - [Vite](https://vitejs.dev/): an extremely fast frontend tooling
 - [Vue](https://vuejs.org/): framework
 - [VS Code Extensions](./.vscode/extensions.json)
-    - [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar): Vue 3 `<script setup>` IDE support
-    - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+- [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar): Vue 3 `<script setup>` IDE support
+- [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 
 ## How to Contribute
 
@@ -189,3 +233,6 @@ If no such issue exists, go ahead and create one. **Please be sure to include al
 ## License
 
 [GNU AGPL v3](./LICENSE)
+
+
+
