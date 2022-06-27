@@ -126,21 +126,15 @@ VITE_APP_DESCRIPTION = <your app’s meta description>
 VITE_APP_KEYWORDS = <your app’s meta keywords>
 ```
 
-3) .env.production
+3) ```/public/img```: replace website favicon with your own logo files (do not change filenames).
 
-```
-VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
-```
+4) Images:
 
-4) ```/public/img```: replace website favicon with your own logo files (do not change filenames).
+4.1) ```/src/assets/img/customize/app-logo.svg```: replace the svg in this file to change the header logo.
 
-5) Images:
+4.2) ```/src/assets/img/customize/xsol.svg```: replace the svg to change the token icon.
 
-5.1) ```/src/assets/img/customize/app-logo.svg```: replace the svg in this file to change the header logo.
-
-5.2) ```/src/assets/img/customize/xsol.svg```: replace the svg to change the token icon.
-
-5.3) ```/src/assets/img/customize/no-wallet-icon.svg```: replace the large SOL logo (displayed if the wallet is not connected).
+4.3) ```/src/assets/img/customize/no-wallet-icon.svg```: replace the large SOL logo (displayed if the wallet is not connected).
 
 Insert links here if you want to use remotely stored images; if left empty, internal SVG images (see above) will be used:
 
@@ -150,7 +144,7 @@ VITE_XSOL_LOGO = <URL of your token logo file (see 5.2)>
 VITE_NO_WALLET_ICON = <URL of your graphics file to replace the large SOL logo (see 5.3)>
 ```
 
-6) .env
+5) .env
     Contains the variable for the URL pointing to your Telegram channel:
    
 ```
@@ -160,9 +154,9 @@ TELEGRAM_ANNOUNCEMENT_URL = <URL of your Telegram channel or group>
 _This URL is displayed in case of an error, so that the user can contact you for support._
    
 
-7) ```/src/assets/scss/_variables.scss``` can be changed if you want to play around with the theme colors.
+6) ```/src/assets/scss/_variables.scss``` can be changed if you want to play around with the theme colors.
 
-8) Customizing the footer in .env:
+7) Customizing the footer in .env:
 
 ```
 VITE_COPYRIGHT_BY = <replace “xxx” with your project name>
@@ -182,9 +176,9 @@ If the first symbol of a URL is "/", it is considered an internal URL, otherwise
 VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "link1 url", "link2 name": "link2 url", ... }>
 ```
 
-9) ```/src/pages/```: the files ```terms.vue```, ```impressum.vue```, and ```privacy.vue``` hold the content for the respective pages linked in the page footer.
+8) ```/src/pages/```: the files ```terms.vue```, ```impressum.vue```, and ```privacy.vue``` hold the content for the respective pages linked in the page footer.
 
-10) ```/src/components/customize/FaqSection.vue``` You can change the FAQ contents by editing the html code in this file. If you don’t want a FAQ section, replace this file’s whole content with:
+9) ```/src/components/customize/FaqSection.vue``` You can change the FAQ contents by editing the html code in this file. If you don’t want a FAQ section, replace this file’s whole content with:
 ```
 <template>
   <section class="custom-section">
@@ -193,7 +187,13 @@ VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "lin
 </template>
 ```
 
-11) ```/src/components/customize/CustomSection.vue``` Any content you want to add past the FAQ section (or replacing it if you removed the FAQ section) can be added to this file.
+10) ```/src/components/customize/CustomSection.vue``` Any content you want to add past the FAQ section (or replacing it if you removed the FAQ section) can be added to this file.
+
+11) .env.production
+
+```
+VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
+```
 
 
 
