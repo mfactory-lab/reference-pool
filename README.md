@@ -1,4 +1,5 @@
 # Reference Stake Pool (Solana Blockchain)
+
 ## Abstract
 
 Stake Pools are a new concept that has been introduced to improve the stake distribution across the validator network.
@@ -28,7 +29,7 @@ A fully functioning prototype stake pool is running at https://mfactory-lab.gith
 
 - Familiarity with the command line
 - [NodeJs](https://nodejs.org/en/)
-- [Yarn](https://yarnpkg.com/) package manager
+- [Pnpm](https://pnpm.io/) package manager
 
 ## Getting Started
 
@@ -75,6 +76,20 @@ Upon request we are also able to create a unique, tailored strategy for your sta
 
 [Create a repo from this template on GitHub](https://github.com/mfactory-lab/reference-pool/generate).
 
+#### Docker Production Build
+
+First, build the ref-pool image by opening the terminal in the project's root directory.
+
+```bash
+docker build . -t refpool:latest
+```
+
+Run the image and specify port mapping with the `-p` flag.
+
+```bash
+docker run --rm -it -p 8080:80 refpool:latest
+```
+
 #### Clone to local
 
 If you prefer to do it manually with cleaner git history:
@@ -87,16 +102,16 @@ $ git clone https://github.com/mfactory-lab/reference-pool.git
 $ cd reference-pool
 
 # install packages
-$ yarn install
+$ pnpm install
 
 # build and serve with vite dev server
-$ yarn dev
+$ pnpm dev
 
 # production build
-$ yarn build
+$ pnpm build
 
 # preview production build locally
-$ yarn preview
+$ pnpm preview
 
 # production build with Docker
 $ docker build -t reference-stake-pool .
@@ -191,7 +206,7 @@ VITE_POWERED_LINK = <URL; if left empty, the POWERED_BY line will not have a lin
 ```
 _Links in the footer can point to internal or external pages.
 If the first symbol of a URL is "/", it is considered an internal URL, otherwise external._
-   
+
 ```
 VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "link1 url", "link2 name": "link2 url", ... }>
 ```
