@@ -1,5 +1,7 @@
 {
-  "extends": "@antfu",
+  "extends": [
+    "@antfu/eslint-config-vue"
+  ],
   "rules": {
     "curly": ["error", "all"],
     "antfu/if-newline": "off",
