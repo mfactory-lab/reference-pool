@@ -14,22 +14,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-#    environment:
-#      name: production
-#      url: https://${{ env.URL }}
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: yarn
+          cache: pnpm
 
       - name: Install
-        run: yarn install
+        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: |
-          yarn run build:staging
+          pnpm run build:staging
           cp dist/index.html dist/404.html
 #          echo ${{ env.URL }} > dist/CNAME
 
