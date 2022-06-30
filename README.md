@@ -76,20 +76,6 @@ Upon request we are also able to create a unique, tailored strategy for your sta
 
 [Create a repo from this template on GitHub](https://github.com/mfactory-lab/reference-pool/generate).
 
-#### Docker Production Build
-
-First, build the ref-pool image by opening the terminal in the project's root directory.
-
-```bash
-docker build . -t refpool:latest
-```
-
-Run the image and specify port mapping with the `-p` flag.
-
-```bash
-docker run --rm -it -p 8080:80 refpool:latest
-```
-
 #### Clone to local
 
 If you prefer to do it manually with cleaner git history:
@@ -112,6 +98,20 @@ $ pnpm build
 
 # preview production build locally
 $ pnpm preview
+```
+
+#### Docker Production Build
+
+First, build the ref-pool image by opening the terminal in the project's root directory.
+
+```bash
+docker build . -t refpool:latest
+```
+
+Run the image and specify port mapping with the `-p` flag.
+
+```bash
+docker run --rm -it -p 8080:80 refpool:latest
 ```
 
 ### Configure the Frontend App
