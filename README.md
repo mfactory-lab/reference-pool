@@ -112,10 +112,6 @@ $ pnpm build
 
 # preview production build locally
 $ pnpm preview
-
-# production build with Docker
-$ docker build -t reference-stake-pool .
-$ docker run -it -p 8080:80 --rm --name reference-stake-pool reference-stake-pool
 ```
 
 ### Configure the Frontend App
