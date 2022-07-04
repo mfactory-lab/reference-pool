@@ -43,7 +43,7 @@ export function lamportsToSol(lamports: number | BN): number {
 
   const absLamports = lamports.abs()
   const lamportsString = absLamports.toString(10).padStart(10, '0')
-  const splitIndex = lamportsString.length - 9
+  const splitIndex = lamportsString.length - SOL_DECIMALS
   const solString = `${lamportsString.slice(0, splitIndex)}.${lamportsString.slice(splitIndex)}`
   return signMultiplier * parseFloat(solString)
 }
