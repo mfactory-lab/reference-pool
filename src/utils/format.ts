@@ -26,8 +26,10 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import type BN from 'bn.js'
+import BN from 'bn.js'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
+
+const SOL_DECIMALS = Math.log10(LAMPORTS_PER_SOL)
 
 export function lamportsToSol(lamports: number | BN): number {
   if (typeof lamports === 'number') {
@@ -51,16 +53,11 @@ export function lamportsToSolString(lamports: number | BN, maximumFractionDigits
   return `◎ ${new Intl.NumberFormat('en-US', { maximumFractionDigits }).format(sol)}`
 }
 
-// export const solToLamports = (amount: string | number | BN): number => {
-//   const val = new BN(amount, 10);
-//   return val.mul(new BN(LAMPORTS_PER_SOL, 10)).toNumber();
-// };
-
 export function solToLamports(amount: number): number {
   if (isNaN(amount)) {
     return Number(0)
   }
-  return Number(amount * LAMPORTS_PER_SOL)
+  return new BN(amount.toFixed(SOL_DECIMALS).replace('.', '')).toNumber()
 }
 
 export const priceFormatter = new Intl.NumberFormat('en-US', {
