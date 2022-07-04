@@ -1,1 +1,0 @@
-import{ab as e,ac as c,ad as t,am as r,af as a}from"./vendor.ff26ecac.js";import{_ as s}from"./index.6316490d.js";const o={},i=a("div",{class:"container q-pb-xl"},[a("div",{class:"page-title"}," Privacy Policy ")],-1);function n(_,l){return e(),c(r,null,{default:t(()=>[i]),_:1})}var p=s(o,[["render",n]]);export{p as default};
