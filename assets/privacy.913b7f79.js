@@ -1,1 +1,0 @@
-import{aa as e,ab as c,ac as t,al as r,ae as a}from"./vendor.cace6bbc.js";import{_ as s}from"./index.9abae0b4.js";const o={},i=a("div",{class:"container q-pb-xl"},[a("div",{class:"page-title"}," Privacy Policy ")],-1);function l(n,_){return e(),c(r,null,{default:t(()=>[i]),_:1})}var p=s(o,[["render",l]]);export{p as default};
