@@ -180,7 +180,7 @@ export default defineComponent({
           })
           return
         }
-        stake.from = formatAmount(solBalance.value)
+        stake.from = solBalance.value
       },
 
       unstakeMax() {
@@ -191,7 +191,7 @@ export default defineComponent({
           })
           return
         }
-        unstake.from = formatAmount(tokenBalance.value)
+        unstake.from = tokenBalance.value
       },
 
       stakeHandler: async () => {
