@@ -37,10 +37,10 @@ export const SITE_DESCRIPTION = import.meta.env.VITE_APP_DESCRIPTION
 export const SITE_KEYWORDS = import.meta.env.VITE_APP_KEYWORDS
 
 // intervals
-export const EPOCH_RELOAD_INTERVAL = 60000
-export const RATES_RELOAD_INTERVAL = 300000
-export const POOL_RELOAD_INTERVAL = 30000
-export const VALIDATORS_RELOAD_INTERVAL = 1800000
+export const EPOCH_RELOAD_INTERVAL = 60_000
+export const RATES_RELOAD_INTERVAL = 300_000
+export const POOL_RELOAD_INTERVAL = 30_000
+export const VALIDATORS_RELOAD_INTERVAL = 1_800_000
 
 // misc
 // export const HOW_TO_STAKE_URL = 'https://www.youtube.com/embed/KXPPGC8iOPM'

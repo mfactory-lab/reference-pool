@@ -28,9 +28,9 @@
 
 import type { PublicKey } from '@solana/web3.js'
 import { useWallet } from 'solana-wallets-vue'
-import { useMonitorTransaction } from './monitor'
 import { useConnectionStore } from '~/store'
 import { solToLamports } from '~/utils'
+import { useMonitorTransaction } from './monitor'
 
 export function useAirdrop() {
   const { connection } = useConnectionStore()
@@ -41,7 +41,7 @@ export function useAirdrop() {
     airdrop: async (amount = 10) => {
       if (connected.value) {
         const sign = await connection.requestAirdrop(
-          wallet.value?.publicKey as PublicKey,
+          wallet.value?.adapter?.publicKey as PublicKey,
           solToLamports(amount),
         )
         await monitorTransaction(sign)

@@ -27,26 +27,20 @@
  */
 
 import type { App } from 'vue'
-import SolanaWallets from 'solana-wallets-vue'
 import {
   BitpieWalletAdapter,
-  BloctoWalletAdapter,
   CloverWalletAdapter,
   Coin98WalletAdapter,
   CoinhubWalletAdapter,
-  ExodusWalletAdapter,
-  GlowWalletAdapter,
   LedgerWalletAdapter,
   MathWalletAdapter,
   PhantomWalletAdapter,
   SafePalWalletAdapter,
-  SlopeWalletAdapter,
   SolflareWalletAdapter,
-  SolletExtensionWalletAdapter,
-  SolletWalletAdapter,
   SolongWalletAdapter,
   TokenPocketWalletAdapter,
 } from '@solana/wallet-adapter-wallets'
+import SolanaWallets from 'solana-wallets-vue'
 
 export const install = ({ app }: { app: App<Element> }) => {
   // const network = WalletAdapterNetwork.Mainnet
@@ -54,21 +48,15 @@ export const install = ({ app }: { app: App<Element> }) => {
     wallets: [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
-      new SolletWalletAdapter(),
-      new SolletExtensionWalletAdapter(),
-      new SlopeWalletAdapter(),
       new SolongWalletAdapter(),
       new CloverWalletAdapter(),
-      new ExodusWalletAdapter(),
       new BitpieWalletAdapter(),
       new Coin98WalletAdapter(),
       new CoinhubWalletAdapter(),
       new SafePalWalletAdapter(),
       new TokenPocketWalletAdapter(),
-      new GlowWalletAdapter(),
       new MathWalletAdapter(),
       new LedgerWalletAdapter(),
-      new BloctoWalletAdapter(),
     ],
     autoConnect: false,
   })

@@ -34,6 +34,7 @@ import '~/assets/scss/app.scss'
 
 async function bootstrap() {
   const app = createApp(App)
+  // eslint-disable-next-line unicorn/no-array-for-each
   Object.values(import.meta.glob('./modules/*.ts', { eager: true })).forEach((i: any) => i.install?.({ app }))
 
   setupRouter(app)
@@ -42,4 +43,5 @@ async function bootstrap() {
   app.mount('#app')
 }
 
+// eslint-disable-next-line unicorn/prefer-top-level-await
 bootstrap().then()

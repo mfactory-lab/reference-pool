@@ -6,27 +6,40 @@ export default antfu(
     stylistic: true,
     typescript: true,
     formatters: true,
+    prettier: true,
+    unicorn: {
+      allRecommended: true,
+    },
     yaml: true,
-    toml: true,
-    vue: true,
+    isInEditor: false,
+    lessOpinionated: true,
     ignores: [
-      '**/build/**',
       '**/dist/**',
       '**/coverage/**',
     ],
   }, {
     rules: {
+      'unicorn/no-array-callback-reference': 'off',
+      'unicorn/no-array-method-this-argument': 'off',
+      'unicorn/prevent-abbreviations': 'off',
+      'unicorn/prefer-module': 'off',
+      'unicorn/no-array-reduce': 'off',
+      'unicorn/no-process-exit': 'off',
+      'unicorn/no-null': 'off',
+      'unicorn/filename-case': 'off',
+
       'antfu/consistent-list-newline': 'off',
       'style/brace-style': ['error', '1tbs', { allowSingleLine: true }],
-      'max-statements-per-line': ['error', { max: 2 }],
-      'toml/padding-line-between-pairs': 'off',
-      'ts/consistent-type-definitions': ['error', 'type'],
       'curly': ['error', 'all'],
+
+      'ts/consistent-type-definitions': ['error', 'type'],
+      'ts/consistent-type-imports': 'off',
+
       'node/prefer-global/process': 'off',
       'node/prefer-global/buffer': 'off',
+      'node/no-path-concat': 'off',
+
       'no-console': 'off',
-      'vue/component-name-in-template-casing': ['error', 'kebab-case'],
-      'regexp/no-unused-capturing-group': 'off',
     },
   },
 )

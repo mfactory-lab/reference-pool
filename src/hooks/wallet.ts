@@ -25,74 +25,129 @@
  *
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
-
-import { useQuasar } from 'quasar'
+import type { Adapter } from '@solana/wallet-adapter-base'
+import type { PublicKey } from '@solana/web3.js'
+import { Notify } from 'quasar'
 import { useWallet } from 'solana-wallets-vue'
-import { watch } from 'vue'
 import { shortenAddress } from '~/utils'
+import { useEmitter } from './emitter'
 
 export const WALLET_CONNECT_EVENT = Symbol('WALLET_CONNECT_EVENT')
 export const WALLET_DISCONNECT_EVENT = Symbol('WALLET_DISCONNECT_EVENT')
+export const WALLET_ERROR_EVENT = Symbol('WALLET_ERROR_EVENT')
 export const ACCOUNT_CHANGE_EVENT = Symbol('ACCOUNT_CHANGE_EVENT')
 
-const noticeTimeout = 5000
+const NOTIFICATION_TIMEOUT = 5000
 
 export function initWallet() {
   const { connection } = useConnectionStore()
   const { emit } = useEmitter()
-  const { notify } = useQuasar()
-  const { wallet } = useWallet()
+  const { wallet, connected } = useWallet()
 
-  watch(
-    wallet,
-    (w) => {
-      if (!w) {
-        return
+  // Map to track cleanup functions for each registered public key
+  const cleanup = new Map<string, () => void>()
+
+  function registerAccountChange(pk: PublicKey) {
+    const key = String(pk)
+
+    if (cleanup.has(key)) {
+      // Listeners already registered for this public key
+      return
+    }
+
+    // Listen for account changes
+    const accountChangeListenerId = connection.onAccountChange(pk, (accountInfo) => {
+      console.log('ACCOUNT_CHANGE_EVENT', accountInfo)
+      emit(ACCOUNT_CHANGE_EVENT, accountInfo)
+    })
+
+    // Listen for logs related to the public key
+    const logsListenerId = connection.onLogs(pk, (logs) => {
+      console.log('LOGS_EVENT', logs)
+    })
+
+    // Store the cleanup function for future reference
+    cleanup.set(key, () => {
+      connection.removeAccountChangeListener(accountChangeListenerId).then()
+      connection.removeOnLogsListener(logsListenerId).then()
+      cleanup.delete(key)
+    })
+  }
+
+  function unregisterAccountChange() {
+    for (const [, fn] of cleanup) {
+      fn()
+    }
+    cleanup.clear()
+  }
+
+  /**
+   * Handles wallet connection events.
+   * Displays a notification and emits a connect event.
+   * @param adapter WalletAdapter instance
+   */
+  const handleConnect = (adapter: Adapter) => {
+    const pk = adapter.publicKey
+    if (!pk) {
+      return
+    }
+    Notify.create({
+      message: 'Wallet Update',
+      caption: `Connected to wallet ${shortenAddress(String(pk), 7)}`,
+      timeout: NOTIFICATION_TIMEOUT,
+    })
+    emit(WALLET_CONNECT_EVENT, adapter)
+  }
+
+  /**
+   * Handles wallet disconnection events.
+   * Displays a notification and emits a disconnect event.
+   * @param adapter WalletAdapter instance
+   */
+  const handleDisconnect = (adapter: Adapter) => {
+    Notify.create({
+      message: 'Wallet Update',
+      caption: 'Disconnected from wallet',
+      timeout: NOTIFICATION_TIMEOUT,
+    })
+    emit(WALLET_DISCONNECT_EVENT, adapter)
+  }
+
+  /**
+   * Handles wallet error events.
+   * Logs the error to the console.
+   * @param error Error object
+   */
+  const handleError = (error: Error) => {
+    if (!error.message) {
+      return
+    }
+    console.error('Wallet Error:', error.message)
+    // Notify.create({
+    //   type: 'negative',
+    //   message: 'Wallet Error',
+    //   caption: error.message,
+    //   timeout: NOTIFICATION_TIMEOUT,
+    // })
+    emit(WALLET_ERROR_EVENT, error)
+  }
+
+  watch(connected, useDebounceFn((connected) => {
+    if (!wallet.value) {
+      return
+    }
+    const { adapter } = wallet.value
+    if (connected) {
+      handleConnect(adapter)
+      if (adapter.publicKey) {
+        registerAccountChange(adapter.publicKey)
       }
-
-      const onConnect = () => {
-        const publicKey = w.publicKey!
-        connection.onAccountChange(publicKey, (acc) => {
-          emit(ACCOUNT_CHANGE_EVENT, acc)
-        })
-        connection.onLogs(publicKey, (logs) => {
-          console.log(logs)
-        })
-        notify({
-          message: 'Wallet update',
-          caption: `Connected to wallet ${shortenAddress(publicKey.toBase58(), 7)}`,
-          timeout: noticeTimeout,
-        })
-        emit(WALLET_CONNECT_EVENT, w)
-      }
-
-      const onDisconnect = () => {
-        notify({
-          message: 'Wallet update',
-          caption: 'Disconnected from wallet',
-          timeout: noticeTimeout,
-        })
-        emit(WALLET_DISCONNECT_EVENT, w)
-      }
-
-      const onError = (e) => {
-        if (!e?.message) {
-          return
-        }
-        notify({
-          type: 'negative',
-          message: 'Wallet update',
-          caption: e.message,
-          timeout: noticeTimeout,
-        })
-      }
-
-      w.once('connect', onConnect)
-      w.once('disconnect', onDisconnect)
-
-      w.removeAllListeners('error')
-      w.on('error', onError)
-    },
-    { immediate: true },
-  )
+      adapter.once('disconnect', () => {
+        unregisterAccountChange()
+        handleDisconnect(adapter)
+      })
+      adapter.removeAllListeners('error')
+      adapter.on('error', handleError)
+    }
+  }, 500), { immediate: true })
 }

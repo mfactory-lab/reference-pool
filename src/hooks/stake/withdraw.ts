@@ -46,7 +46,7 @@ export function useWithdraw() {
   const { notify } = useQuasar()
   const { monitorTransaction, sending } = useMonitorTransaction()
 
-  const { wallet, connected } = useWallet()
+  const { connected } = useWallet()
   const anchorWallet = useAnchorWallet()
 
   const lamportsPerSignature = toRef(stakePoolStore, 'lamportsPerSignature')
@@ -99,8 +99,8 @@ export function useWithdraw() {
           const { instructions, signers } = await withdrawSol(
             connectionStore.connection,
             connectionStore.stakePoolAddress!,
-            wallet.value!.publicKey!,
-            wallet.value!.publicKey!,
+            anchorWallet.value!.publicKey!,
+            anchorWallet.value!.publicKey!,
             amount.value,
           )
 
@@ -114,7 +114,7 @@ export function useWithdraw() {
         const { instructions: withdrawInstructions, signers } = await withdrawStake(
           connectionStore.connection,
           connectionStore.stakePoolAddress!,
-          wallet.value!.publicKey!,
+          anchorWallet.value!.publicKey!,
           amount.value,
           useReserve.value,
           undefined,
@@ -148,7 +148,7 @@ export function useWithdraw() {
 
         const deactivateInstructions = StakeProgram.deactivate({
           stakePubkey: stakePubKey!,
-          authorizedPubkey: wallet.value!.publicKey!,
+          authorizedPubkey: anchorWallet.value!.publicKey!,
         }).instructions
 
         const txLabels = ['Unstake', 'Deactivate']
@@ -174,8 +174,8 @@ export function useWithdraw() {
         stakeAccountStore.load()
 
         return true
-      } catch (e: any) {
-        notify({ message: e.message, type: 'negative' })
+      } catch (error: any) {
+        notify({ message: error.message, type: 'negative' })
         // throw e
       } finally {
         loading.value = false
@@ -217,7 +217,7 @@ async function prepareApyComparator(epoch: number) {
         return aApy - bApy
       }
     }
-  } catch (e) {
-    console.log('Error:', e)
+  } catch (error) {
+    console.log('Error:', error)
   }
 }

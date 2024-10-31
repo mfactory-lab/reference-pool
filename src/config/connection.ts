@@ -35,7 +35,7 @@ const MAIN_STAKE_LIMIT = import.meta.env.VITE_MAIN_STAKE_LIMIT
 // const TEST_STAKE_POOL_ADDRESS = import.meta.env.VITE_TEST_STAKE_POOL_ADDRESS
 // const TEST_STAKE_LIMIT = import.meta.env.VITE_TEST_STAKE_LIMIT
 
-const DEV_STAKE_POOL_ADDRESS = import.meta.env.VITE_DEV_STAKE_POOL_ADDRESS
+// const DEV_STAKE_POOL_ADDRESS = import.meta.env.VITE_DEV_STAKE_POOL_ADDRESS
 
 export const ENDPOINTS: Endpoint[] = [
   {
@@ -47,12 +47,12 @@ export const ENDPOINTS: Endpoint[] = [
     stakeLimit: Number(MAIN_STAKE_LIMIT),
   },
   {
-    id: 'devnet',
-    name: 'DevNet',
-    cluster: 'devnet',
-    url: 'https://jody-hlb1qh-fast-devnet.helius-rpc.com/',
-    stakePoolAddress: DEV_STAKE_POOL_ADDRESS,
-    stakeLimit: 100000,
+    id: 'mainnet',
+    name: 'Solana Mainnet',
+    cluster: 'mainnet-beta',
+    url: 'https://api.mainnet-beta.solana.com',
+    stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
+    stakeLimit: 100_000,
   },
 ]
 
@@ -80,9 +80,9 @@ export const DEFAULT_COMMITMENT: Commitment = 'confirmed'
 
 export const DEFAULT_MONITOR_COMMITMENT: Commitment = 'processed'
 
-export const DEFAULT_SEND_TIMEOUT = 15000
+export const DEFAULT_SEND_TIMEOUT = 15_000
 
 /**
  * Time to allow for the server to initially process a transaction (in milliseconds)
  */
-export const DEFAULT_CONFIRM_TIMEOUT = 120000
+export const DEFAULT_CONFIRM_TIMEOUT = 120_000

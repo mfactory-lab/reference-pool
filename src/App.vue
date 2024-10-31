@@ -30,7 +30,6 @@
 import { useHead } from '@unhead/vue'
 import { SITE_DESCRIPTION, SITE_KEYWORDS, SITE_TITLE } from '~/config'
 
-console.log(SITE_TITLE)
 useHead({
   title: SITE_TITLE,
   meta: [

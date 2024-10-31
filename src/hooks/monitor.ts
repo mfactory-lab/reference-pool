@@ -83,13 +83,13 @@ export function useMonitorTransaction() {
     let signature = ''
     try {
       signature = String(await signatureOrPromise)
-    } catch (e: any) {
+    } catch (error: any) {
       sending.value = false
       dismiss()
-      if (!String(e?.message).startsWith('User rejected')) {
+      if (!String(error?.message).startsWith('User rejected')) {
         notify({
           message: idx ? `Transaction "${idx}" error` : 'Transaction error',
-          caption: e?.message,
+          caption: error?.message,
           type: 'negative',
           timeout: 0,
           actions: [closeAction],
@@ -146,20 +146,20 @@ export function useMonitorTransaction() {
       if (onSuccess) {
         onSuccess(signature)
       }
-    } catch (e: any) {
+    } catch (error: any) {
       dismiss()
       notify({
         message: idx ? `Transaction "${idx}" error` : 'Transaction error',
-        caption: e.message,
+        caption: error.message,
         type: 'negative',
         timeout: 0,
         actions: [exploreAction, telegramAction, closeAction],
       })
 
       if (onError) {
-        onError(e)
+        onError(error)
       }
-      console.error(e)
+      console.error(error)
     } finally {
       sending.value = false
     }

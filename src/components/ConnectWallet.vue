@@ -27,7 +27,7 @@
   -->
 
 <script lang="ts">
-import type { Wallet } from 'solana-wallets-vue'
+import type { Wallet } from 'solana-wallets-vue/dist/types'
 import { evaClose } from '@quasar/extras/eva-icons'
 import { WalletReadyState } from '@solana/wallet-adapter-base'
 import { useQuasar } from 'quasar'
@@ -42,6 +42,13 @@ const walletPriority = {
   sollet: 5,
   blocto: 4,
 }
+
+type ExtendedWallet = Wallet & { adapter: Wallet['adapter'] & { darkIcon: string } }
+
+function isActiveWallet(wallet: Wallet) {
+  return [WalletReadyState.Installed, WalletReadyState.Loadable].includes(wallet.readyState)
+}
+
 export default defineComponent({
   setup() {
     const {
@@ -61,9 +68,7 @@ export default defineComponent({
       ledger: ledgerDarkSvg,
       mathwallet: mathWalletDarkSvg,
     }
-    function isActiveWallet(wallet: Wallet) {
-      return [WalletReadyState.Installed, WalletReadyState.Loadable].includes(wallet.readyState)
-    }
+
     return {
       walletAddress,
       walletShortAddress,
@@ -72,13 +77,13 @@ export default defineComponent({
       dark,
       wallets: computed(() =>
         [...wallets.value]
-          .map((w) => {
-            w.darkIcon = darkIcons[w.name.toLowerCase()]
+          .map((w: ExtendedWallet) => {
+            w.adapter.darkIcon = darkIcons[w.adapter.name.toLowerCase()]
             return w
           })
           .sort((a, b) => {
-            const aPriority = walletPriority[a.name.toLowerCase()] ?? 1
-            const bPriority = walletPriority[b.name.toLowerCase()] ?? 1
+            const aPriority = walletPriority[a.adapter.name.toLowerCase()] ?? 1
+            const bPriority = walletPriority[b.adapter.name.toLowerCase()] ?? 1
             return (
               bPriority - aPriority + ((isActiveWallet(b) ? 1 : 0) - (isActiveWallet(a) ? 1 : 0))
             )
@@ -89,7 +94,7 @@ export default defineComponent({
       },
       isActiveWallet,
       async select(wallet: Wallet) {
-        await selectWallet(wallet.name)
+        selectWallet(wallet.adapter.name)
         dialog.value = false
         await connect()
       },
@@ -205,18 +210,18 @@ export default defineComponent({
             <div class="col-12 col-md-6">
               <q-item clickable :disable="!isActiveWallet(wallet)" @click="select(wallet)">
                 <q-item-section>
-                  <b>{{ wallet.name }}</b>
+                  <b>{{ wallet.adapter.name }}</b>
                   <div
                     class="text-light-gray text-caption full-width text-no-wrap"
                     style="text-overflow: ellipsis; overflow: hidden"
                   >
-                    {{ wallet.url }}
+                    {{ wallet.adapter.url }}
                   </div>
                 </q-item-section>
                 <q-item-section avatar>
                   <q-avatar square>
                     <img
-                      :src="dark.isActive ? wallet.icon : wallet.darkIcon ?? wallet.icon"
+                      :src="dark.isActive ? wallet.adapter.icon : wallet.adapter.darkIcon ?? wallet.adapter.icon"
                       alt=""
                     >
                   </q-avatar>

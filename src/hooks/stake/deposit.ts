@@ -32,7 +32,7 @@ import { useQuasar } from 'quasar'
 import { useAnchorWallet } from 'solana-wallets-vue'
 import { computed, ref, toRef } from 'vue'
 import type { ProgramAccount } from '~/store'
-import { formatAmount, lamportsToSol, sendTransaction, solToLamports } from '~/utils'
+import { formatAmount, sendTransaction, solToLamports } from '~/utils'
 
 export function useDeposit() {
   const { notify } = useQuasar()
@@ -46,7 +46,7 @@ export function useDeposit() {
   const stakePool = toRef(stakePoolStore, 'stakePool')
   const minRentBalance = toRef(stakePoolStore, 'minRentBalance')
 
-  const nativeBalance = toRef(balanceStore, 'nativeBalance')
+  // const nativeBalance = toRef(balanceStore, 'nativeBalance')
   const hasTokenAccount = toRef(balanceStore, 'hasTokenAccount')
 
   const loading = ref(false)
@@ -80,7 +80,7 @@ export function useDeposit() {
           throw new Error('Wrong stake account state, must be delegated to validator')
         }
 
-        const { rentFee, instructions, signers } = await depositStake(
+        const { instructions, signers } = await depositStake(
           connectionStore.connection,
           connectionStore.stakePoolAddress!,
           wallet.value!.publicKey!,
@@ -88,12 +88,12 @@ export function useDeposit() {
           stakeAccount.pubkey,
         )
 
-        if (nativeBalance.value < rentFee) {
-          // noinspection ExceptionCaughtLocallyJS
-          throw new Error(
-            `Insufficient balance, at least ${lamportsToSol(rentFee)} SOL are required.`,
-          )
-        }
+        // if (nativeBalance.value < rentFee) {
+        //   // noinspection ExceptionCaughtLocallyJS
+        //   throw new Error(
+        //     `Insufficient balance, at least ${lamportsToSol(rentFee)} SOL are required.`,
+        //   )
+        // }
 
         let success = false
 
@@ -105,9 +105,9 @@ export function useDeposit() {
         )
 
         return success
-      } catch (e: any) {
-        notify({ message: e.message, type: 'negative' })
-        throw e
+      } catch (error: any) {
+        notify({ message: error.message, type: 'negative' })
+        throw error
       } finally {
         loading.value = false
       }
@@ -137,19 +137,19 @@ export function useDeposit() {
 
         loading.value = true
 
-        const { rentFee, instructions, signers } = await depositSol(
+        const { instructions, signers } = await depositSol(
           connectionStore.connection,
           connectionStore.stakePoolAddress!,
           wallet.value.publicKey,
           lamports,
         )
 
-        if (nativeBalance.value < rentFee) {
-          // noinspection ExceptionCaughtLocallyJS
-          throw new Error(
-            `Insufficient balance, at least ${lamportsToSol(rentFee)} SOL are required.`,
-          )
-        }
+        // if (nativeBalance.value < rentFee) {
+        //   // noinspection ExceptionCaughtLocallyJS
+        //   throw new Error(
+        //     `Insufficient balance, at least ${lamportsToSol(rentFee)} SOL are required.`,
+        //   )
+        // }
 
         await monitorTransaction(
           sendTransaction(connectionStore.connection, wallet.value, instructions, signers),
@@ -157,9 +157,9 @@ export function useDeposit() {
         )
 
         return true
-      } catch (e: any) {
-        notify({ message: e.message, type: 'negative' })
-        throw e
+      } catch (error: any) {
+        notify({ message: error.message, type: 'negative' })
+        throw error
       } finally {
         loading.value = false
       }
@@ -184,9 +184,9 @@ export function useDeposit() {
         await monitorTransaction(
           sendTransaction(connectionStore.connection, wallet.value, transaction.instructions, []),
         )
-      } catch (e: any) {
-        notify({ message: e.message, type: 'negative' })
-        throw e
+      } catch (error: any) {
+        notify({ message: error.message, type: 'negative' })
+        throw error
       }
     },
   }

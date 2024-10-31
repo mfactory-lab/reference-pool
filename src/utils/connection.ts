@@ -82,8 +82,8 @@ export async function sendTransaction(
     preflightCommitment: DEFAULT_COMMITMENT,
   })
 
-  console.log('TX(signature): ', result.toString())
-  console.log('TX(base64): ', rawTransaction.toString('base64'))
+  console.log('TX(signature):', result.toString())
+  console.log('TX(base64):', rawTransaction.toString('base64'))
 
   return result
 }
@@ -122,8 +122,8 @@ export async function sendTransactions(connection: Connection,
     blockhash = (await connection.getRecentBlockhash(commitment)).blockhash
   }
 
-  for (let i = 0; i < instructionSet.length; i++) {
-    const instructions = instructionSet[i] ?? []
+  for (const [i, element] of instructionSet.entries()) {
+    const instructions = element ?? []
     if (instructions.length === 0) {
       continue
     }
@@ -164,15 +164,15 @@ export async function sendTransactions(connection: Connection,
     try {
       const txId = await pendingTransaction
       console.log(`TX(#${i}) Signature:`, txId)
-      console.log(`TX(#${i}) Base64: `, rawTransaction.toString('base64'))
+      console.log(`TX(#${i}) Base64:`, rawTransaction.toString('base64'))
       if (onSuccess) {
         await onSuccess(txId, i)
       }
-    } catch (e: any) {
-      console.log(`TX(#${i}) Error:`, e)
-      console.log(`TX(#${i}) Base64: `, rawTransaction.toString('base64'))
+    } catch (error: any) {
+      console.log(`TX(#${i}) Error:`, error)
+      console.log(`TX(#${i}) Base64:`, rawTransaction.toString('base64'))
       if (onError) {
-        await onError(e, i)
+        await onError(error, i)
       }
       if (stopOnError) {
         return await Promise.all(pendingTransactions)
@@ -199,12 +199,12 @@ const storage = localStorage // typeof localStorage !== 'undefined' ? localStora
 export class LocalTokenStorage implements ITokenStorage {
   setToken(token: string): void {
     storage.setItem('auth-token', token)
-    storage.setItem('last-set', String(new Date().valueOf()))
+    storage.setItem('last-set', String(Date.now()))
   }
 
   getTimeSinceLastSet(): number | null {
     if (storage.getItem('last-set')) {
-      return new Date().valueOf() - Number(storage.getItem('last-set'))
+      return Date.now() - Number(storage.getItem('last-set'))
     }
     return null
   }
@@ -249,11 +249,11 @@ export function tokenAuthFetchMiddleware({
         if (!tokenIsValid) {
           tokenStorage.setToken(await getToken())
         }
-      } catch (e: any) {
-        console.error(e)
+      } catch (error: any) {
+        console.error(error)
       }
       fetch(url, {
-        ...(options || {}),
+        ...options,
         headers: {
           ...(options || {}).headers,
           Authorization: `Bearer ${tokenStorage.getToken()}`,
