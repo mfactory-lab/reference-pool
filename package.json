@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@solana/buffer-layout": "^4.0.1",
-    "@solana/spl-stake-pool": "github:mfactory-lab/jfactory-stake-pool#8995f4a",
+    "@solana/spl-stake-pool": "mfactory-lab/spl-stake-pool#b74c66e",
     "@solana/spl-token": "^0.1.8",
     "@solana/wallet-adapter-wallets": "^0.16.10",
     "@solana/web3.js": "^1.95.4",
