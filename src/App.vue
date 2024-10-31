@@ -27,25 +27,23 @@
   -->
 
 <script lang="ts" setup>
-import { computed, onBeforeMount } from 'vue'
-import { useAuthStore } from '@/store'
-import { initWallet } from '@/hooks'
+import { useHead } from '@unhead/vue'
+import { SITE_DESCRIPTION, SITE_KEYWORDS, SITE_TITLE } from '~/config'
 
-import '@/assets/scss/app.scss'
-
-// useHead({
-//   title: SITE_TITLE,
-//   meta: [
-//     { name: 'description', content: SITE_DESCRIPTION },
-//     { name: 'keywords', content: SITE_KEYWORDS },
-//     { name: 'og:title', content: SITE_TITLE },
-//     { name: 'og:description', content: SITE_DESCRIPTION },
-//     { name: 'og:type', content: 'website' },
-//     { name: 'og:image', content: '/img/logo.svg' },
-//     { name: 'twitter:title', content: SITE_TITLE },
-//     { name: 'twitter:creator', content: '@JPoolSolana' },
-//   ],
-// })
+console.log(SITE_TITLE)
+useHead({
+  title: SITE_TITLE,
+  meta: [
+    { name: 'description', content: SITE_DESCRIPTION },
+    { name: 'keywords', content: SITE_KEYWORDS },
+    { name: 'og:title', content: SITE_TITLE },
+    { name: 'og:description', content: SITE_DESCRIPTION },
+    { name: 'og:type', content: 'website' },
+    { name: 'og:image', content: '/img/logo.svg' },
+    { name: 'twitter:title', content: SITE_TITLE },
+    { name: 'twitter:creator', content: '@JPoolSolana' },
+  ],
+})
 
 onBeforeMount(() => {
   initWallet()

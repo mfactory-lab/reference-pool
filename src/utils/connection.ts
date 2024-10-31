@@ -36,12 +36,12 @@ import type {
   Signer,
   TransactionInstruction,
 } from '@solana/web3.js'
+import type { AnchorWallet } from 'solana-wallets-vue'
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
 import {
   Transaction,
 } from '@solana/web3.js'
-import type { AnchorWallet } from 'solana-wallets-vue'
-import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
-import { DEFAULT_COMMITMENT } from '@/config'
+import { DEFAULT_COMMITMENT } from '~/config'
 
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -88,7 +88,7 @@ export async function sendTransaction(
   return result
 }
 
-interface SendTransactionsParams {
+type SendTransactionsParams = {
   commitment?: Commitment
   onSuccess?: (txId: string, idx: number) => Promise<void>
   onError?: (reason: string, idx: number) => Promise<boolean>
@@ -100,8 +100,7 @@ interface SendTransactionsParams {
 /**
  * Send and sign multiple transactions
  */
-export const sendTransactions = async (
-  connection: Connection,
+export async function sendTransactions(connection: Connection,
   wallet: AnchorWallet,
   instructionSet: TransactionInstruction[][],
   signersSet: Keypair[][],
@@ -112,8 +111,7 @@ export const sendTransactions = async (
     onError,
     stopOnError,
     blockhash,
-  }: SendTransactionsParams = {},
-) => {
+  }: SendTransactionsParams = {}) {
   if (!wallet.publicKey) {
     throw new WalletNotConnectedError()
   }
@@ -188,12 +186,12 @@ export const sendTransactions = async (
   return await Promise.all(pendingTransactions)
 }
 
-interface ITokenStorage {
-  setToken(token: string): void
+type ITokenStorage = {
+  setToken: (token: string) => void
 
-  getToken(): string | null
+  getToken: () => string | null
 
-  getTimeSinceLastSet(): number | null
+  getTimeSinceLastSet: () => number | null
 }
 
 const storage = localStorage // typeof localStorage !== 'undefined' ? localStorage : require('localstorage-memory');
@@ -216,7 +214,7 @@ export class LocalTokenStorage implements ITokenStorage {
   }
 }
 
-export interface ITokenAuthFetchMiddlewareArgs {
+export type ITokenAuthFetchMiddlewareArgs = {
   /**
    * An api endpoint to get a new token. Default /api/get-token
    */
@@ -241,7 +239,7 @@ export function tokenAuthFetchMiddleware({
   tokenExpiry = 5 * 60 * 1000, // 5 minutes
   getToken,
 }: ITokenAuthFetchMiddlewareArgs): FetchMiddleware {
-  return (url: string, options: any, fetch: Function) => {
+  return (url: string, options: any, fetch: any) => {
     (async () => {
       try {
         const token = tokenStorage.getToken()

@@ -27,11 +27,9 @@
   -->
 
 <script lang="ts">
-import { computed, defineComponent, ref, watchEffect } from 'vue'
 import type { StakeActivationData } from '@solana/web3.js'
-import type { ProgramAccount } from '@/store'
-import { useConnectionStore } from '@/store'
-import { formatAmount, lamportsToSol, shortenAddress } from '@/utils'
+import type { ProgramAccount } from '~/store'
+import { formatAmount, lamportsToSol, shortenAddress } from '~/utils'
 
 export default defineComponent({
   props: {
@@ -143,22 +141,22 @@ export default defineComponent({
 
 <style scoped lang="scss">
   .q-item {
+  .q-btn-group {
+    margin-left: 1.5rem;
+  }
+  .q-btn {
+    font-size: 0.7rem;
+  }
+  @media (max-width: $breakpoint-xs-max) {
+    text-align: center;
     .q-btn-group {
-      margin-left: 1.5rem;
-    }
-    .q-btn {
-      font-size: 0.7rem;
-    }
-    @media (max-width: $breakpoint-xs-max) {
-      text-align: center;
-      .q-btn-group {
-        margin: 0.5rem 0 0;
-      }
-    }
-    @media (min-width: $breakpoint-xs) {
-      .q-btn-group {
-        float: right;
-      }
+      margin: 0.5rem 0 0;
     }
   }
+  @media (min-width: $breakpoint-xs) {
+    .q-btn-group {
+      float: right;
+    }
+  }
+}
 </style>

@@ -26,24 +26,16 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { useQuasar } from 'quasar'
-import { computed, ref, toRef, watch } from 'vue'
-import { useAnchorWallet, useWallet } from 'solana-wallets-vue'
-import { withdrawSol, withdrawStake } from '@solana/spl-stake-pool/src'
 import type { ValidatorAccount } from '@solana/spl-stake-pool/src/utils'
-import { useDebounce } from '@vueuse/core'
 import type { Keypair } from '@solana/web3.js'
+import { withdrawSol, withdrawStake } from '@solana/spl-stake-pool/src'
 import { StakeProgram } from '@solana/web3.js'
-import { WITHDRAW_SOL_ACTIVE } from '@/config'
-import { useMonitorTransaction } from '@/hooks'
-import { sendTransaction, sendTransactions, solToLamports } from '@/utils'
-import {
-  loadApyInfo,
-  useConnectionStore,
-  useEpochStore,
-  useStakeAccountStore,
-  useStakePoolStore,
-} from '@/store'
+import { useDebounce } from '@vueuse/core'
+import { useQuasar } from 'quasar'
+import { useAnchorWallet, useWallet } from 'solana-wallets-vue'
+import { computed, ref, toRef, watch } from 'vue'
+import { WITHDRAW_SOL_ACTIVE } from '~/config'
+import { sendTransaction, sendTransactions, solToLamports } from '~/utils'
 
 export function useWithdraw() {
   const connectionStore = useConnectionStore()
@@ -216,8 +208,8 @@ async function prepareApyComparator(epoch: number) {
         if (!aVoteId || !bVoteId) {
           return 0
         }
-        const aApy = parseFloat(String(voteApyMap[aVoteId]))
-        const bApy = parseFloat(String(voteApyMap[bVoteId]))
+        const aApy = Number.parseFloat(String(voteApyMap[aVoteId]))
+        const bApy = Number.parseFloat(String(voteApyMap[bVoteId]))
         // console.log(`Compare ${aVoteId} (${aApy}) and ${bVoteId} (${bApy})`);
         // if (isNaN(aApy) || isNaN(bApy)) {
         //   return defaultResult;

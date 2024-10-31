@@ -27,15 +27,9 @@
   -->
 
 <script lang="ts">
-import { computed, defineComponent, toRef } from 'vue'
-import {
-  useBalanceStore,
-  useCoinRateStore,
-  useStakeAccountStore,
-  useStakePoolStore,
-} from '@/store'
-import { formatMoney, longPriceFormatter } from '@/utils'
-import { XSOL_NAME } from '@/config'
+import solLogo from '~/assets/img/sol-logo.svg'
+import { XSOL_NAME } from '~/config'
+import { formatMoney, longPriceFormatter } from '~/utils'
 
 export default defineComponent({
   setup() {
@@ -56,6 +50,7 @@ export default defineComponent({
     const stackedUsd = computed(() => coinRateStore.solPrice * stakeSolBalance.value)
 
     return {
+      solLogo,
       XSOL_NAME,
       solBalance,
       tokenBalance,
@@ -89,7 +84,7 @@ export default defineComponent({
           </q-item-section>
           <q-item-section side>
             <q-item-label>
-              <img alt="" src="@/assets/img/sol-logo.svg">
+              <img alt="" :src="solLogo">
               <span>SOL</span>
             </q-item-label>
           </q-item-section>
@@ -132,7 +127,7 @@ export default defineComponent({
           </q-item-section>
           <q-item-section side>
             <q-item-label>
-              <img alt="" src="@/assets/img/sol-logo.svg">
+              <img alt="" :src="solLogo">
               <span>SOL</span>
             </q-item-label>
           </q-item-section>

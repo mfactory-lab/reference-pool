@@ -27,11 +27,10 @@
   -->
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
 import { useWallet } from 'solana-wallets-vue'
-import type { Endpoint } from '@/store'
-import { useConnectionStore } from '@/store'
-import { ENDPOINTS } from '@/config'
+import { ENDPOINTS } from '~/config'
+import type { Endpoint } from '~/store'
+
 export default defineComponent({
   setup() {
     const connectionStore = useConnectionStore()

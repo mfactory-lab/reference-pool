@@ -27,9 +27,7 @@
   -->
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
-import { useStakePoolStore } from '@/store'
-import { lamportsToSol, priceFormatter } from '@/utils'
+import { lamportsToSol, priceFormatter } from '~/utils'
 
 export default defineComponent({
   setup() {
@@ -52,37 +50,37 @@ export default defineComponent({
 
 <style lang="scss" scoped>
   .total-stacked {
+  &__reserved-balance {
+    padding: 0 0 0 23px;
+    font-size: 12px;
+    color: #fff;
+
+    @media (max-width: $breakpoint-sm) {
+      width: 270px;
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      width: auto;
+    }
+  }
+}
+
+.total-stacked-alter {
+  .total-stacked {
     &__reserved-balance {
-      padding: 0 0 0 23px;
-      font-size: 12px;
-      color: #fff;
-
-      @media (max-width: $breakpoint-sm) {
-        width: 270px;
-      }
-
-      @media (max-width: $breakpoint-xs) {
-        width: auto;
-      }
+      color: #000;
     }
   }
-
-  .total-stacked-alter {
-    .total-stacked {
-      &__reserved-balance {
-        color: #000;
-      }
-    }
-  }
+}
 </style>
 
 <style lang="scss">
   .total-stacked-alter {
-    display: flex;
-    flex-direction: column;
-    margin-top: -20px;
-    margin-bottom: 10px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+  display: flex;
+  flex-direction: column;
+  margin-top: -20px;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
 </style>

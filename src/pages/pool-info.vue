@@ -28,8 +28,7 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue'
-import { useStakePoolStore } from '@/store'
-import { formatPct } from '@/utils'
+import { formatPct } from '~/utils'
 
 export default defineComponent({
   setup() {

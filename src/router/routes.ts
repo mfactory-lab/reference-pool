@@ -49,12 +49,12 @@ function createRoutes(prefix = '') {
 export default [
   {
     path: '',
-    component: () => import('@/layouts/default.vue'),
+    component: () => import('~/layouts/default.vue'),
     children: createRoutes(),
   },
   {
     path: '/:catchAll(.*)*',
-    component: () => import('@/pages/404.vue'),
+    component: () => import('~/pages/404.vue'),
     children: [],
   },
 ] as RouteRecordRaw[]

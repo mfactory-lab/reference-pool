@@ -26,12 +26,10 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { computed, ref, toRef, watch } from 'vue'
-import { defineStore } from 'pinia'
 import type { Connection, EpochInfo } from '@solana/web3.js'
-import { useEmitter } from '@/hooks'
-import { useConnectionStore } from '@/store'
-import { EPOCH_RELOAD_INTERVAL } from '@/config'
+import { defineStore } from 'pinia'
+import { computed, ref, toRef, watch } from 'vue'
+import { EPOCH_RELOAD_INTERVAL } from '~/config'
 
 export const EPOCH_UPDATE_EVENT = Symbol('EPOCH_UPDATE_EVENT')
 
@@ -103,10 +101,9 @@ export const useEpochStore = defineStore('epoch', () => {
 })
 
 async function calcHourlySlotTime(connection: Connection) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
+  // @ts-expect-error...
   const res = await connection._rpcRequest('getRecentPerformanceSamples', [60])
-  const samples: { numSlots: number; samplePeriodSecs: number }[] = res.result ?? []
+  const samples: { numSlots: number, samplePeriodSecs: number }[] = res.result ?? []
   const timePerSlotSamples = samples
     .filter(s => s.numSlots !== 0)
     .map(s => s.samplePeriodSecs / s.numSlots)

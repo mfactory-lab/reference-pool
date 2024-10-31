@@ -28,8 +28,6 @@
 
 <script lang="ts">
 import { evaMoon, evaSun } from '@quasar/extras/eva-icons'
-import { computed } from 'vue'
-import { useDarkTheme } from '@/hooks'
 
 export default {
   setup() {

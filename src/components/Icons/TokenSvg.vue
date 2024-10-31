@@ -27,10 +27,11 @@
   -->
 
 <script setup lang="ts">
-import { XSOL_LOGO, XSOL_NAME } from '@/config'
+import xsolLogo from '~/assets/img/customize/xsol.svg'
+import { XSOL_LOGO, XSOL_NAME } from '~/config'
 </script>
 
 <template>
   <img v-if="!!XSOL_LOGO" :alt="XSOL_NAME" :src="XSOL_LOGO">
-  <img v-else :alt="XSOL_NAME" src="@/assets/img/customize/xsol.svg">
+  <img v-else :alt="XSOL_NAME" :src="xsolLogo">
 </template>

@@ -27,8 +27,7 @@
   -->
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { useAuthStore } from '@/store'
+import logo from '~/assets/img/logo.svg'
 
 const authStore = useAuthStore()
 const error = ref(false)
@@ -48,7 +47,7 @@ function login() {
       <div class="column">
         <div class="row justify-center">
           <div :class="$style.logo">
-            <img src="@/assets/img/logo.svg" alt="" height="132">
+            <img :src="logo" alt="" height="132">
           </div>
         </div>
         <div class="row">
@@ -80,23 +79,23 @@ function login() {
 
 <style lang="scss" module>
   .input {
-    width: 240px;
-    input {
-      &::placeholder {
-        color: #aaa;
-      }
+  width: 240px;
+  input {
+    &::placeholder {
+      color: #aaa;
     }
   }
+}
 
-  .layout {
-    background-color: $blue-grey-1;
-  }
+.layout {
+  background-color: $blue-grey-1;
+}
 
-  .logo {
-    font-size: 40px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 1rem;
-    color: #333;
-  }
+.logo {
+  font-size: 40px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+}
 </style>

@@ -26,15 +26,13 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import type { Buffer } from 'buffer'
-import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
-import debounce from 'lodash-es/debounce'
-import { useWallet } from 'solana-wallets-vue'
 import type { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
-import { useConnectionStore, useStakePoolStore } from '@/store'
-import { findAssociatedTokenAddress, lamportsToSol } from '@/utils'
-import { ACCOUNT_CHANGE_EVENT, WALLET_DISCONNECT_EVENT, useEmitter } from '@/hooks'
+import type { Buffer } from 'node:buffer'
+import debounce from 'lodash-es/debounce'
+import { defineStore } from 'pinia'
+import { useWallet } from 'solana-wallets-vue'
+import { computed, ref, watch } from 'vue'
+import { findAssociatedTokenAddress, lamportsToSol } from '~/utils'
 
 const ACCOUNT_CHANGE_DEBOUNCE = 300
 
@@ -117,7 +115,8 @@ export async function getTokenBalance(
     const associatedTokenAcc = await findAssociatedTokenAddress(walletAddress, mint)
     const tBalance = await connection.getTokenAccountBalance(associatedTokenAcc)
     return tBalance.value.uiAmount
-  } catch (ex) {
+  } catch (err) {
+    console.log(err)
     // No token account found
     return null
   }

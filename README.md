@@ -4,22 +4,25 @@
 
 Stake Pools are a new concept that has been introduced to improve the stake distribution across the validator network.
 Delegating via stake pool is good for the Solana network:
-* Stake is distributed in optimal fashion across validators (some pools also take into account the distribution across ASNs and data centers)
-* The pool automatically redistributes the stake each epoch, aiming at maximum rewards
-* The delegator receives stake pool tokens which can be used as a DeFi instrument for liquidity mining, lending, etc.
+
+- Stake is distributed in optimal fashion across validators (some pools also take into account the distribution across ASNs and data centers)
+- The pool automatically redistributes the stake each epoch, aiming at maximum rewards
+- The delegator receives stake pool tokens which can be used as a DeFi instrument for liquidity mining, lending, etc.
 
 This project can be used as a basis to bootstrap a Solana stake pool quickly and with minimal effort.
 For all funds-sensitive operations it uses the [Stake Pool Program](https://github.com/solana-labs/solana-program-library/tree/master/stake-pool) developed by the [Solana Foundation](https://solana.foundation/).
 
 Following tasks must be completed to launch your own stake pool:
-* Conceive and implement a strategy for choosing validators to be added to the pool and distributing the stake among these validators
-* Develop your own branding (project name, logo, etc.)
-* Redesign front end based on your branding
-* Create your pool token and add it to the Solana token list
+
+- Conceive and implement a strategy for choosing validators to be added to the pool and distributing the stake among these validators
+- Develop your own branding (project name, logo, etc.)
+- Redesign front end based on your branding
+- Create your pool token and add it to the Solana token list
 
 It is also recommended to do the following:
-* Write documentation and guides for your users
-* Negotiate with DeFi platforms to have your pool token added as an asset to liquidity pools, lending solutions, and other DeFi services
+
+- Write documentation and guides for your users
+- Negotiate with DeFi platforms to have your pool token added as an asset to liquidity pools, lending solutions, and other DeFi services
 
 ## Prototype Stake Pool
 
@@ -32,7 +35,6 @@ A fully functioning prototype stake pool is running at https://mfactory-lab.gith
 - [Pnpm](https://pnpm.io/) package manager
 
 ## Getting Started
-
 
 ### Create your Solana stake pool.
 
@@ -120,9 +122,10 @@ Many parameters and visual features can (and some of them should) be configured.
 
 #### Important Stake Pool variables
 
-File: ```.env```
+File: `.env`
 
 Variables to set:
+
 ```
 VITE_MAIN_STAKE_POOL_ADDRESS = [See Stake Pool Address] (required)
 VITE_TEST_STAKE_POOL_ADDRESS = <optional: stake pool address on TestNet>
@@ -139,9 +142,11 @@ VITE_TEST_STAKE_LIMIT = <maximum allowed stake for TestNet>
 #### Frontend design configuration
 
 ##### Web App metadata
-File: ```.env```
+
+File: `.env`
 
 Variables to set:
+
 ```
 VITE_APP_TITLE = <your app’s meta title>
 VITE_APP_DESCRIPTION = <your app’s meta description>
@@ -153,9 +158,10 @@ VITE_APP_KEYWORDS = <your app’s meta keywords>
 If you prefer to use remotely stored images, set the variables below to corresponding URLs.
 If left empty, internal SVG images in default locations (see below) will be used.
 
-File: ```.env```
+File: `.env`
 
 Variables to set:
+
 ```
 VITE_APP_LOGO = <URL of your header logo file>
 VITE_XSOL_LOGO = <URL of your token logo file>
@@ -164,42 +170,46 @@ VITE_NO_WALLET_ICON = <URL of your graphics file to replace the large SOL logo>
 
 If using internal images:
 
-Folder: ```/public/img```
+Folder: `/public/img`
 
 Replace website favicon files with your own logo files (do not change filenames).
 
-File: ```/src/assets/img/customize/app-logo.svg```
+File: `/src/assets/img/customize/app-logo.svg`
 
 Replace the svg in this file to change your header logo.
 
-File: ```/src/assets/img/customize/xsol.svg```
+File: `/src/assets/img/customize/xsol.svg`
 
 Replace the svg to change the token icon.
 
-File: ```/src/assets/img/customize/no-wallet-icon.svg```
+File: `/src/assets/img/customize/no-wallet-icon.svg`
 
 Replace the large SOL logo (displayed as long as no wallet is connected).
 
 ##### Text, links, and color theme
 
-File: ```.env```
+File: `.env`
 
 URL pointing to your Telegram channel (_displayed in case of an error, so that the user can contact you for support_):
+
 ```
 TELEGRAM_ANNOUNCEMENT_URL = <URL of your Telegram channel or group>
 ```
 
 Footer text and links:
+
 ```
 VITE_COPYRIGHT_BY = <replace “xxx” with your project name>
 VITE_COPYRIGHT = <replace the whole line>
 ```
+
 _Leave both variables empty if no copyright message is needed._
 
 ```
 VITE_POWERED_BY = <if left empty, the POWERED_BY line is not displayed>
 VITE_POWERED_LINK = <URL; if left empty, the POWERED_BY line will not have a link>
 ```
+
 _Links in the footer can point to internal or external pages.
 If the first symbol of a URL is "/", it is considered an internal URL, otherwise external._
 
@@ -207,13 +217,14 @@ If the first symbol of a URL is "/", it is considered an internal URL, otherwise
 VITE_FOOTER_LINKS = <list of links in the following format: { "link1 name": "link1 url", "link2 name": "link2 url", ... }>
 ```
 
-Folder: ```/src/pages/```
+Folder: `/src/pages/`
 
-The files ```terms.vue```, ```impressum.vue```, and ```privacy.vue``` hold the content for the respective pages linked in the page footer.
+The files `terms.vue`, `impressum.vue`, and `privacy.vue` hold the content for the respective pages linked in the page footer.
 
-File: ```/src/components/customize/FaqSection.vue```
+File: `/src/components/customize/FaqSection.vue`
 
 You can change the FAQ contents by editing the html code in this file. If you don’t want a FAQ section, replace this file’s whole content with:
+
 ```
 <template>
   <section class="custom-section">
@@ -222,18 +233,19 @@ You can change the FAQ contents by editing the html code in this file. If you do
 </template>
 ```
 
-File: ```/src/components/customize/CustomSection.vue```
+File: `/src/components/customize/CustomSection.vue`
 
 Any content you want to add past the FAQ section (or replacing it if you removed the FAQ section) can be added to this file.
 
-File: ```.env.production```
+File: `.env.production`
 
 Variable to set:
+
 ```
 VITE_GTAG_ID = <set your global site tag (GTAG) if you need to connect Google Analytics>
 ```
 
-File: ```/src/assets/scss/_variables.scss```
+File: `/src/assets/scss/_variables.scss`
 
 Change this one if you want to play around with the theme colors.
 
@@ -272,6 +284,3 @@ If no such issue exists, go ahead and create one. **Please be sure to include al
 ## License
 
 [GNU AGPL v3](./LICENSE)
-
-
-

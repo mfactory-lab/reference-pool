@@ -26,23 +26,50 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import type { QuasarPluginOptions } from 'quasar'
-import { Dark, LocalStorage, Notify, Quasar } from 'quasar'
-import iconSet from 'quasar/icon-set/svg-eva-icons'
 import type { App } from 'vue'
-
-// import lang from 'quasar/lang/en-US'
-// import 'quasar/src/css/index.sass'
-// import '@quasar/extras/eva-icons/eva-icons.css'
-// import '@quasar/extras/roboto-font/roboto-font.css'
+import SolanaWallets from 'solana-wallets-vue'
+import {
+  BitpieWalletAdapter,
+  BloctoWalletAdapter,
+  CloverWalletAdapter,
+  Coin98WalletAdapter,
+  CoinhubWalletAdapter,
+  ExodusWalletAdapter,
+  GlowWalletAdapter,
+  LedgerWalletAdapter,
+  MathWalletAdapter,
+  PhantomWalletAdapter,
+  SafePalWalletAdapter,
+  SlopeWalletAdapter,
+  SolflareWalletAdapter,
+  SolletExtensionWalletAdapter,
+  SolletWalletAdapter,
+  SolongWalletAdapter,
+  TokenPocketWalletAdapter,
+} from '@solana/wallet-adapter-wallets'
 
 export const install = ({ app }: { app: App<Element> }) => {
-  app.use(Quasar, {
-    plugins: {
-      Dark,
-      Notify,
-      LocalStorage,
-    },
-    iconSet,
-  } as QuasarPluginOptions)
+  // const network = WalletAdapterNetwork.Mainnet
+  app.use(SolanaWallets, {
+    wallets: [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new SolletWalletAdapter(),
+      new SolletExtensionWalletAdapter(),
+      new SlopeWalletAdapter(),
+      new SolongWalletAdapter(),
+      new CloverWalletAdapter(),
+      new ExodusWalletAdapter(),
+      new BitpieWalletAdapter(),
+      new Coin98WalletAdapter(),
+      new CoinhubWalletAdapter(),
+      new SafePalWalletAdapter(),
+      new TokenPocketWalletAdapter(),
+      new GlowWalletAdapter(),
+      new MathWalletAdapter(),
+      new LedgerWalletAdapter(),
+      new BloctoWalletAdapter(),
+    ],
+    autoConnect: false,
+  })
 }

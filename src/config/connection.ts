@@ -27,63 +27,30 @@
  */
 
 import type { Commitment } from '@solana/web3.js'
-import { clusterApiUrl } from '@solana/web3.js'
-import type { Endpoint } from '@/store'
+import type { Endpoint } from '~/store'
 
 const MAIN_STAKE_POOL_ADDRESS = import.meta.env.VITE_MAIN_STAKE_POOL_ADDRESS
 const MAIN_STAKE_LIMIT = import.meta.env.VITE_MAIN_STAKE_LIMIT
 
-const TEST_STAKE_POOL_ADDRESS = import.meta.env.VITE_TEST_STAKE_POOL_ADDRESS
-const TEST_STAKE_LIMIT = import.meta.env.VITE_TEST_STAKE_LIMIT
+// const TEST_STAKE_POOL_ADDRESS = import.meta.env.VITE_TEST_STAKE_POOL_ADDRESS
+// const TEST_STAKE_LIMIT = import.meta.env.VITE_TEST_STAKE_LIMIT
 
 const DEV_STAKE_POOL_ADDRESS = import.meta.env.VITE_DEV_STAKE_POOL_ADDRESS
 
 export const ENDPOINTS: Endpoint[] = [
   {
-    id: 'genesys-mainnet',
-    name: 'Genesys RPC',
+    id: 'helius-mainnet',
+    name: 'Helius RPC',
     cluster: 'mainnet-beta',
-    url: 'https://ssc-dao.genesysgo.net/',
+    url: 'https://marketa-1sh8m6-fast-mainnet.helius-rpc.com/',
     stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
     stakeLimit: Number(MAIN_STAKE_LIMIT),
-  },
-  {
-    id: 'serum-mainnet',
-    name: 'Serum RPC',
-    cluster: 'mainnet-beta',
-    url: 'https://solana-api.projectserum.com/',
-    stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
-    stakeLimit: Number(MAIN_STAKE_LIMIT),
-  },
-  {
-    id: 'rpcpool-mainnet',
-    name: 'RPCPool RPC',
-    cluster: 'mainnet-beta',
-    url: 'https://mainnet.rpcpool.com/',
-    stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
-    stakeLimit: Number(MAIN_STAKE_LIMIT),
-  },
-  {
-    id: 'mainnet',
-    name: 'Solana RPC',
-    cluster: 'mainnet-beta',
-    url: clusterApiUrl('mainnet-beta'),
-    stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
-    stakeLimit: Number(MAIN_STAKE_LIMIT),
-  },
-  {
-    id: 'testnet',
-    name: 'TestNet',
-    cluster: 'testnet',
-    url: 'https://testnet.rpcpool.com/',
-    stakePoolAddress: TEST_STAKE_POOL_ADDRESS,
-    stakeLimit: Number(TEST_STAKE_LIMIT),
   },
   {
     id: 'devnet',
     name: 'DevNet',
     cluster: 'devnet',
-    url: 'https://devnet.rpcpool.com/',
+    url: 'https://jody-hlb1qh-fast-devnet.helius-rpc.com/',
     stakePoolAddress: DEV_STAKE_POOL_ADDRESS,
     stakeLimit: 100000,
   },

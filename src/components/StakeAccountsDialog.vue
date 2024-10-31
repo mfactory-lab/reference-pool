@@ -27,17 +27,11 @@
   -->
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
 import { evaClose, evaRefresh } from '@quasar/extras/eva-icons'
 import { PublicKey, StakeProgram } from '@solana/web3.js'
 import { useAnchorWallet, useWallet } from 'solana-wallets-vue'
-import type { ProgramAccount } from '@/store'
-import {
-  useConnectionStore,
-  useStakeAccountStore,
-} from '@/store'
-import { useDeposit, useMonitorTransaction } from '@/hooks'
-import { sendTransaction } from '@/utils'
+import type { ProgramAccount } from '~/store'
+import { sendTransaction } from '~/utils'
 
 export default defineComponent({
   props: {

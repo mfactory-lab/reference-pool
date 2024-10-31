@@ -26,7 +26,7 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-interface CoinStats {
+type CoinStats = {
   ath: number
   ath_change_percentage: number
   ath_date: string
@@ -67,7 +67,7 @@ export async function getTokenPrice(ids = 'solana', vs_currencies = 'usd') {
           if (res.length > 0) {
             resolve(res[0])
           } else {
-            reject(Error('Promise rejected'))
+            reject(new Error('Promise rejected'))
           }
         },
         (error) => {

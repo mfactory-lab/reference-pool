@@ -26,25 +26,25 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import assert from 'assert'
-import { Buffer } from 'buffer'
 import type {
   Commitment,
   Connection,
   Signer,
 } from '@solana/web3.js'
+import assert from 'node:assert'
+import { Buffer } from 'node:buffer'
+import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import {
   Keypair,
   PublicKey,
-  SYSVAR_RENT_PUBKEY,
   StakeProgram,
   SystemProgram,
+  SYSVAR_RENT_PUBKEY,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
 import * as struct from 'superstruct'
-import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { sendTransaction } from '@/utils'
+import { sendTransaction } from '~/utils'
 
 /**
  * Shorten the checksummed version of the input address
@@ -320,8 +320,7 @@ export async function getMultipleAccounts(
   for (const key of keys) {
     const args = [key, { commitment }]
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
+    // @ts-expect-error...
     const unsafeRes = await connection._rpcRequest('getMultipleAccounts', args)
     const res = struct.create(
       unsafeRes,
@@ -332,7 +331,7 @@ export async function getMultipleAccounts(
       throw new Error(
         `failed to get info about accounts ${
           publicKeys.map(k => k.toBase58()).join(', ')
-          }: ${
+        }: ${
           res.error.message}`,
       )
     }
@@ -373,8 +372,7 @@ export async function getFilteredTokenAccountsByOwner(
   programId: PublicKey,
   mint: PublicKey,
 ) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
+  // @ts-expect-error...
   const resp = await connection._rpcRequest('getTokenAccountsByOwner', [
     programId.toBase58(),
     {

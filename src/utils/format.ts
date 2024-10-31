@@ -26,8 +26,8 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import BN from 'bn.js'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
+import BN from 'bn.js'
 
 const SOL_DECIMALS = Math.log10(LAMPORTS_PER_SOL)
 
@@ -45,16 +45,16 @@ export function lamportsToSol(lamports: number | BN): number {
   const lamportsString = absLamports.toString(10).padStart(10, '0')
   const splitIndex = lamportsString.length - SOL_DECIMALS
   const solString = `${lamportsString.slice(0, splitIndex)}.${lamportsString.slice(splitIndex)}`
-  return signMultiplier * parseFloat(solString)
+  return signMultiplier * Number.parseFloat(solString)
 }
 
-export function lamportsToSolString(lamports: number | BN, maximumFractionDigits = 9): String {
+export function lamportsToSolString(lamports: number | BN, maximumFractionDigits = 9): string {
   const sol = lamportsToSol(lamports)
   return `◎ ${new Intl.NumberFormat('en-US', { maximumFractionDigits }).format(sol)}`
 }
 
 export function solToLamports(amount: number): number {
-  if (isNaN(amount)) {
+  if (Number.isNaN(amount)) {
     return Number(0)
   }
   return new BN(amount.toFixed(SOL_DECIMALS).replace('.', '')).toNumber()
@@ -86,7 +86,7 @@ export const formatPct = new Intl.NumberFormat('en-US', {
 
 const SI_SYMBOL = ['', 'K', 'M', 'G', 'T', 'P', 'E']
 
-const abbreviateNumber = (number: number, precision: number, trimZeros = false) => {
+function abbreviateNumber(number: number, precision: number, trimZeros = false) {
   const tier = (Math.log10(number) / 3) | 0
   let scaled = number
   const suffix = SI_SYMBOL[tier]
@@ -95,25 +95,27 @@ const abbreviateNumber = (number: number, precision: number, trimZeros = false) 
     scaled = number / scale
   }
 
-  if (isNaN(scaled)) {
+  if (Number.isNaN(scaled)) {
     return ''
   }
   const result = trimZeros ? Number(scaled.toFixed(precision)) : scaled.toFixed(precision)
   return result + (typeof suffix === 'string' ? suffix : '')
 }
 
-export const formatAmount = (val: number, precision = 5, abbr = true) =>
-  abbr ? abbreviateNumber(val, precision) : val.toFixed(precision)
+export function formatAmount(val: number, precision = 5, abbr = true) {
+  return abbr ? abbreviateNumber(val, precision) : val.toFixed(precision)
+}
 
-export const formatAndTrimAmount = (val: number, precision = 5, abbr = true) =>
-  abbr ? abbreviateNumber(val, precision, true) : Number(val.toFixed(precision))
+export function formatAndTrimAmount(val: number, precision = 5, abbr = true) {
+  return abbr ? abbreviateNumber(val, precision, true) : Number(val.toFixed(precision))
+}
 
 export function isInt(n: string | number): boolean {
   return Number(n) === n && n % 1 === 0
 }
 
 export function isInvalidFloat(n: string | number): boolean {
-  return isNaN(Number(n))
+  return Number.isNaN(Number(n))
 }
 
 export function isInvalidTime(n: string, p: string): boolean {
@@ -144,7 +146,7 @@ export function formatMoney(val: string | number): string {
   let fractionalPart = decimalSeparator >= 0 ? val.slice(decimalSeparator + 1) : null
 
   if (fractionalPart) {
-    fractionalPart = fractionalPart.slice(0, 2).replace(/[^0-9]+/g, '')
+    fractionalPart = fractionalPart.slice(0, 2).replace(/\D+/g, '')
     if (fractionalPart.length === 1) {
       fractionalPart += '0'
     }
@@ -152,7 +154,7 @@ export function formatMoney(val: string | number): string {
     fractionalPart = '00'
   }
 
-  integerPart = integerPart.replace(/[^0-9]+/g, '')
+  integerPart = integerPart.replace(/\D+/g, '')
   if (!integerPart) {
     integerPart = '0'
   }

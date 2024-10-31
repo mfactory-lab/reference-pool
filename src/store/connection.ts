@@ -1,7 +1,7 @@
 /*
  * This file is part of Solana Reference Stake Pool code.
  *
- * Copyright © 2021, mFactory GmbH
+ * Copyright © 2023, mFactory GmbH
  *
  * Solana Reference Stake Pool is free software: you can redistribute it
  * and/or modify it under the terms of the GNU Affero General Public License
@@ -26,64 +26,90 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
 import type { Cluster, Commitment } from '@solana/web3.js'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { tokenAuthFetchMiddleware } from '@/utils'
-import { DEFAULT_COMMITMENT, DEFAULT_CONFIRM_TIMEOUT, DEFAULT_ENDPOINT, ENDPOINTS } from '@/config'
+import { defineStore } from 'pinia'
+import {
+  DEFAULT_COMMITMENT,
+  DEFAULT_CONFIRM_TIMEOUT,
+  DEFAULT_ENDPOINT,
+  ENDPOINTS,
+} from '~/config'
+import { tokenAuthFetchMiddleware } from '~/utils'
 
 export type ExtendedCluster = Cluster | 'localnet'
 
-export interface Endpoint {
+export type Endpoint = {
   id: string
   name: string
   cluster: ExtendedCluster
   url: string
   stakePoolAddress: string
   stakeLimit?: number
+  wsEndpoint?: string
   getToken?: () => Promise<string>
 }
 
-export const useConnectionStore = defineStore({
-  id: 'connection',
-  state: () => ({
+export const useConnectionStore = defineStore('connection', () => {
+  const state = reactive({
     commitment: DEFAULT_COMMITMENT,
     confirmTransactionInitialTimeout: DEFAULT_CONFIRM_TIMEOUT,
-    rpc: useStorage<string>('rpc', ''),
-  }),
-  getters: {
-    endpoint(state) {
-      return ENDPOINTS.find(e => e.id === state.rpc) ?? DEFAULT_ENDPOINT
-    },
-    connection(state): Connection {
-      return new Connection(this.endpoint.url, {
-        confirmTransactionInitialTimeout: state.confirmTransactionInitialTimeout,
-        commitment: state.commitment,
-        fetchMiddleware: this.endpoint.getToken
-          ? tokenAuthFetchMiddleware({
-            tokenExpiry: 5 * 60 * 1000, // 5 min
-            getToken: this.endpoint.getToken,
-          })
-          : undefined,
-      })
-    },
-    stakePoolAddress(): PublicKey | null {
-      return this.endpoint ? new PublicKey(this.endpoint.stakePoolAddress) : null
-    },
-    stakeLimit(): number {
-      return this.endpoint.stakeLimit ?? 0
-    },
-    cluster(): ExtendedCluster {
-      return this.endpoint.cluster
-    },
-  },
-  actions: {
-    setRpc(rpc: string) {
-      this.rpc = rpc
-    },
-    setCommitment(commitment: Commitment) {
-      this.commitment = commitment
-    },
-  },
+  })
+
+  const rpc = useLocalStorage<string>('rpc', '')
+
+  const endpoint = computed(() => {
+    return ENDPOINTS.find(e => e.id === rpc.value) ?? DEFAULT_ENDPOINT
+  })
+
+  const connection = computed<Connection>(() => {
+    return new Connection(endpoint.value?.url, {
+      confirmTransactionInitialTimeout: state.confirmTransactionInitialTimeout,
+      wsEndpoint: endpoint.value?.wsEndpoint,
+      commitment: state.commitment,
+      fetchMiddleware: endpoint.value?.getToken
+        ? tokenAuthFetchMiddleware({
+          tokenExpiry: 5 * 60 * 1000, // 5 min
+          getToken: endpoint.value?.getToken,
+        })
+        : undefined,
+    })
+  })
+
+  const stakePoolAddress = computed<PublicKey | null>(() => {
+    return endpoint.value ? new PublicKey(endpoint.value.stakePoolAddress) : null
+  })
+
+  const stakeLimit = computed<number>(() => {
+    return endpoint.value?.stakeLimit ?? 0
+  })
+
+  const cluster = computed<ExtendedCluster>(() => {
+    return endpoint.value?.cluster
+  })
+
+  const network = computed<string>(() => {
+    const cluster = endpoint.value?.cluster
+    return cluster === 'mainnet-beta' ? 'mainnet' : cluster
+  })
+
+  function setRpc(_rpc: string) {
+    rpc.value = _rpc
+  }
+
+  function setCommitment(commitment: Commitment) {
+    state.commitment = commitment
+  }
+
+  return {
+    cluster,
+    network,
+    endpoint,
+    stakeLimit,
+    connection,
+    stakePoolAddress,
+
+    setRpc,
+    setCommitment,
+  }
 })

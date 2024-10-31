@@ -26,20 +26,18 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { defineStore } from 'pinia'
-import type { Ref } from 'vue'
-import { computed, ref, toRef, watch } from 'vue'
-import type { PublicKey } from '@solana/web3.js'
-import { StakeProgram } from '@solana/web3.js'
-import { getStakePoolAccount } from '@solana/spl-stake-pool'
 import type { StakePool } from '@solana/spl-stake-pool/src/layouts'
+import type { PublicKey } from '@solana/web3.js'
+import type { Ref } from 'vue'
+import { getStakePoolAccount } from '@solana/spl-stake-pool'
 import { divideBnToNumber } from '@solana/spl-stake-pool/src/utils'
+import { StakeProgram } from '@solana/web3.js'
 import { useIntervalFn } from '@vueuse/core'
-import { useConnectionStore } from '@/store'
-import { ACCOUNT_CHANGE_EVENT, useEmitter } from '@/hooks'
-import { POOL_RELOAD_INTERVAL } from '@/config'
+import { defineStore } from 'pinia'
+import { computed, ref, toRef, watch } from 'vue'
+import { POOL_RELOAD_INTERVAL } from '~/config'
 
-export interface StakePoolStore {
+export type StakePoolStore = {
   stakePool: Ref<StakePool | undefined>
   exchangeRate: Ref<number>
   minRentBalance: Ref<number>
@@ -48,7 +46,7 @@ export interface StakePoolStore {
   fees: any
   stakePoolAddress: Ref<PublicKey | null>
   connectionLost: Ref<boolean>
-  loadReserveStake(): void
+  loadReserveStake: () => void
 }
 
 export const useStakePoolStore = defineStore('stake-pool', (): StakePoolStore => {

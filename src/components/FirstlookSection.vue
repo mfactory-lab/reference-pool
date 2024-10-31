@@ -28,7 +28,8 @@
 
 <script lang="ts">
 import { useWallet } from 'solana-wallets-vue'
-import { NO_WALLET_ICON } from '@/config'
+import noWalletIcon from '~/assets/img/customize/no-wallet-icon.svg'
+import { NO_WALLET_ICON } from '~/config'
 
 export default {
   setup() {
@@ -36,6 +37,7 @@ export default {
 
     return {
       NO_WALLET_ICON,
+      noWalletIcon,
       connected,
     }
   },
@@ -62,7 +64,7 @@ export default {
           </div>
           <div v-else class="firstlook__placeholder">
             <img v-if="NO_WALLET_ICON" alt="" class="firstlook__placeholder__icon" :src="NO_WALLET_ICON">
-            <img v-else alt="" class="firstlook__placeholder__icon" src="@/assets/img/customize/no-wallet-icon.svg">
+            <img v-else alt="" class="firstlook__placeholder__icon" :src="noWalletIcon">
           </div>
 
           <div class="col col-12 col-md-8 q-pl-md q-ml-auto firstlook__stake-box">

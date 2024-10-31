@@ -29,9 +29,7 @@
 import { useQuasar } from 'quasar'
 import { useWallet } from 'solana-wallets-vue'
 import { watch } from 'vue'
-import { useEmitter } from '@/hooks/emitter'
-import { useConnectionStore } from '@/store'
-import { shortenAddress } from '@/utils'
+import { shortenAddress } from '~/utils'
 
 export const WALLET_CONNECT_EVENT = Symbol('WALLET_CONNECT_EVENT')
 export const WALLET_DISCONNECT_EVENT = Symbol('WALLET_DISCONNECT_EVENT')

@@ -29,8 +29,8 @@
 import type { PublicKey } from '@solana/web3.js'
 import { useWallet } from 'solana-wallets-vue'
 import { useMonitorTransaction } from './monitor'
-import { useConnectionStore } from '@/store'
-import { solToLamports } from '@/utils'
+import { useConnectionStore } from '~/store'
+import { solToLamports } from '~/utils'
 
 export function useAirdrop() {
   const { connection } = useConnectionStore()

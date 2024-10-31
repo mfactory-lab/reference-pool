@@ -27,9 +27,6 @@
   -->
 
 <script lang="ts">
-import { ref, toRef } from 'vue'
-import { useStakePoolStore } from '@/store'
-
 export default {
   setup() {
     const stakePoolStore = useStakePoolStore()

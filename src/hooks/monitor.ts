@@ -26,18 +26,18 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
+import type { Commitment } from '@solana/web3.js'
 import { useQuasar } from 'quasar'
 import { ref, toRef } from 'vue'
-import type { Commitment } from '@solana/web3.js'
-import { useConnectionStore } from '@/store'
 import {
   DEFAULT_CONFIRM_TIMEOUT,
   DEFAULT_MONITOR_COMMITMENT,
   DEFAULT_SEND_TIMEOUT,
   TELEGRAM_ANNOUNCEMENT_URL,
-} from '@/config'
+} from '~/config'
+import { useConnectionStore } from '~/store'
 
-interface MonitorTransactionParams {
+type MonitorTransactionParams = {
   onSuccess?: (signature: string) => void
   onError?: (reason: string) => void
   commitment?: Commitment

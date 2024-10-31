@@ -31,6 +31,11 @@ export const DEFAULT_APY = 0.07
 // export const APY_VALIDATOR_ID = '8BYmtxKY1LuvjesaMi1nkXcj6ghuq48iiGKq2jNpnrNY'
 export const APY_VALIDATOR_ID = ''
 
+// meta
+export const SITE_TITLE = import.meta.env.VITE_APP_TITLE
+export const SITE_DESCRIPTION = import.meta.env.VITE_APP_DESCRIPTION
+export const SITE_KEYWORDS = import.meta.env.VITE_APP_KEYWORDS
+
 // intervals
 export const EPOCH_RELOAD_INTERVAL = 60000
 export const RATES_RELOAD_INTERVAL = 300000

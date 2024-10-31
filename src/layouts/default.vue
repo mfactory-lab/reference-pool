@@ -26,9 +26,6 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script setup lang="ts">
-</script>
-
 <template>
   <q-layout view="lfh Lpr lff">
     <app-header />

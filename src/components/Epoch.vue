@@ -27,9 +27,6 @@
   -->
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import { useEpochStore } from '@/store'
-
 const epochStore = useEpochStore()
 const epochNumber = computed(() => epochStore.epochNumber)
 const epochProgress = computed(() => +epochStore.epochProgress)

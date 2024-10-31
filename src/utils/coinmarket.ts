@@ -26,7 +26,7 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-interface PairData {
+type PairData = {
   timeClose: string
   quote: {
     close: number
@@ -60,7 +60,7 @@ export async function getPairIntervalPrice(
           if (resp.data?.quotes) {
             resolve(resp.data.quotes)
           } else {
-            reject(Error('Promise rejected'))
+            reject(new Error('Promise rejected'))
           }
         },
         (error) => {

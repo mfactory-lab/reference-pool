@@ -27,7 +27,7 @@
   -->
 
 <script setup lang="ts">
-import { COPYRIGHT, COPYRIGHT_BY, FOOTER_LINKS, POWERED_BY, POWERED_LINK } from '@/config'
+import { COPYRIGHT, COPYRIGHT_BY, FOOTER_LINKS, POWERED_BY, POWERED_LINK } from '~/config'
 
 const fLinks = FOOTER_LINKS ? JSON.parse(FOOTER_LINKS) : {}
 const footerLinks = Object.keys(fLinks).map(title => ({ title, url: fLinks[title] }))
@@ -59,49 +59,49 @@ const year = new Date().getFullYear()
 
 <style lang="scss" module>
   .footer {
-    background-color: $gray !important;
-    color: #fff !important;
-    padding: 1rem 0 1rem;
-    @media (max-width: $breakpoint-sm) {
-      text-align: center;
-    }
-
-    a {
-      color: #fff;
-      text-decoration: none;
-    }
-  }
-
-  .nav {
-    justify-content: center;
+  background-color: $gray !important;
+  color: #fff !important;
+  padding: 1rem 0 1rem;
+  @media (max-width: $breakpoint-sm) {
     text-align: center;
-
-    a {
-      margin: 0 0.5em;
-    }
   }
+
+  a {
+    color: #fff;
+    text-decoration: none;
+  }
+}
+
+.nav {
+  justify-content: center;
+  text-align: center;
+
+  a {
+    margin: 0 0.5em;
+  }
+}
 </style>
 
 <style lang="scss" scope>
   .contact-title {
-    text-align: right;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    padding-right: 93px;
-    margin-top: -15px;
-    margin-bottom: -10px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  padding-right: 93px;
+  margin-top: -15px;
+  margin-bottom: -10px;
 
-    @media (max-width: $breakpoint-sm) {
-      text-align: center;
-      margin-bottom: 5px;
-      padding-right: 0;
-    }
+  @media (max-width: $breakpoint-sm) {
+    text-align: center;
+    margin-bottom: 5px;
+    padding-right: 0;
   }
+}
 
-  .footer-links {
-    @media (max-width: $breakpoint-sm) {
-      margin-top: 10px;
-    }
+.footer-links {
+  @media (max-width: $breakpoint-sm) {
+    margin-top: 10px;
   }
+}
 </style>

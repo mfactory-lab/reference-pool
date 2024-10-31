@@ -26,10 +26,10 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { computed } from 'vue'
-import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
-import { PASSWORD_PROTECT } from '@/config'
+import { defineStore } from 'pinia'
+import { computed } from 'vue'
+import { PASSWORD_PROTECT } from '~/config'
 
 export const useAuthStore = defineStore('auth', () => {
   const password = useLocalStorage<string>('password', null)

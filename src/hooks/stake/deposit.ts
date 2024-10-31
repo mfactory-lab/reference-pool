@@ -26,15 +26,13 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
+import { depositSol, depositStake } from '@solana/spl-stake-pool/src'
+import { PublicKey, StakeProgram } from '@solana/web3.js'
 import { useQuasar } from 'quasar'
 import { useAnchorWallet } from 'solana-wallets-vue'
 import { computed, ref, toRef } from 'vue'
-import { PublicKey, StakeProgram } from '@solana/web3.js'
-import { depositSol, depositStake } from '@solana/spl-stake-pool/src'
-import type { ProgramAccount } from '@/store'
-import { useBalanceStore, useConnectionStore, useStakePoolStore } from '@/store'
-import { useMonitorTransaction } from '@/hooks'
-import { formatAmount, lamportsToSol, sendTransaction, solToLamports } from '@/utils'
+import type { ProgramAccount } from '~/store'
+import { formatAmount, lamportsToSol, sendTransaction, solToLamports } from '~/utils'
 
 export function useDeposit() {
   const { notify } = useQuasar()

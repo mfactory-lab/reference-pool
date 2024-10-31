@@ -26,15 +26,14 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
 import type { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { StakeProgram } from '@solana/web3.js'
+import { defineStore } from 'pinia'
 import { useWallet } from 'solana-wallets-vue'
-import { useConnectionStore } from '@/store'
-import { getFilteredProgramAccounts, lamportsToSol, sleep } from '@/utils'
+import { computed, ref, watch } from 'vue'
+import { getFilteredProgramAccounts, lamportsToSol, sleep } from '~/utils'
 
-export interface ProgramAccount {
+export type ProgramAccount = {
   pubkey: PublicKey
   account: AccountInfo<ParsedAccountData>
 }

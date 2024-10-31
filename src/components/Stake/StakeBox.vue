@@ -27,27 +27,25 @@
   -->
 
 <script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, reactive, ref, watch } from 'vue'
-import { useQuasar } from 'quasar'
+import { Notify } from 'quasar'
 import { useWallet } from 'solana-wallets-vue'
+import solLogo from '~/assets/img/sol-logo.svg'
+import { XSOL_NAME } from '~/config'
+import { clickOutside } from '~/directives'
 import {
   useApyStore,
   useBalanceStore,
   useConnectionStore,
   useStakeAccountStore,
   useStakePoolStore,
-} from '@/store'
-import { formatAmount, formatPct, lamportsToSol } from '@/utils'
-import { useDeposit, useWithdraw } from '@/hooks'
-import { clickOutside } from '@/directives'
-import { XSOL_NAME } from '@/config'
+} from '~/store'
+import { formatAmount, formatPct, lamportsToSol } from '~/utils'
 
 export default defineComponent({
   directives: {
     clickOutside,
   },
   setup() {
-    const { notify } = useQuasar()
     const stakePoolStore = useStakePoolStore()
     const connectionStore = useConnectionStore()
     const { connected } = useWallet()
@@ -66,13 +64,13 @@ export default defineComponent({
     const exchangeRate = computed(() => stakePoolStore.exchangeRate)
     const connectionLost = computed(() => stakePoolStore.connectionLost)
 
-    const stake = reactive<{ from: any; to: any; factor: number }>({
+    const stake = reactive<{ from: any, to: any, factor: number }>({
       from: null,
       to: null,
       factor: 0,
     })
 
-    const unstake = reactive<{ from: any; to: any }>({
+    const unstake = reactive<{ from: any, to: any }>({
       from: null,
       to: null,
     })
@@ -146,6 +144,7 @@ export default defineComponent({
 
     return {
       XSOL_NAME,
+      solLogo,
       tab,
       stake,
       unstake,
@@ -174,7 +173,7 @@ export default defineComponent({
 
       stakeMax() {
         if (!connected.value) {
-          notify({
+          Notify.create({
             message: 'Wallet is not connected',
             caption: 'Please connect your wallet',
           })
@@ -185,7 +184,7 @@ export default defineComponent({
 
       unstakeMax() {
         if (!connected.value) {
-          notify({
+          Notify.create({
             message: 'Wallet is not connected',
             caption: 'Please connect your wallet',
           })
@@ -345,7 +344,7 @@ export default defineComponent({
               >
                 MAX
               </q-btn>
-              <img alt="" class="stake-field__icon" src="@/assets/img/sol-logo.svg">
+              <img alt="" class="stake-field__icon" :src="solLogo">
               <span class="stake-field__symbol">SOL</span>
             </template>
           </q-input>
@@ -475,7 +474,7 @@ export default defineComponent({
             bg-color="transparent"
           >
             <template #append>
-              <img alt="" class="stake-field__icon" src="@/assets/img/sol-logo.svg">
+              <img alt="" class="stake-field__icon" :src="solLogo">
               <span class="stake-field__symbol">SOL</span>
             </template>
           </q-input>

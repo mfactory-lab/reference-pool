@@ -26,8 +26,8 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { useQuasar } from 'quasar'
 import { useLocalStorage } from '@vueuse/core'
+import { useQuasar } from 'quasar'
 
 export function useDarkTheme() {
   const { dark } = useQuasar()

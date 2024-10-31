@@ -27,7 +27,7 @@
   -->
 
 <script setup lang="ts">
-import { XSOL_NAME } from '@/config'
+import { XSOL_NAME } from '~/config'
 </script>
 
 <template>

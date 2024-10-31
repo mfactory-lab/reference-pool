@@ -26,19 +26,18 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { computed, ref, watch } from 'vue'
-import { defineStore } from 'pinia'
 import type { Connection, ParsedAccountData } from '@solana/web3.js'
-import { PublicKey, ValidatorInfo } from '@solana/web3.js'
-import { findWithdrawAuthorityProgramAddress } from '@solana/spl-stake-pool/src/utils'
 import { STAKE_POOL_PROGRAM_ID } from '@solana/spl-stake-pool/src'
-import { getStakeAccountsByWithdrawAuthority, shortenAddress } from '@/utils'
-import { useConnectionStore } from '@/store'
-import { VALIDATORS_RELOAD_INTERVAL } from '@/config'
+import { findWithdrawAuthorityProgramAddress } from '@solana/spl-stake-pool/src/utils'
+import { PublicKey, ValidatorInfo } from '@solana/web3.js'
+import { defineStore } from 'pinia'
+import { computed, ref, watch } from 'vue'
+import { VALIDATORS_RELOAD_INTERVAL } from '~/config'
+import { getStakeAccountsByWithdrawAuthority, shortenAddress } from '~/utils'
 
 const CONFIG_PROGRAM_ID = new PublicKey('Config1111111111111111111111111111111111111')
 
-export interface ValidatorData {
+export type ValidatorData = {
   id: string
   voter: string
   lamports: number

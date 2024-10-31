@@ -26,20 +26,19 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { computed, ref, watch } from 'vue'
-import { defineStore } from 'pinia'
-import axios from 'axios'
 import { useLocalStorage } from '@vueuse/core'
-import { useEpochStore, useValidatorStore } from '@/store'
-import { APY_VALIDATOR_ID, DEFAULT_APY } from '@/config'
+import axios from 'axios'
+import { defineStore } from 'pinia'
+import { computed, ref, watch } from 'vue'
+import { APY_VALIDATOR_ID, DEFAULT_APY } from '~/config'
 
-interface ApyValidatorInfo {
+type ApyValidatorInfo = {
   id: string
   vote: string
   apy: number
 }
 
-interface ApyInfo {
+type ApyInfo = {
   beginTimestamp: number
   collectionTimestamp: number
   endTimestamp: number
@@ -70,6 +69,7 @@ export const useApyStore = defineStore('apy', () => {
 
   watch([epochInfo, voteIds], async ([epochInfo, ids]) => {
     if (!epochInfo?.epoch || ids.length === 0) {
+      apyLoading.value = false
       return
     }
 

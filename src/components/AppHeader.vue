@@ -27,7 +27,8 @@
   -->
 
 <script setup lang="ts">
-import { APP_LOGO } from '@/config'
+import logoImg from '~/assets/img/customize/app-logo.svg'
+import { APP_LOGO } from '~/config'
 </script>
 
 <template>
@@ -36,7 +37,7 @@ import { APP_LOGO } from '@/config'
       <q-toolbar>
         <router-link class="app-header__logo" to="/">
           <img v-if="!!APP_LOGO" alt="app-logo" :src="APP_LOGO">
-          <img v-else alt="app-logo" src="@/assets/img/customize/app-logo.svg">
+          <img v-else alt="app-logo" :src="logoImg">
         </router-link>
         <div class="xs-hide">
           <stacked-and-liquidity />

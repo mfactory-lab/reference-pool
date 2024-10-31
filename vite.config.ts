@@ -26,17 +26,19 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { resolve } from 'path'
 import type { BuildOptions, DepOptimizationOptions, PluginOption } from 'vite'
-import { defineConfig, loadEnv } from 'vite'
-import { createHtmlPlugin } from 'vite-plugin-html'
-import vue from '@vitejs/plugin-vue'
-import checker from 'vite-plugin-checker'
-import visualizer from 'rollup-plugin-visualizer'
-import components from 'unplugin-vue-components/vite'
-import inject from '@rollup/plugin-inject'
-import { chunkSplitPlugin } from 'vite-plugin-chunk-split'
+import { resolve } from 'node:path'
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
+import { unheadVueComposablesImports } from '@unhead/vue'
+import vue from '@vitejs/plugin-vue'
+import visualizer from 'rollup-plugin-visualizer'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { VueRouterAutoImports } from 'unplugin-vue-router'
+import VueRouter from 'unplugin-vue-router/vite'
+import { defineConfig, loadEnv } from 'vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import Layouts from 'vite-plugin-vue-layouts'
 
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
@@ -50,28 +52,55 @@ export default defineConfig(({ mode }) => {
       template: { transformAssetUrls },
       // reactivityTransform: true,
     }),
-    quasar(),
-    checker({
-      // typescript: true,
-      eslint: {
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      },
+
+    // https://github.com/posva/unplugin-vue-router
+    VueRouter({
+      extensions: ['.vue', '.md'],
+      dts: 'types/typed-router.d.ts',
     }),
-    createHtmlPlugin({
-      inject: {
-        data: {
-          title: process.env.VITE_APP_TITLE,
-          description: process.env.VITE_APP_DESCRIPTION,
-          keywords: process.env.VITE_APP_KEYWORDS,
+
+    // https://github.com/antfu/unplugin-auto-import
+    AutoImport({
+      imports: [
+        'vue',
+        '@vueuse/core',
+        'vue-router',
+        unheadVueComposablesImports,
+        VueRouterAutoImports,
+        {
+          '@gtm-support/vue-gtm': ['useGtm'],
         },
+      ],
+      packagePresets: ['quasar'],
+      dts: 'types/auto-imports.d.ts',
+      dirs: [
+        'src/hooks/**',
+        'src/store/**',
+      ],
+      // ignore: [
+      //   'useId',
+      // ],
+      vueTemplate: true,
+      viteOptimizeDeps: true,
+      injectAtEnd: true,
+    }),
+
+    quasar(),
+
+    // https://github.com/JohnCampionJr/vite-plugin-vue-layouts
+    Layouts({
+      importMode(name) {
+        return name === 'home' ? 'sync' : 'async'
       },
     }),
-    chunkSplitPlugin({
-      // strategy: 'unbundle',
-    }),
+
+    // https://github.com/davidmyersdev/vite-plugin-node-polyfills
+    nodePolyfills(),
+
     // https://github.com/antfu/unplugin-vue-components
-    components({
+    Components({
       extensions: ['vue', 'md'],
+      include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
       dts: 'types/components.d.ts',
     }),
   ]
@@ -85,7 +114,7 @@ export default defineConfig(({ mode }) => {
     // assetsInlineLimit: 4096,
     chunkSizeWarningLimit: 1024,
     rollupOptions: {
-      plugins: [inject({ Buffer: ['buffer', 'Buffer'] })],
+      // plugins: [inject({ Buffer: ['buffer', 'Buffer'] })],
       // treeshake: true,
       // output: {
       //   manualChunks(id) {
@@ -116,7 +145,7 @@ export default defineConfig(({ mode }) => {
     ],
     exclude: ['vue-demi'],
     esbuildOptions: {
-      minify: true,
+      target: 'esnext',
     },
   }
 
@@ -130,52 +159,38 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          charset: false,
-          additionalData: '@import "@/assets/scss/global.scss";\n',
+          additionalData: `@import "~/assets/scss/global.scss";`,
         },
       },
-      postcss: {
-        plugins: [
-          {
-            postcssPlugin: 'internal:charset-removal',
-            AtRule: {
-              charset: (atRule) => {
-                if (atRule.name === 'charset') {
-                  atRule.remove()
-                }
-              },
-            },
-          },
-        ],
-      },
-      // TODO https://github.com/vitejs/vite/issues/5833
-      charset: false,
     },
 
     resolve: {
       // browser: true,
       // preferBuiltins: false,
+      // dedupe: [
+      //   'bn.js',
+      //   'bs58',
+      //   'lodash',
+      //   'buffer',
+      //   'buffer-layout',
+      //   'eventemitter3',
+      //   '@solana/web3.js',
+      //   'buffer-layout',
+      // ],
       dedupe: [
         'bn.js',
         'bs58',
         'lodash',
-        'buffer',
         'buffer-layout',
-        'eventemitter3',
-        '@solana/web3.js',
-        '@solana/buffer-layout',
       ],
-      alias: [
-        {
-          find: /~(.+)/,
-          replacement: resolve('node_modules/$1'),
-        },
-        { find: '@', replacement: resolve(__dirname, './src') },
-      ],
+      alias: {
+        'lodash': 'lodash-es',
+        '~/': `${resolve(__dirname, 'src')}/`,
+      },
     },
 
     define: {
-      'process.env': process.env,
+      // 'process.env': process.env,
       // global: 'globalThis',
     },
   }

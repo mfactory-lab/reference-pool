@@ -26,14 +26,19 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
+import { createHead } from '@unhead/vue'
 import { createApp } from 'vue'
+import { setupRouter } from '~/router'
 import App from './App.vue'
-import { setupRouter } from '@/router'
+import '~/assets/scss/app.scss'
 
 async function bootstrap() {
   const app = createApp(App)
-  Object.values(import.meta.globEager('./plugins/*.ts')).forEach(i => i.install?.({ app }))
+  Object.values(import.meta.glob('./modules/*.ts', { eager: true })).forEach((i: any) => i.install?.({ app }))
+
   setupRouter(app)
+  const head = createHead()
+  app.use(head)
   app.mount('#app')
 }
 

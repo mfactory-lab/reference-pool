@@ -26,11 +26,11 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import VueGtag from 'vue-gtag'
 import type { App } from 'vue'
-import { GTAG_ID } from '@/config'
+import VueGtag from 'vue-gtag'
+import { GTAG_ID } from '~/config'
 
-export const install = ({ app }: { app: App<Element> }) => {
+export function install({ app }: { app: App<Element> }) {
   if (GTAG_ID) {
     app.use(VueGtag, {
       config: { id: GTAG_ID },

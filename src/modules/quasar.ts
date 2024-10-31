@@ -26,38 +26,23 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { useIntervalFn, useLocalStorage } from '@vueuse/core'
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { RATES_RELOAD_INTERVAL } from '~/config'
-import { getTokenPrice } from '~/utils/coingecko'
+import type { QuasarPluginOptions } from 'quasar'
+import type { App } from 'vue'
+import { Dark, LocalStorage, Notify, Quasar } from 'quasar'
+import iconSet from 'quasar/icon-set/svg-eva-icons'
 
-export const useCoinRateStore = defineStore('coin-rate', () => {
-  const solPrice = useLocalStorage('sol-price', 200)
-  const solVol24 = ref(0)
-  const solChange24 = ref(0)
-  const solChangePercentage24 = ref(0)
-  const loading = ref(false)
+// import lang from 'quasar/lang/en-US'
+// import 'quasar/src/css/index.sass'
+// import '@quasar/extras/eva-icons/eva-icons.css'
+// import '@quasar/extras/roboto-font/roboto-font.css'
 
-  async function load() {
-    loading.value = true
-    const resp = await getTokenPrice()
-    solPrice.value = resp.current_price
-    solVol24.value = resp.total_volume
-    solChange24.value = resp.price_change_24h
-    solChangePercentage24.value = resp.price_change_percentage_24h_in_currency
-    loading.value = false
-    console.log('[CoinRate]', resp)
-  }
-
-  useIntervalFn(load, RATES_RELOAD_INTERVAL, { immediateCallback: true })
-
-  return {
-    solPrice,
-    solVol24,
-    solChange24,
-    solChangePercentage24,
-    loading,
-    load,
-  }
-})
+export function install({ app }: { app: App<Element> }) {
+  app.use(Quasar, {
+    plugins: {
+      Dark,
+      Notify,
+      LocalStorage,
+    },
+    iconSet,
+  } as QuasarPluginOptions)
+}

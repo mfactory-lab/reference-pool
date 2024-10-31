@@ -27,15 +27,15 @@
   -->
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
 import type { Wallet } from 'solana-wallets-vue'
-import { useWallet } from 'solana-wallets-vue'
 import { evaClose } from '@quasar/extras/eva-icons'
 import { WalletReadyState } from '@solana/wallet-adapter-base'
 import { useQuasar } from 'quasar'
-import { shortenAddress } from '@/utils'
-import ledgerDarkSvg from '@/assets/img/wallets/ledger.svg'
-import mathWalletDarkSvg from '@/assets/img/wallets/mathwallet.svg'
+import { useWallet } from 'solana-wallets-vue'
+import ledgerDarkSvg from '~/assets/img/wallets/ledger.svg'
+import mathWalletDarkSvg from '~/assets/img/wallets/mathwallet.svg'
+import { shortenAddress } from '~/utils'
+
 const walletPriority = {
   solflare: 10,
   phantom: 20,
@@ -232,26 +232,26 @@ export default defineComponent({
 
 <style scoped lang="scss">
   .wallet-connect-card {
-    .q-item {
-      border: 1px solid #f5f5f5;
-      margin: 3px;
-      b {
-        font-weight: 500;
-      }
-      &:hover {
-        border-color: #e8e8e8;
-      }
+  .q-item {
+    border: 1px solid #f5f5f5;
+    margin: 3px;
+    b {
+      font-weight: 500;
+    }
+    &:hover {
+      border-color: #e8e8e8;
     }
   }
+}
 </style>
 
 <style lang="scss" module>
   .btn {
-    white-space: nowrap;
-    flex-wrap: nowrap;
-    img {
-      height: 0.6em;
-      margin-right: 0.2em;
-    }
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  img {
+    height: 0.6em;
+    margin-right: 0.2em;
   }
+}
 </style>
