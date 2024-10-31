@@ -1,0 +1,1 @@
+import{_ as s,o as t,h as c,as as r,j as e,aS as o}from"./index-z80tX5ck.js";const l={};function n(i,a){return t(),c(o,null,{default:r(()=>a[0]||(a[0]=[e("div",{class:"container q-pb-xl"},[e("div",{class:"page-title"}," Privacy Policy ")],-1)])),_:1})}const d=s(l,[["render",n]]);export{d as default};

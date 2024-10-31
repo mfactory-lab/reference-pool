@@ -1,0 +1,27 @@
+@charset "UTF-8";._footer_1klib_83{background-color:#455a64!important;color:#fff!important;padding:1rem 0}@media (max-width: 1023px){._footer_1klib_83{text-align:center}}._footer_1klib_83 a{color:#fff;text-decoration:none}._nav_1klib_98{justify-content:center;text-align:center}._nav_1klib_98 a{margin:0 .5em}.contact-title{text-align:right;font-size:12px;font-weight:500;text-transform:uppercase;padding-right:93px;margin-top:-15px;margin-bottom:-10px}@media (max-width: 1023px){.contact-title{text-align:center;margin-bottom:5px;padding-right:0}}@media (max-width: 1023px){.footer-links{margin-top:10px}}/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */.connection-lost[data-v-d2e1edcc]{position:fixed;width:100%;top:0;padding:20px;background:#609ecc;color:#fff;font-weight:500;font-size:22px;z-index:10000;text-align:center}

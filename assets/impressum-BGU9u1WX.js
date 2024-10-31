@@ -1,0 +1,1 @@
+import{_ as a,o as t,h as r,as as o,j as s,aS as c}from"./index-z80tX5ck.js";const n={};function l(i,e){return t(),r(c,null,{default:o(()=>e[0]||(e[0]=[s("div",{class:"container q-pb-xl"},[s("div",{class:"page-title"}," Impressum ")],-1)])),_:1})}const d=a(n,[["render",l]]);export{d as default};

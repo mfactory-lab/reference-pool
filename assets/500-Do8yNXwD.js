@@ -1,0 +1,1 @@
+import{_ as n}from"./ErrorContainer-rJU8557r.js";import{_,o as r,h as c}from"./index-z80tX5ck.js";const e={};function t(s,a){const o=n;return r(),c(o)}const m=_(e,[["render",t]]);export{m as default};
