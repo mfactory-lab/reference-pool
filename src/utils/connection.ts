@@ -62,7 +62,7 @@ export async function sendTransaction(
 
   let transaction = new Transaction({ feePayer: wallet.publicKey })
   transaction.add(...instructions)
-  transaction.recentBlockhash = (await connection.getRecentBlockhash('finalized')).blockhash
+  transaction.recentBlockhash = (await connection.getLatest('finalized')).blockhash
 
   if (signers.length > 0) {
     transaction.partialSign(...signers)
@@ -119,7 +119,7 @@ export async function sendTransactions(connection: Connection,
   const transactions: Transaction[] = []
 
   if (!blockhash) {
-    blockhash = (await connection.getRecentBlockhash(commitment)).blockhash
+    blockhash = (await connection.getLatestBlockhash(commitment)).blockhash
   }
 
   for (const [i, element] of instructionSet.entries()) {
