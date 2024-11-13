@@ -1,0 +1,1 @@
+import{_ as s,o as t,h as r,as as o,j as a,aS as c}from"./index-DmbSBdI8.js";const n={};function l(_,e){return t(),r(c,null,{default:o(()=>e[0]||(e[0]=[a("div",{class:"container q-pb-xl"},[a("div",{class:"page-title"}," TERMS OF USE ")],-1)])),_:1})}const f=s(n,[["render",l]]);export{f as default};
