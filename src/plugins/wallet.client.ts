@@ -29,6 +29,7 @@
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 
 import SolanaWalletAdapter from '@solana/wallet-adapter-vue'
+import { defineNuxtPlugin } from 'nuxt/app'
 import {
   BackpackWalletAdapter,
   BitgetWalletAdapter,
@@ -37,13 +38,13 @@ import {
   Coin98WalletAdapter,
   CoinbaseWalletAdapter,
   ExodusWalletAdapter,
-  FractalWalletAdapter,
+  // FractalWalletAdapter,
   GateWalletAdapter,
-  KeystoneWalletAdapter,
+  // KeystoneWalletAdapter,
   LedgerWalletAdapter,
   MagicEdenWalletAdapter,
   MathWalletAdapter,
-  MoongateWalletAdapter2,
+  // MoongateWalletAdapter2,
   NightlyWalletAdapter,
   NufiWalletAdapter,
   OKXWalletAdapter,
@@ -73,7 +74,6 @@ import {
   // SpotWalletAdapter,
   // TokenaryWalletAdapter,
 } from 'wallets'
-import { defineNuxtPlugin } from 'nuxt/app'
 
 export default defineNuxtPlugin((nuxtApp) => {
   if (process.server) {
@@ -82,18 +82,18 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   nuxtApp.vueApp.use(SolanaWalletAdapter, {
     wallets: [
-      new MoongateWalletAdapter2({
-        authMode: 'Ethereum',
-        position: 'top-right',
-      }),
-      new MoongateWalletAdapter2({
-        authMode: 'Google',
-        position: 'top-right',
-      }),
-      new MoongateWalletAdapter2({
-        authMode: 'Apple',
-        position: 'top-right',
-      }),
+      // new MoongateWalletAdapter2({
+      //   authMode: 'Ethereum',
+      //   position: 'top-right',
+      // }),
+      // new MoongateWalletAdapter2({
+      //   authMode: 'Google',
+      //   position: 'top-right',
+      // }),
+      // new MoongateWalletAdapter2({
+      //   authMode: 'Apple',
+      //   position: 'top-right',
+      // }),
       new TipLinkWalletAdapter({
         clientId: import.meta.env.TIP_WALLET_KEY ?? '',
         title: 'JPool',
@@ -107,7 +107,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       }),
       new PhantomWalletAdapter(),
       new BackpackWalletAdapter(),
-      new FractalWalletAdapter(),
       new OKXWalletAdapter(),
       new TrustWalletAdapter(),
       new SolflareWalletAdapter(),
@@ -121,13 +120,14 @@ export default defineNuxtPlugin((nuxtApp) => {
       new LedgerWalletAdapter(),
       new MagicEdenWalletAdapter(),
       new NufiWalletAdapter(),
-      new KeystoneWalletAdapter(),
       new NightlyWalletAdapter(),
       new TorusWalletAdapter(),
       new TokenPocketWalletAdapter(),
       new TrezorWalletAdapter(),
       new GateWalletAdapter(),
       new BybitWalletAdapter(),
+      // new FractalWalletAdapter(),
+      // new KeystoneWalletAdapter(),
       // new OntoWalletAdapter(),
       // new BitpieWalletAdapter(),
       // new CoinhubWalletAdapter(),
