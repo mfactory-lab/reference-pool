@@ -139,13 +139,15 @@ export const useValidatorStore = defineStore('validators', () => {
 
   const cluster = computed(() => connectionStore.cluster)
 
-  watch(cluster, () => {
-    load(true)
-  }, { immediate: true })
+  if (import.meta.client) {
+    watch(cluster, () => {
+      load(true)
+    }, { immediate: true })
 
-  setInterval(() => {
-    load()
-  }, VALIDATORS_RELOAD_INTERVAL)
+    setInterval(() => {
+      load()
+    }, VALIDATORS_RELOAD_INTERVAL)
+  }
 
   return {
     loading,
@@ -166,7 +168,6 @@ async function getStakeAccounts(connection: Connection, stakePoolAddress: Public
     poolWithdrawAuthority,
   )
   return items.sort((a, b) => b.account.lamports - a.account.lamports)
-  // .slice(0, VALIDATORS_LIMIT)
 }
 
 async function getValidatorInfos(connection: Connection) {

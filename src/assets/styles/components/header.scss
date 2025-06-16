@@ -1,0 +1,99 @@
+/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+
+// Header
+header {
+  display: flex;
+  flex-direction: column;
+  background-color: $gray;
+  padding: 10px 0;
+}
+
+.app-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: $gray;
+  --bs-btn-active-bg: #fff;
+  --bs-btn-active-color: #000;
+
+  &__logo {
+    height: 76px;
+
+    img {
+      height: 100%;
+      width: auto;
+      object-fit: contain;
+    }
+  }
+
+  &__epoch {
+    position: absolute;
+    right: calc(50% - 53px);
+    bottom: -42px;
+    z-index: 1;
+
+    @media (max-width: $breakpoint-sm) {
+      display: none;
+    }
+  }
+
+  &__actions {
+    margin-left: auto;
+    display: flex;
+
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+  }
+
+  &__cluster-btn {
+    .btn {
+      padding: 8px 16px;
+      font-size: 14px;
+      line-height: 14px;
+      font-weight: 500;
+      height: 38px;
+      z-index: 1;
+      border-radius: 50px;
+      background-color: #fff !important;
+      color: #000 !important;
+
+      &:hover {
+        color: #000 !important;
+        background-color: #ececec !important;
+      }
+    }
+
+    .dropdown-toggle::after {
+      margin-left: 12px;
+    }
+  }
+}

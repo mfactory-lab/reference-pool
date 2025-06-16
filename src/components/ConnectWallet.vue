@@ -26,237 +26,345 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import type { Wallet } from 'solana-wallets-vue/dist/types'
-import { evaClose } from '@quasar/extras/eva-icons'
+<script setup lang="ts">
+import type { Wallet } from '@solana/wallet-adapter-vue'
 import { WalletReadyState } from '@solana/wallet-adapter-base'
-import { useQuasar } from 'quasar'
-import { useWallet } from 'solana-wallets-vue'
-import ledgerDarkSvg from '~/assets/img/wallets/ledger.svg'
-import mathWalletDarkSvg from '~/assets/img/wallets/mathwallet.svg'
+
+import camelCase from 'lodash-es/camelCase'
+import type { ExtendedWallet } from '~/config/wallets'
+import { walletOpts } from '~/config/wallets'
 import { shortenAddress } from '~/utils'
 
-const walletPriority = {
-  solflare: 10,
-  phantom: 20,
-  sollet: 5,
-  blocto: 4,
+defineProps<{
+  className?: string
+  withIcon?: boolean
+}>()
+
+const recommended = new Set(['Solflare', 'Phantom'])
+
+const { width } = useWindowSize()
+
+const { webViewWallet } = useAutoConnect()
+const { isWebView, isMobileOs } = useMobileDetect()
+const isMobile = computed(() => isMobileOs.value && !isWebView.value)
+
+const balanceStore = useBalanceStore()
+
+const wallet = useClientWallet()
+
+const dialog = ref(false)
+const connectingTimer = ref<any>(0)
+
+const isConnecting = computed(() => !!wallet?.connecting.value)
+
+function isActiveWallet(w: Wallet) {
+  return w.readyState === WalletReadyState.Installed || w.readyState === WalletReadyState.Loadable
 }
 
-type ExtendedWallet = Wallet & { adapter: Wallet['adapter'] & { darkIcon: string } }
-
-function isActiveWallet(wallet: Wallet) {
-  return [WalletReadyState.Installed, WalletReadyState.Loadable].includes(wallet.readyState)
+function isMobileRelevant(w: ExtendedWallet) {
+  return isMobile.value && (w.deepLink || w.adapter.name === 'WalletConnect')
 }
 
-export default defineComponent({
-  setup() {
-    const {
-      wallets,
-      select: selectWallet,
-      publicKey,
-      connected,
-      disconnect,
-      connect,
-    } = useWallet()
+function cancelTimer() {
+  if (connectingTimer.value > 0) {
+    clearTimeout(connectingTimer.value)
+  }
+}
 
-    const walletAddress = computed(() => publicKey.value?.toBase58() ?? '')
-    const walletShortAddress = computed(() => shortenAddress(walletAddress.value))
-    const dialog = ref(false)
-    const { dark } = useQuasar()
-    const darkIcons = {
-      ledger: ledgerDarkSvg,
-      mathwallet: mathWalletDarkSvg,
+async function select(w: Wallet) {
+  cancelTimer()
+  await wallet?.select(w.adapter.name)
+  dialog.value = false
+  connectingTimer.value = setTimeout(() => {
+    if (wallet && wallet?.connecting) {
+      wallet.connecting.value = false
     }
+  }, 10_000)
+  await wallet?.connect()
+}
 
-    return {
-      walletAddress,
-      walletShortAddress,
-      dialog,
-      connected,
-      dark,
-      wallets: computed(() =>
-        [...wallets.value]
-          .map((w: ExtendedWallet) => {
-            w.adapter.darkIcon = darkIcons[w.adapter.name.toLowerCase()]
-            return w
-          })
-          .sort((a, b) => {
-            const aPriority = walletPriority[a.adapter.name.toLowerCase()] ?? 1
-            const bPriority = walletPriority[b.adapter.name.toLowerCase()] ?? 1
-            return (
-              bPriority - aPriority + ((isActiveWallet(b) ? 1 : 0) - (isActiveWallet(a) ? 1 : 0))
-            )
-          }),
-      ),
-      icons: {
-        close: evaClose,
-      },
-      isActiveWallet,
-      async select(wallet: Wallet) {
-        selectWallet(wallet.adapter.name)
-        dialog.value = false
-        await connect()
-      },
-      connect() {
-        dialog.value = true
-      },
-      disconnect() {
-        disconnect()
-        dialog.value = false
-      },
-      ok() {
-        dialog.value = false
-      },
+const walletAddress = computed(() => wallet?.publicKey.value?.toBase58() ?? '')
+const walletShortAddress = computed(() => shortenAddress(walletAddress.value, 5))
+const wallets = computed<ExtendedWallet[]>(() =>
+  [...wallet?.wallets.value as ExtendedWallet[]]
+    ?.map((w) => {
+      const key = camelCase(w.adapter.name)
+      if (walletOpts[key]?.icon) {
+        w.adapter.icon = walletOpts[key].icon
+      }
+      // if (!isDark.value && walletOpts[key]?.lightIcon) {
+      //   w.adapter.icon = walletOpts[key].lightIcon
+      // }
+      // if (isDark.value && walletOpts[key]?.darkIcon) {
+      //   w.adapter.icon = walletOpts[key].darkIcon
+      // }
+      // only show deep links on mobile
+      if (isMobile.value && walletOpts[key]?.deepLink) {
+        w.deepLink = walletOpts[key].deepLink
+          .replace('{uri}', encodeURIComponent(`${location.href}?wallet=${w.adapter.name}`))
+          .replace('{ref}', encodeURIComponent(location.origin))
+          .replace('{host}', location.host)
+      }
+      return w
+    })
+    .sort((a, b) => {
+      const aPriority = walletOpts[camelCase(a.adapter.name)]?.priority ?? 1
+      const bPriority = walletOpts[camelCase(b.adapter.name)]?.priority ?? 1
+      return (
+        bPriority
+        - aPriority
+        + ((isActiveWallet(b) ? 1 : 0) - (isActiveWallet(a) ? 1 : 0))
+      )
+    }),
+)
+
+const computedWallets = computed(() => {
+  return wallets.value?.reduce((acc: { installed: ExtendedWallet[], others: ExtendedWallet[] }, w) => {
+    const isWebViewMatch = !webViewWallet.value || w.adapter.name === webViewWallet.value
+
+    const isInstalled = recommended.has(w.adapter.name)
+      || w.readyState === WalletReadyState.Installed
+      || (isMobile.value && w.deepLink)
+
+    if (isWebViewMatch && (isMobile.value ? isMobileRelevant(w) : true)) {
+      if (isInstalled) {
+        acc.installed.push(w)
+      } else {
+        acc.others.push(w)
+      }
     }
-  },
+    return acc
+  }, { installed: [], others: [] })
 })
+
+watch(() => wallet?.publicKey.value, (pubkey) => {
+  if (pubkey) {
+    cancelTimer()
+
+    let hasTriggered = false
+    let stopWatcher: (() => void) | null = null
+
+    const debouncedHandler = useDebounceFn(() => {
+      if (balanceStore.tokenBalance !== null && balanceStore.solBalance !== null && !hasTriggered) {
+        hasTriggered = true
+
+        if (stopWatcher) {
+          stopWatcher()
+        }
+      }
+    }, 300)
+
+    stopWatcher = watch(
+      [() => balanceStore.tokenBalance, () => balanceStore.solBalance],
+      debouncedHandler,
+      { flush: 'post' },
+    )
+  }
+}, { immediate: true })
+
+function show() {
+  dialog.value = true
+}
+
+function disconnect() {
+  wallet?.disconnect()
+  dialog.value = false
+}
 </script>
 
 <template>
-  <q-btn
-    v-if="connected"
-    class="app-header__wallet-btn"
-    :class="$style.btn"
-    color="primary"
-    text-color="primary-gray"
-    rounded
-    unelevated
-    @click="dialog = true"
+  <j-btn
+    :class="className"
+    :loading="isConnecting"
+    size="sm"
+    pill
+    variant="primary"
+    class="connect-wallet"
+    @click="show"
   >
-    {{ walletShortAddress }}
-  </q-btn>
-  <q-btn
-    v-else
-    class="app-header__wallet-btn"
-    :class="$style.btn"
-    color="primary"
-    text-color="primary-gray"
-    rounded
-    @click="connect"
-  >
-    <div class="row items-center no-wrap">
-      <span>CONNECT WALLET</span>
-    </div>
-  </q-btn>
+    <span v-if="wallet?.publicKey.value">{{ walletShortAddress }}</span>
+    <span v-else>Connect wallet</span>
+  </j-btn>
 
-  <q-dialog
+  <j-dialog
+    v-if="wallet?.publicKey.value"
     v-model="dialog"
-    transition-duration="150"
-    transition-show="fade"
-    transition-hide="fade"
+    :title="!wallet?.publicKey.value ? 'Connect wallet' : 'Disconnect Wallet'"
+    class-name="connect-wallet-dialog"
   >
-    <q-card v-if="connected">
-      <q-card-section class="relative-position">
-        <div class="text-h6 text-center">
-          Your wallet
-        </div>
-        <q-btn
-          padding="md"
-          color="transparent"
-          text-color="primary-gray"
-          unelevated
-          class="absolute-right"
-          :icon="icons.close"
-          size="md"
-          @click="ok"
-        />
-      </q-card-section>
-      <q-separator />
-      <q-card-section>
-        <copy-to-clipboard :text="walletAddress" />
-        {{ walletAddress }}
-      </q-card-section>
-      <q-separator />
-      <q-card-section>
-        <div class="q-gutter-md row justify-between">
-          <q-btn outline rounded @click="disconnect">
-            Disconnect
-          </q-btn>
-          <q-btn outline rounded @click="ok">
-            Ok
-          </q-btn>
-        </div>
-      </q-card-section>
-    </q-card>
+    <div class="disconnect-wrapper">
+      <div class="wallet-address">
+        <template v-if="width > 650">
+          {{ wallet?.publicKey.value }}
+        </template>
+        <template v-else>
+          {{ shortenAddress(String(wallet?.publicKey.value), 15) }}
+        </template>
+        <copy-to-clipboard :value="wallet?.publicKey.value" />
+      </div>
+      <div class="disconnect-actions">
+        <j-btn pill variant="primary" @click="disconnect">
+          Disconnect
+        </j-btn>
+        <j-btn pill variant="primary" @click="dialog = false">
+          ok
+        </j-btn>
+      </div>
+    </div>
+  </j-dialog>
 
-    <q-card v-else class="wallet-connect-card">
-      <q-card-section>
-        <div class="text-h6">
-          Connect to a wallet
+  <j-dialog
+    v-else
+    v-model="dialog"
+    :title="!wallet?.publicKey.value ? 'Connect wallet' : 'Disconnect Wallet'"
+    class-name="connect-wallet-dialog"
+  >
+    <div class="wallets-wrapper">
+      <span class="wallets-wrapper__title">Recommended wallets</span>
+
+      <div v-if="computedWallets?.installed" class="wallets">
+        <div v-for="w in computedWallets.installed" :key="w.adapter.name" class="wattet-item" @click="select(w)">
+          <img :src="w.adapter.icon" alt="wallet icon">
+          {{ w.adapter.name }}
         </div>
-        <q-btn
-          padding="md"
-          color="transparent"
-          text-color="primary-gray"
-          unelevated
-          class="absolute-right"
-          :icon="icons.close"
-          size="md"
-          @click="ok"
-        />
-      </q-card-section>
-      <q-separator />
-      <q-card-section>
-        <q-table
-          grid
-          :rows="wallets"
-          row-key="name"
-          hide-pagination
-          hide-header
-          :rows-per-page-options="[20]"
-        >
-          <template #item="{ row: wallet }">
-            <div class="col-12 col-md-6">
-              <q-item clickable :disable="!isActiveWallet(wallet)" @click="select(wallet)">
-                <q-item-section>
-                  <b>{{ wallet.adapter.name }}</b>
-                  <div
-                    class="text-light-gray text-caption full-width text-no-wrap"
-                    style="text-overflow: ellipsis; overflow: hidden"
-                  >
-                    {{ wallet.adapter.url }}
-                  </div>
-                </q-item-section>
-                <q-item-section avatar>
-                  <q-avatar square>
-                    <img
-                      :src="dark.isActive ? wallet.adapter.icon : wallet.adapter.darkIcon ?? wallet.adapter.icon"
-                      alt=""
-                    >
-                  </q-avatar>
-                </q-item-section>
-              </q-item>
-            </div>
-          </template>
-        </q-table>
-      </q-card-section>
-    </q-card>
-  </q-dialog>
+      </div>
+
+      <j-accordion title="More wallets">
+        <div v-if="computedWallets?.others" class="wallets">
+          <div v-for="w in computedWallets.others" :key="w.adapter.name" class="wattet-item" @click="select(w)">
+            <img :src="w.adapter.icon" alt="wallet icon">
+            {{ w.adapter.name }}
+          </div>
+        </div>
+      </j-accordion>
+    </div>
+  </j-dialog>
 </template>
 
-<style scoped lang="scss">
-  .wallet-connect-card {
-  .q-item {
-    border: 1px solid #f5f5f5;
-    margin: 3px;
-    b {
-      font-weight: 500;
-    }
-    &:hover {
-      border-color: #e8e8e8;
-    }
+<style lang="scss" scoped>
+.connect-wallet {
+  white-space: nowrap;
+  margin-left: -30px;
+  padding-left: 40px;
+  text-transform: uppercase;
+  height: 38px;
+  color: #455a64;
+  font-size: 14px;
+  height: 38px;
+  font-weight: 400;
+
+  @media (max-width: $breakpoint-sm) {
+    margin-left: 0;
+    padding-left: 16px;
   }
 }
-</style>
 
-<style lang="scss" module>
-  .btn {
-  white-space: nowrap;
-  flex-wrap: nowrap;
-  img {
-    height: 0.6em;
-    margin-right: 0.2em;
+.connect-wallet-dialog {
+  z-index: 9999 !important;
+  .modal-dialog {
+    width: 100%;
+    width: fit-content;
+  }
+
+  .disconnect-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    .wallet-address {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      @media (max-width: $breakpoint-xs) {
+        font-size: 14px;
+      }
+    }
+
+    .disconnect-actions {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 24px;
+    }
+  }
+
+  .wallets-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    & > .wallets {
+      border-bottom: 1px solid $graySuperLight;
+      padding-bottom: 24px;
+    }
+
+    &__title {
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 20px;
+      padding-bottom: 24px;
+      color: $neutral-600;
+    }
+
+    .wallets {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .wattet-item {
+      padding: 12px;
+      border-radius: 12px;
+      background-color: $graySuperLight;
+      flex-basis: calc(50% - 6px);
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      border: 1px solid transparent;
+
+      @media (max-width: $breakpoint-xs) {
+        font-size: 14px;
+      }
+
+      &:hover {
+        border-color: $neutral-200;
+      }
+
+      img {
+        width: 44px;
+        height: 44px;
+        object-fit: contain;
+
+        @media (max-width: $breakpoint-xs) {
+          width: 32px;
+          height: 32px;
+        }
+      }
+    }
+
+    .j-accordion {
+      border: none;
+    }
+
+    .accordion-button {
+      color: $neutral-600;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 20px;
+      padding: 24px 0;
+
+      svg path {
+        stroke: $neutral-300;
+      }
+    }
+
+    .accordion-body {
+      padding-bottom: 0;
+    }
   }
 }
 </style>

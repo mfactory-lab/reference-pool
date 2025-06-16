@@ -1,253 +1,356 @@
-/*
- * This file is part of Solana Reference Stake Pool code.
- *
- * Copyright © 2021, mFactory GmbH
- *
- * Solana Reference Stake Pool is free software: you can redistribute it
- * and/or modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * Solana Reference Stake Pool is distributed in the hope that it
- * will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.
- * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
- *
- * You can be released from the requirements of the Affero GNU General Public License
- * by purchasing a commercial license. The purchase of such a license is
- * mandatory as soon as you develop commercial activities using the
- * Solana Reference Stake Pool code without disclosing the source code of
- * your own applications.
- *
- * The developer of this program can be contacted at <info@mfactory.ch>.
- */
-
 import type {
-  Blockhash,
+  AddressLookupTableAccount,
+  BlockhashWithExpiryBlockHeight,
   Commitment,
+  ConfirmOptions,
   Connection,
   FetchMiddleware,
-  Keypair,
+  PublicKey,
   SendOptions,
+  SignatureResult,
   Signer,
   TransactionInstruction,
+  TransactionSignature,
 } from '@solana/web3.js'
-import type { AnchorWallet } from 'solana-wallets-vue'
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
 import {
-  Transaction,
+  ComputeBudgetProgram,
+  PACKET_DATA_SIZE,
+  TransactionExpiredBlockheightExceededError,
+  TransactionMessage,
+  VersionedTransaction,
 } from '@solana/web3.js'
-import { DEFAULT_COMMITMENT } from '~/config'
+import { base64Encode } from './common'
 
-export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
+/**
+ * Generic Wallet interface to support any wallet implementation.
+ */
+type Wallet = {
+  publicKey: PublicKey | null
+  signTransaction: (transaction: VersionedTransaction) => Promise<VersionedTransaction>
+  signAllTransactions?: (transactions: VersionedTransaction[]) => Promise<VersionedTransaction[]>
 }
 
 /**
- * Send and sign transaction
+ * Sends and signs a single transaction.
  */
 export async function sendTransaction(
   connection: Connection,
-  wallet: AnchorWallet,
+  wallet: Wallet,
   instructions: TransactionInstruction[],
-  signers: Signer[],
-) {
-  if (!wallet?.publicKey) {
-    throw new Error('Wallet is not connected')
-  }
+  signers: Signer[] = [],
+  options: {
+    priorityFee?: number
+    commitment?: Commitment
+  } = {},
+): Promise<string> {
+  const { priorityFee = 0, commitment = 'confirmed' } = options
 
-  let transaction = new Transaction({ feePayer: wallet.publicKey })
-  transaction.add(...instructions)
-  transaction.recentBlockhash = (await connection.getLatest('finalized')).blockhash
-
-  if (signers.length > 0) {
-    transaction.partialSign(...signers)
-  }
-
-  transaction = await wallet.signTransaction(transaction)
-  const rawTransaction = transaction.serialize()
-
-  // if (simulate) {
-  //   const simulation = await connection.simulateTransaction(transaction);
-  //   console.log('TX Simulation:', simulation);
-  //   return simulation;
-  // }
-
-  const result = await connection.sendRawTransaction(rawTransaction, {
-    skipPreflight: true,
-    preflightCommitment: DEFAULT_COMMITMENT,
-  })
-
-  console.log('TX(signature):', result.toString())
-  console.log('TX(base64):', rawTransaction.toString('base64'))
-
-  return result
-}
-
-type SendTransactionsParams = {
-  commitment?: Commitment
-  onSuccess?: (txId: string, idx: number) => Promise<void>
-  onError?: (reason: string, idx: number) => Promise<boolean>
-  blockhash?: Blockhash
-  maxRetries?: number
-  stopOnError?: boolean
-}
-
-/**
- * Send and sign multiple transactions
- */
-export async function sendTransactions(connection: Connection,
-  wallet: AnchorWallet,
-  instructionSet: TransactionInstruction[][],
-  signersSet: Keypair[][],
-  {
-    commitment = 'singleGossip',
-    maxRetries = 3,
-    onSuccess,
-    onError,
-    stopOnError,
-    blockhash,
-  }: SendTransactionsParams = {}) {
   if (!wallet.publicKey) {
     throw new WalletNotConnectedError()
   }
 
-  const transactions: Transaction[] = []
+  const { blockhash } = await connection.getLatestBlockhash(commitment)
 
-  if (!blockhash) {
-    blockhash = (await connection.getLatestBlockhash(commitment)).blockhash
+  const txInstructions = priorityFee > 0
+    ? [ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityFee }), ...instructions]
+    : instructions
+
+  const messageV0 = new TransactionMessage({
+    payerKey: wallet.publicKey,
+    recentBlockhash: blockhash,
+    instructions: txInstructions,
+  }).compileToV0Message()
+  const transaction = new VersionedTransaction(messageV0)
+
+  // const transaction = new Transaction({
+  //   feePayer: wallet.publicKey,
+  //   blockhash,
+  //   lastValidBlockHeight,
+  // }).add(...instructions)
+
+  const signedTransaction = await wallet.signTransaction(transaction)
+
+  if (signers.length > 0) {
+    signedTransaction.sign(signers)
   }
 
-  for (const [i, element] of instructionSet.entries()) {
-    const instructions = element ?? []
-    if (instructions.length === 0) {
-      continue
-    }
-    const transaction = new Transaction({ feePayer: wallet.publicKey })
-    transaction.add(...instructions)
-    transaction.recentBlockhash = blockhash
-    const signers = signersSet[i] ?? []
-    if (signers.length > 0) {
-      transaction.partialSign(...signers)
-    }
-    transactions.push(transaction)
+  const rawTransaction = signedTransaction.serialize()
+
+  const txId = await connection.sendRawTransaction(rawTransaction, {
+    skipPreflight: true,
+    maxRetries: 3,
+  })
+
+  console.log('TX Signature:', txId)
+  console.log('TX Raw:', base64Encode(rawTransaction))
+
+  return txId
+}
+
+type SendTransactionsParams = {
+  commitment?: Commitment
+  onSuccess?: (txId: string, idx: number) => Promise<void> | void
+  onError?: (error: any, idx: number) => Promise<boolean> | boolean
+  blockhash?: BlockhashWithExpiryBlockHeight
+  lookupTables?: AddressLookupTableAccount[]
+  maxRetries?: number
+  stopOnError?: boolean
+  priorityFee?: number
+  separate?: boolean
+}
+
+/**
+ * Sends and signs multiple transactions.
+ */
+export async function sendTransactions(
+  connection: Connection,
+  wallet: Wallet,
+  instructionSets: TransactionInstruction[][],
+  signerSets: Signer[][],
+  params: SendTransactionsParams = {},
+): Promise<string[]> {
+  const {
+    commitment = 'confirmed',
+    maxRetries = 3,
+    onSuccess,
+    onError,
+    stopOnError = false,
+    blockhash,
+    priorityFee = 0,
+    separate = false,
+    lookupTables,
+  } = params
+
+  if (!wallet.publicKey) {
+    throw new WalletNotConnectedError()
   }
 
-  const signedTransactions = await wallet.signAllTransactions(transactions)
-  const pendingTransactions: Promise<string>[] = []
+  let currentBlockhash = blockhash ?? (await connection.getLatestBlockhash(commitment))
 
-  let i = 0
-  for (const signedTransaction of signedTransactions) {
-    const rawTransaction = signedTransaction.serialize()
+  const transactions = instructionSets
+    .map((instructions, i) => {
+      if (!instructions?.length) {
+        return null
+      }
 
-    const pendingTransaction = connection.sendRawTransaction(rawTransaction, {
-      skipPreflight: true,
-      maxRetries,
-    } as SendOptions)
+      const txInstructions = priorityFee > 0
+        ? [ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityFee }), ...instructions]
+        : instructions
 
-    // pendingTransaction
-    //   .then((txId) => {
-    //     console.log(`TX(#${i}) Signature:`, txId);
-    //     console.log(`TX(#${i}) Base64: `, rawTransaction.toString('base64'));
-    //     successCallback(txId, i);
-    //   })
-    //   .catch((reason) => {
-    //     console.log(`TX(#${i}) Error:`, reason);
-    //     console.log(`TX(#${i}) Base64: `, rawTransaction.toString('base64'));
-    //     failCallback(reason, i);
-    //   });
+      const messageV0 = new TransactionMessage({
+        payerKey: wallet.publicKey!,
+        recentBlockhash: currentBlockhash.blockhash,
+        instructions: txInstructions,
+      }).compileToV0Message(lookupTables)
 
+      const transaction = new VersionedTransaction(messageV0)
+
+      const signers = signerSets[i] ?? []
+      if (signers.length > 0) {
+        console.log(`Tx #${i} additional signers:`, signers.map(s => s.publicKey.toBase58()))
+        transaction.sign(signers)
+      }
+
+      console.log(`Tx #${i} size: ${transaction.serialize().length} of ${PACKET_DATA_SIZE} bytes`)
+
+      return transaction
+    })
+    .filter(Boolean) as VersionedTransaction[]
+
+  const signedTransactions = !separate && wallet.signAllTransactions
+    ? await wallet.signAllTransactions(transactions)
+    : await Promise.all(transactions.map(tx => wallet.signTransaction(tx)))
+
+  const results: string[] = []
+
+  for (const [i, signedTransaction] of signedTransactions.entries()) {
+    const rawTx = signedTransaction.serialize()
+    let retryCount = 0
+    let succeeded = false
+
+    while (retryCount <= maxRetries && !succeeded) {
+      try {
+        const txId = await sendAndConfirmRawTransaction(connection, Buffer.from(rawTx), {
+          skipPreflight: true,
+          commitment,
+          blockhash: currentBlockhash,
+        })
+
+        console.log(`TX #${i} :: Signature:`, txId)
+        // eslint-disable-next-line ts/no-unused-expressions
+        onSuccess && (await onSuccess(txId, i))
+        results.push(txId)
+        succeeded = true
+      } catch (error) {
+        console.log(`TX #${i} :: Error (attempt ${retryCount + 1}/${maxRetries + 1}):`, error)
+
+        if (error instanceof TransactionExpiredBlockheightExceededError) {
+          currentBlockhash = await connection.getLatestBlockhash(commitment)
+          console.log('Refreshed blockhash:', currentBlockhash.blockhash)
+          retryCount++
+          await sleep(500)
+          continue
+        }
+
+        if (retryCount >= maxRetries) {
+          let shouldContinue = false
+          if (onError) {
+            shouldContinue = await onError(error, i)
+          }
+          results.push('')
+          if (stopOnError && !shouldContinue) {
+            return results
+          }
+          break
+        }
+
+        retryCount++
+        await sleep(500)
+      }
+    }
+  }
+
+  return results
+}
+
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+// Copy of Connection.sendAndConfirmRawTransaction that throws
+// a better error if 'confirmTransaction` returns an error status
+async function sendAndConfirmRawTransaction(
+  connection: Connection,
+  rawTransaction: Buffer | Uint8Array,
+  options?: ConfirmOptionsWithBlockhash,
+): Promise<TransactionSignature> {
+  const sendOptions: SendOptions = options
+    ? {
+        skipPreflight: options.skipPreflight,
+        preflightCommitment: options.preflightCommitment || options.commitment,
+        maxRetries: options.maxRetries,
+        minContextSlot: options.minContextSlot,
+      }
+    : {}
+
+  let status: SignatureResult
+
+  const startTime = Date.now()
+  while (Date.now() - startTime < 60_000) {
     try {
-      const txId = await pendingTransaction
-      console.log(`TX(#${i}) Signature:`, txId)
-      console.log(`TX(#${i}) Base64:`, rawTransaction.toString('base64'))
-      if (onSuccess) {
-        await onSuccess(txId, i)
-      }
-    } catch (error: any) {
-      console.log(`TX(#${i}) Error:`, error)
-      console.log(`TX(#${i}) Base64:`, rawTransaction.toString('base64'))
-      if (onError) {
-        await onError(error, i)
-      }
-      if (stopOnError) {
-        return await Promise.all(pendingTransactions)
-      }
-    }
+      console.log('Sending raw transaction', rawTransaction.toString('base64'), sendOptions)
+      const signature = await connection.sendRawTransaction(
+        rawTransaction,
+        sendOptions,
+      )
 
-    pendingTransactions.push(pendingTransaction)
-    i++
+      if (options?.blockhash) {
+        if (sendOptions.maxRetries === 0) {
+          const abortSignal = AbortSignal.timeout(15_000)
+          status = (
+            await connection.confirmTransaction(
+              { abortSignal, signature, ...options.blockhash },
+              options && options.commitment,
+            )
+          ).value
+        } else {
+          status = (
+            await connection.confirmTransaction(
+              { signature, ...options.blockhash },
+              options?.commitment,
+            )
+          ).value
+        }
+      } else {
+        status = (
+          await connection.confirmTransaction(
+            signature,
+            options?.commitment,
+          )
+        ).value
+      }
+
+      if (status.err) {
+        throw new ConfirmError(
+          `Raw transaction ${signature} failed (${JSON.stringify(status)})`,
+        )
+      }
+
+      return signature
+    } catch (error: any) {
+      if (error.name === 'TimeoutError') {
+        continue
+      }
+      throw error
+    }
   }
 
-  return await Promise.all(pendingTransactions)
+  throw new Error('Transaction failed to confirm in 60s')
+}
+
+class ConfirmError extends Error {
+  constructor(message?: string) {
+    super(message)
+  }
+}
+
+export type ConfirmOptionsWithBlockhash = ConfirmOptions & {
+  blockhash?: BlockhashWithExpiryBlockHeight
 }
 
 type ITokenStorage = {
   setToken: (token: string) => void
-
   getToken: () => string | null
-
   getTimeSinceLastSet: () => number | null
 }
 
-const storage = localStorage // typeof localStorage !== 'undefined' ? localStorage : require('localstorage-memory');
-
 export class LocalTokenStorage implements ITokenStorage {
-  setToken(token: string): void {
-    storage.setItem('auth-token', token)
-    storage.setItem('last-set', String(Date.now()))
-  }
+  private tokenKey = 'auth-token'
+  private timeKey = 'last-set'
 
-  getTimeSinceLastSet(): number | null {
-    if (storage.getItem('last-set')) {
-      return Date.now() - Number(storage.getItem('last-set'))
-    }
-    return null
+  setToken(token: string): void {
+    localStorage.setItem(this.tokenKey, token)
+    localStorage.setItem(this.timeKey, String(Date.now()))
   }
 
   getToken(): string | null {
-    return storage.getItem('auth-token')
+    return localStorage.getItem(this.tokenKey)
+  }
+
+  getTimeSinceLastSet(): number | null {
+    const lastSet = localStorage.getItem(this.timeKey)
+    return lastSet ? Date.now() - Number(lastSet) : null
   }
 }
 
-export type ITokenAuthFetchMiddlewareArgs = {
-  /**
-   * An api endpoint to get a new token. Default /api/get-token
-   */
-  getTokenUrl?: string
-  /**
-   * Optionally override the default storage mechanism of localStorage
-   */
+type TokenAuthFetchMiddlewareArgs = {
   tokenStorage?: ITokenStorage
-  /**
-   * Number of milliseconds until token expiry. Default 5 minutes
-   */
   tokenExpiry?: number
-
-  /**
-   * Logic to get an authorization token
-   */
   getToken: () => Promise<string>
 }
 
+/**
+ * Middleware to handle token-based authentication in fetch requests.
+ */
 export function tokenAuthFetchMiddleware({
   tokenStorage = new LocalTokenStorage(),
   tokenExpiry = 5 * 60 * 1000, // 5 minutes
   getToken,
-}: ITokenAuthFetchMiddlewareArgs): FetchMiddleware {
-  return (url: string, options: any, fetch: any) => {
+}: TokenAuthFetchMiddlewareArgs): FetchMiddleware {
+  // @ts-expect-error...
+  return (url: string, options: any, fetch: (...args: any) => void) => {
     (async () => {
       try {
         const token = tokenStorage.getToken()
         const timeSinceLastSet = tokenStorage.getTimeSinceLastSet()
         const tokenIsValid
-          = token && token !== 'undefined' && timeSinceLastSet && timeSinceLastSet < tokenExpiry
+          = token && token !== 'undefined' && timeSinceLastSet && timeSinceLastSet < tokenExpiry - 10_000
         if (!tokenIsValid) {
-          tokenStorage.setToken(await getToken())
+          const newToken = await getToken()
+          if (newToken) {
+            tokenStorage.setToken(newToken)
+          }
         }
       } catch (error: any) {
         console.error(error)

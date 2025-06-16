@@ -26,39 +26,46 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-export default {
-  setup() {
-    const stakePoolStore = useStakePoolStore()
-    const connectionLost = toRef(stakePoolStore, 'connectionLost')
-    const forceHidden = ref(true)
+<script lang="ts" setup>
+const stakePoolStore = useStakePoolStore()
+const connectionLost = computed(() => stakePoolStore.connectionLost)
+const forceHidden = ref(true)
 
+const { width } = useWindowSize()
+
+watch(connectionLost, (cl) => {
+  forceHidden.value = true
+  if (cl) {
     setTimeout(() => (forceHidden.value = false), 3000)
-    return {
-      connectionLost,
-      forceHidden,
-    }
-  },
-}
+  }
+}, { immediate: true })
 </script>
 
 <template>
-  <div v-if="connectionLost && !forceHidden" class="connection-lost">
-    Solana network overloaded. Data currently unavailable.
-  </div>
+  <dynamic-teleport to="header" :is-teleport="width < 768">
+    <div v-if="connectionLost && !forceHidden" class="connection-lost">
+      Solana network overloaded. Data currently unavailable.
+    </div>
+  </dynamic-teleport>
 </template>
 
 <style scoped lang="scss">
   .connection-lost {
-    position: fixed;
-    width: 100%;
-    top: 0;
-    padding: 20px;
-    background: $info;
-    color: #fff;
-    font-weight: 500;
-    font-size: 22px;
-    z-index: 10000;
-    text-align: center;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  padding: 6px;
+  background: $info;
+  color: #fff;
+  font-weight: 500;
+  font-size: 16px;
+  z-index: 10000;
+  text-align: center;
+
+  @media (max-width: $breakpoint-xs) {
+    position: initial;
+    order: -1;
+    margin: -10px 0 10px;
   }
+}
 </style>

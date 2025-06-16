@@ -26,59 +26,72 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import { useWallet } from 'solana-wallets-vue'
+<script lang="ts" setup>
 import { ENDPOINTS } from '~/config'
 import type { Endpoint } from '~/store'
 
-export default defineComponent({
-  setup() {
-    const connectionStore = useConnectionStore()
-    const { connected, connect, disconnect, autoConnect } = useWallet()
-    return {
-      groups: [
-        ENDPOINTS.filter(e => e.cluster === 'mainnet-beta'),
-        ENDPOINTS.filter(e => e.cluster !== 'mainnet-beta'),
-      ],
-      endpoint: computed(() => connectionStore.endpoint),
-      select: (e: Endpoint) => {
-        if (connected && connectionStore.cluster !== e.cluster) {
-          disconnect()
-          if (autoConnect.value) {
-            connect()
-          }
-        }
-        connectionStore.setRpc(e.id)
-      },
+const connectionStore = useConnectionStore()
+
+const wallet = useClientWallet()
+
+const groups = [
+  ENDPOINTS.filter(e => e.cluster === 'mainnet-beta'),
+  // ENDPOINTS.filter(e => e.cluster !== 'mainnet-beta'),
+]
+const endpoint = computed(() => connectionStore?.endpoint)
+function select(e: Endpoint) {
+  if (wallet?.connected && connectionStore?.cluster !== e.cluster) {
+    wallet?.disconnect()
+    if (wallet?.autoConnect.value) {
+      wallet?.connect()
     }
-  },
-})
+  }
+  connectionStore.setRpc(e.id)
+}
 </script>
 
 <template>
-  <q-btn-dropdown
+  <BDropdown
     class="app-header__cluster-btn"
-    :label="endpoint.name"
-    :model-value="false"
-    auto-close
-    color="white"
-    text-color="black"
-    rounded
-    unelevated
-    :ripple="false"
+    variant="outline"
+    offset="2"
   >
-    <q-list>
-      <template v-for="(items, index) in groups" :key="`${index}-cluster-group`">
-        <q-item v-for="item in items" :key="item.id" clickable @click="select(item)">
-          <q-item-section>
-            <q-item-label>
-              <b>{{ item.name }}</b>
-            </q-item-label>
-            {{ item.url }}
-          </q-item-section>
-        </q-item>
-        <q-separator v-if="index !== groups.length - 1" />
-      </template>
-    </q-list>
-  </q-btn-dropdown>
+    <template #button-content>
+      {{ endpoint.name }}
+    </template>
+    <template v-for="(items, index) in groups" :key="`${index}-cluster-group`">
+      <BDropdownItem v-for="item in items" :key="item.id" clickable class="cluster-select-menu__item" @click="select(item)">
+        <b>{{ item.name }}</b>
+        <br>
+        {{ item.url }}
+      </BDropdownItem>
+      <div v-if="index !== groups.length - 1" class="cluster-separator" />
+    </template>
+  </BDropdown>
 </template>
+
+<style lang="scss">
+.app-header__cluster-btn {
+  .btn.show {
+    border-color: transparent;
+  }
+  .cluster-select-menu__item {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+  }
+
+  .cluster-separator {
+    display: block;
+    height: 1px;
+    width: 100%;
+    border: 0;
+    background: rgba(0, 0, 0, 0.12);
+    margin: 0;
+  }
+
+  .dropdown-item:active {
+    background-color: lighten($primary, 10%);
+  }
+}
+</style>

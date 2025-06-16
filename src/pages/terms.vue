@@ -27,11 +27,11 @@
   -->
 
 <template>
-  <q-page>
-    <div class="container q-pb-xl">
+  <main>
+    <div class="container pt-3">
       <div class="page-title">
         TERMS OF USE
       </div>
     </div>
-  </q-page>
+  </main>
 </template>

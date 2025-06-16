@@ -25,12 +25,11 @@
  *
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
+
 import type { Adapter } from '@solana/wallet-adapter-base'
 import type { PublicKey } from '@solana/web3.js'
-import { Notify } from 'quasar'
-import { useWallet } from 'solana-wallets-vue'
-import { shortenAddress } from '~/utils'
 import { useEmitter } from './emitter'
+import { shortenAddress } from '~/utils'
 
 export const WALLET_CONNECT_EVENT = Symbol('WALLET_CONNECT_EVENT')
 export const WALLET_DISCONNECT_EVENT = Symbol('WALLET_DISCONNECT_EVENT')
@@ -42,7 +41,9 @@ const NOTIFICATION_TIMEOUT = 5000
 export function initWallet() {
   const { connection } = useConnectionStore()
   const { emit } = useEmitter()
-  const { wallet, connected } = useWallet()
+  const { wallet, connected } = useClientWallet()
+
+  const Toast = useToast()
 
   // Map to track cleanup functions for each registered public key
   const cleanup = new Map<string, () => void>()
@@ -75,7 +76,7 @@ export function initWallet() {
   }
 
   function unregisterAccountChange() {
-    for (const [, fn] of cleanup) {
+    for (const [,fn] of cleanup) {
       fn()
     }
     cleanup.clear()
@@ -87,14 +88,16 @@ export function initWallet() {
    * @param adapter WalletAdapter instance
    */
   const handleConnect = (adapter: Adapter) => {
-    const pk = adapter.publicKey
-    if (!pk) {
+    if (!adapter.publicKey) {
       return
     }
-    Notify.create({
-      message: 'Wallet Update',
-      caption: `Connected to wallet ${shortenAddress(String(pk), 7)}`,
-      timeout: NOTIFICATION_TIMEOUT,
+
+    Toast.create({
+      value: NOTIFICATION_TIMEOUT,
+      variant: 'info',
+      title: 'Wallet Update',
+      message: `Connected to wallet ${shortenAddress(String(adapter.publicKey), 7)}`,
+      noCloseButton: true,
     })
     emit(WALLET_CONNECT_EVENT, adapter)
   }
@@ -105,10 +108,12 @@ export function initWallet() {
    * @param adapter WalletAdapter instance
    */
   const handleDisconnect = (adapter: Adapter) => {
-    Notify.create({
-      message: 'Wallet Update',
-      caption: 'Disconnected from wallet',
-      timeout: NOTIFICATION_TIMEOUT,
+    Toast.create({
+      value: NOTIFICATION_TIMEOUT,
+      variant: 'info',
+      title: 'Wallet Update',
+      message: 'Disconnected from wallet',
+      noCloseButton: true,
     })
     emit(WALLET_DISCONNECT_EVENT, adapter)
   }
@@ -123,12 +128,13 @@ export function initWallet() {
       return
     }
     console.error('Wallet Error:', error.message)
-    // Notify.create({
-    //   type: 'negative',
-    //   message: 'Wallet Error',
-    //   caption: error.message,
-    //   timeout: NOTIFICATION_TIMEOUT,
-    // })
+    Toast.create({
+      value: NOTIFICATION_TIMEOUT,
+      variant: 'danger',
+      title: 'Wallet Error',
+      message: error.message,
+      noCloseButton: true,
+    })
     emit(WALLET_ERROR_EVENT, error)
   }
 
@@ -150,4 +156,24 @@ export function initWallet() {
       adapter.on('error', handleError)
     }
   }, 500), { immediate: true })
+
+  // watch(wallet, useDebounceFn((w) => {
+  //   if (!w) {
+  //     // Wallet is disconnected; no further action needed
+  //     return
+  //   }
+  //
+  //   if (publicKey.value) {
+  //     registerAccountChange(publicKey.value)
+  //   }
+  //
+  //   // w.adapter.once('connect', () => handleConnect(w.adapter))
+  //   w.adapter.once('disconnect', () => {
+  //     cleanupFunctions.forEach(cleanupFn => cleanupFn())
+  //     cleanupFunctions.clear()
+  //     handleDisconnect(w.adapter)
+  //   })
+  //   w.adapter.removeAllListeners('error')
+  //   w.adapter.on('error', handleError)
+  // }, 200), { immediate: true })
 }

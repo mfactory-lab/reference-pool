@@ -3,12 +3,12 @@ name: Deploy
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
       - public/**
       - src/**
 
-#env:
+# env:
 #  URL: example.com
 
 jobs:
@@ -27,9 +27,9 @@ jobs:
 
       - name: Build
         run: |
-          pnpm run build:staging
+          pnpm run build:ssg
           cp dist/index.html dist/404.html
-#          echo ${{ env.URL }} > dist/CNAME
+      #          echo ${{ env.URL }} > dist/CNAME
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.3.3

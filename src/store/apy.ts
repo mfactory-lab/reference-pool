@@ -26,98 +26,49 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import { useLocalStorage } from '@vueuse/core'
-import axios from 'axios'
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
-import { APY_VALIDATOR_ID, DEFAULT_APY } from '~/config'
+import { API2_URL } from '~/config'
 
-type ApyValidatorInfo = {
-  id: string
-  vote: string
-  apy: number
-}
-
-type ApyInfo = {
-  beginTimestamp: number
-  collectionTimestamp: number
-  endTimestamp: number
-  firstEpoch: number
-  isEstimated: boolean
-  lastEpoch: number
-  validators: ApyValidatorInfo[]
+type ApyData = {
+  staking: number
+  jito: number
+  defi: number
+  total: number
 }
 
 export const useApyStore = defineStore('apy', () => {
-  const validatorStore = useValidatorStore()
-  const epochStore = useEpochStore()
-
-  const apyInfo = useLocalStorage<ApyInfo>('apy', {
-    beginTimestamp: 0,
-    collectionTimestamp: 0,
-    endTimestamp: 0,
-    firstEpoch: 0,
-    isEstimated: false,
-    lastEpoch: 0,
-    validators: [],
+  const apy = ref<ApyData>({
+    staking: 0,
+    jito: 0,
+    defi: 0,
+    total: 0,
   })
-  const selectedApy = ref()
-  const apyLoading = ref(!apyInfo.value?.lastEpoch)
 
-  const voteIds = computed(() => validatorStore.voteIds)
-  const epochInfo = computed(() => epochStore.epochInfo)
+  const loading = ref(false)
 
-  watch([epochInfo, voteIds], async ([epochInfo, ids]) => {
-    if (!epochInfo?.epoch || ids.length === 0) {
-      apyLoading.value = false
-      return
-    }
-
-    if (apyInfo.value?.lastEpoch === epochInfo.epoch) {
-      console.log('[APY] Skip loading...')
-      apyLoading.value = false
-      return
-    }
-    console.log('[APY] Loading apy info...')
-    apyLoading.value = true
+  const getApy = async () => {
     try {
-      const res = await loadApyInfo('prev10')
-      apyInfo.value = {
-        ...res,
-        validators: res?.validators.filter(v => ids.includes(v.vote)) ?? [],
-      }
-      // use APY from selected validator
-      if (APY_VALIDATOR_ID) {
-        const apyValidator = res?.validators.find(v => v.id === APY_VALIDATOR_ID)
-        if (apyValidator) {
-          selectedApy.value = apyValidator.apy
-        }
-      }
+      loading.value = true
+      const res = await fetch(`${API2_URL}/apy`)
+      apy.value = await res.json()
+    } catch (error) {
+      console.log('APY fetch error', error)
     } finally {
-      apyLoading.value = false
+      loading.value = false
     }
-  })
+  }
 
-  const apy = computed<number>(() => {
-    const validators = apyInfo.value?.validators ?? []
-    if (validators.length === 0) {
-      return DEFAULT_APY
-    }
-    if (selectedApy.value) {
-      return selectedApy.value
-    }
-    const sumApy = validators.reduce((sum, v) => sum + v.apy, 0)
-    return sumApy / validators.length
+  onMounted(async () => {
+    await getApy()
   })
 
   return {
-    apyInfo,
-    apyLoading,
     apy,
+    loading,
   }
 })
 
-export async function loadApyInfo(type: string | number = 'prev3'): Promise<ApyInfo> {
-  const res = await axios.get(`https://stakeview.app/apy/${type}.json`)
-  return res.data
+export type Apy = {
+  staking: number
+  jito: number
 }

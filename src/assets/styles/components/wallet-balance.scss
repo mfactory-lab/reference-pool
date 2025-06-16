@@ -1,0 +1,190 @@
+/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+
+// Wallet Balance
+.wallet-balance {
+  position: relative;
+
+  @media (min-width: $breakpoint-sm) {
+    min-height: 322px;
+  }
+
+  @media (max-width: $breakpoint-xs) {
+    margin-bottom: 20px;
+  }
+
+  &__head {
+    padding: 8px 24px;
+    background-color: $gray;
+    font-size: 20px;
+    font-weight: 400;
+    height: 50px;
+    padding-top: 11px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 12px 12px 0 0;
+  }
+
+  &__body {
+    padding: 8px 16px 0;
+
+    @media (max-width: $breakpoint-sm) {
+      padding-bottom: 8px;
+    }
+  }
+
+  &__title {
+    position: relative;
+    text-align: right;
+
+    &::before {
+      content: '';
+      position: absolute;
+      height: 1px;
+      background-color: #5c5c5c;
+      top: 50%;
+      left: 0;
+      width: 100%;
+    }
+
+    .q-badge {
+      position: relative;
+      z-index: 2;
+      background-color: #5c5c5c;
+      padding-left: 10px;
+      padding-right: 10px;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+  }
+
+  &__staking {
+    &__title {
+      margin: 9px -16px 7px;
+      padding: 6px 20px;
+      background: $primary;
+      color: $gray;
+      text-align: right;
+      font-size: 16px;
+      line-height: 16px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+  }
+
+  .balance__item {
+    height: 42px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    .dialog-btn {
+      height: 22px;
+      padding: 0 16px;
+      text-transform: uppercase;
+      font-size: 10px;
+      margin-right: auto;
+      color: #455a64;
+    }
+  }
+
+  .balance__token {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 80px;
+    color: $dark;
+    font-size: 18px;
+
+    svg,
+    img {
+      height: 36px;
+      min-height: 36px;
+      width: 36px;
+      min-width: 36px;
+    }
+
+    span {
+      text-align: right;
+    }
+  }
+
+  .balance__value {
+    text-align: right;
+    font-size: 17px;
+    line-height: 18px;
+    color: #5c5c5c;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    margin-right: 10px;
+
+    &__usd {
+      color: $lightGray;
+      font-size: 12px;
+      line-height: 14px;
+    }
+  }
+
+  .table {
+    border: 0;
+    margin: 0;
+    font-size: 20px;
+
+    td {
+      border-color: #d0d0d0;
+    }
+
+    tr {
+      &:first-child {
+        td {
+          border: 0;
+        }
+      }
+    }
+
+    .col-amount {
+      color: #5c5c5c;
+    }
+
+    .col-name {
+      color: #000;
+      width: 1%;
+    }
+
+    .col-icon {
+      width: 1%;
+
+      img {
+        width: 30px;
+      }
+    }
+  }
+}

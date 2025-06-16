@@ -26,31 +26,22 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
+<script lang="ts" setup>
 import { formatAmount, lamportsToSol } from '~/utils'
 
-export default {
-  setup() {
-    const coinRateStore = useCoinRateStore()
-    const connectionStore = useConnectionStore()
-    const stakePoolStore = useStakePoolStore()
-    const stakePool = toRef(stakePoolStore, 'stakePool')
+const coinRateStore = useCoinRateStore()
+const connectionStore = useConnectionStore()
+const stakePoolStore = useStakePoolStore()
+const stakePool = toRef(stakePoolStore, 'stakePool')
 
-    const solStaked = computed(() =>
-      lamportsToSol(stakePool.value?.totalLamports.toNumber() ?? 0),
-    )
-    const usdStacked = computed(() => solStaked.value * coinRateStore.solPrice)
+const solStaked = computed(() =>
+  lamportsToSol(stakePool.value?.totalLamports.toNumber() ?? 0),
+)
+const usdStacked = computed(() => solStaked.value * coinRateStore.solPrice)
 
-    const maxSolToStake = computed(() => connectionStore.stakeLimit ?? 0)
+const maxSolToStake = computed(() => connectionStore.stakeLimit ?? 0)
 
-    return {
-      maxSolToStake,
-      solStaked,
-      usdStacked,
-      formatPrice: (v: number) => formatAmount(v, 1),
-    }
-  },
-}
+const formatPrice = (v: number) => formatAmount(v, 1)
 </script>
 
 <template>
@@ -88,7 +79,7 @@ export default {
   &__value {
     padding-right: 15px;
     padding-left: 50px;
-    font-weight: 700;
+    font-weight: 500;
     position: relative;
 
     @media (min-width: $breakpoint-md) {
@@ -98,7 +89,6 @@ export default {
 
     &::before {
       content: '';
-      //noinspection CssUnknownTarget
       background: url(~/assets/img/sol-gray-logo.svg) no-repeat center center;
       background-size: contain;
       width: 33px;

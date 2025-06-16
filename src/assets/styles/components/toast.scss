@@ -1,0 +1,174 @@
+/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+
+.toast {
+  margin-bottom: 4px;
+  border-radius: 9px !important;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 500;
+
+  .progress-bar {
+    background-color: $primary;
+  }
+
+  .toast-body {
+    padding: 12px 16px;
+  }
+
+  .toast-message {
+    overflow: hidden;
+  }
+
+  .toast-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toast-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    .btn-close {
+      margin-bottom: auto;
+    }
+  }
+
+  .toast-title {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px;
+    padding-bottom: 9px;
+  }
+
+  .toast-actions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 24px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 16px;
+  }
+
+  .toast-icon {
+    width: 16px;
+    height: 16px;
+    margin: 0 0 auto;
+  }
+
+  &.toast-info {
+    background-color: $neutral-50;
+    border: 1px solid $neutral-300;
+    color: $neutral-600;
+
+    .btn-close {
+      background-color: $neutral-600;
+    }
+
+    a {
+      color: $neutral-600;
+    }
+  }
+
+  &.toast-success {
+    background-color: $green-50;
+    border: 1px solid $success;
+    color: $success;
+
+    .btn-close {
+      background-color: $success;
+    }
+
+    a {
+      color: $success;
+    }
+  }
+
+  &.toast-warning {
+    background-color: $orange-50;
+    border: 1px solid $warning;
+    color: $warning;
+
+    .btn-close {
+      background-color: $warning;
+    }
+
+    a {
+      color: $warning;
+    }
+  }
+
+  &.toast-danger {
+    background-color: $red-50;
+    border: 1px solid $danger;
+    color: $danger;
+
+    .btn-close {
+      background-color: $danger;
+    }
+
+    a {
+      color: $danger;
+    }
+  }
+}
+
+body.body--dark {
+  .toast {
+    &.toast-info {
+      background-color: $neutral-900;
+      border-color: $neutral-600;
+      color: $neutral-400;
+
+      .btn-close {
+        background-color: $neutral-400;
+      }
+    }
+
+    &.toast-warning {
+      background-color: $orange-900;
+    }
+
+    &.toast-success {
+      background-color: $green-900;
+    }
+
+    &.toast-danger {
+      background-color: $red-900;
+      border-color: $negative;
+      color: $negative;
+    }
+  }
+}

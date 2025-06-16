@@ -26,6 +26,10 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-export const TELEGRAM_ANNOUNCEMENT_URL = import.meta.env.VITE_TELEGRAM_ANNOUNCEMENT_URL
+import { getRuntimeConfig } from '~/utils'
 
-export const GTAG_ID = import.meta.env.VITE_GTAG_ID
+const config = getRuntimeConfig()
+
+export const TELEGRAM_ANNOUNCEMENT_URL = config.TELEGRAM_ANNOUNCEMENT_URL
+
+export const GTAG_ID = config.GTAG_ID

@@ -26,12 +26,12 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import type { Commitment } from '@solana/web3.js'
-import { useQuasar } from 'quasar'
-import { ref, toRef } from 'vue'
+import type { Commitment, TransactionInstruction } from '@solana/web3.js'
+import { Transaction } from '@solana/web3.js'
+// import { Notify } from 'quasar'
 import {
   DEFAULT_CONFIRM_TIMEOUT,
-  DEFAULT_MONITOR_COMMITMENT,
+  // DEFAULT_MONITOR_COMMITMENT,
   DEFAULT_SEND_TIMEOUT,
   TELEGRAM_ANNOUNCEMENT_URL,
 } from '~/config'
@@ -46,12 +46,74 @@ type MonitorTransactionParams = {
   idx?: string
 }
 
+/**
+ * Estimate the size of a created account based on the program ID of the instruction.
+ * @param instruction The instruction to estimate the size for.
+ * @returns The estimated size of the created account in bytes.
+ */
+async function estimateAccountSize(instruction: TransactionInstruction): Promise<number> {
+  // Logic for various instructions, for example:
+  // - If this is an instruction to create a token account, return 165 bytes.
+  // - If this is an instruction to create metadata, return 512 bytes.
+  const createAccountSizeMap: { [programId: string]: number } = {
+    TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: 165, // Token account
+    TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: 165, // Token account
+    metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s: 512, // NFT metadata account
+  }
+
+  return createAccountSizeMap[instruction.programId.toBase58()] || 0
+}
+
 export function useMonitorTransaction() {
   const connectionStore = useConnectionStore()
-  const { notify } = useQuasar()
+  const { publicKey } = useClientWallet()
+
+  const Toast = useToast()
 
   const cluster = toRef(connectionStore, 'cluster')
   const sending = ref(false)
+
+  async function hasSufficientBalance(
+    instructions: TransactionInstruction[],
+  ) {
+    try {
+      const balanceLamports = await connectionStore.connection.getBalance(publicKey.value!)
+
+      const transaction = new Transaction().add(...instructions)
+      transaction.feePayer = publicKey.value!
+
+      const { blockhash } = await connectionStore.connection.getLatestBlockhash()
+      transaction.recentBlockhash = blockhash
+
+      const message = transaction.compileMessage()
+      const transactionFee = await connectionStore.connection.getFeeForMessage(message)
+
+      let totalCostLamports = transactionFee.value ?? 0
+
+      for (const instruction of instructions) {
+        for (const accountMeta of instruction.keys) {
+          if (accountMeta.isWritable && accountMeta.isSigner) {
+            const accountInfo = await connectionStore.connection.getAccountInfo(accountMeta.pubkey)
+            if (!accountInfo) {
+              const requiredSize = await estimateAccountSize(instruction)
+              const rentExemptBalance = await connectionStore.connection.getMinimumBalanceForRentExemption(requiredSize)
+              totalCostLamports += rentExemptBalance
+            }
+          }
+        }
+      }
+
+      const passes = Number(balanceLamports) >= Number(totalCostLamports)
+      if (!passes) {
+        throw new Error('Not enough funds for transaction')
+      }
+    } catch (error) {
+      Toast.create({
+        message: String(error),
+        variant: 'danger',
+      })
+    }
+  }
 
   async function monitorTransaction(
     signatureOrPromise: Promise<string> | string,
@@ -59,40 +121,42 @@ export function useMonitorTransaction() {
       onSuccess,
       onError,
       idx,
-      commitment = DEFAULT_MONITOR_COMMITMENT,
+      commitment, // = 'confirmed',
       sendTimeout = DEFAULT_SEND_TIMEOUT,
       confirmTimeout = DEFAULT_CONFIRM_TIMEOUT,
     }: MonitorTransactionParams = {},
   ): Promise<void> {
     idx = idx ?? ''
 
-    let dismiss = notify({
-      progress: true,
-      type: 'ongoing',
+    // const dismiss = Notify.create({
+    //   progress: true,
+    //   type: 'ongoing',
+    //   message: idx ? `Sending transaction "${idx}" ...` : 'Sending transaction...',
+    //   timeout: sendTimeout,
+    // })
+
+    let toast = Toast.create({
+      value: sendTimeout,
+      variant: 'info',
       message: idx ? `Sending transaction "${idx}" ...` : 'Sending transaction...',
-      timeout: sendTimeout,
+      progressProps: {
+        variant: 'gray',
+      },
     })
 
     sending.value = true
-
-    const closeAction = {
-      label: 'Close',
-      color: 'white',
-    }
 
     let signature = ''
     try {
       signature = String(await signatureOrPromise)
     } catch (error: any) {
       sending.value = false
-      dismiss()
-      if (!String(error?.message).startsWith('User rejected')) {
-        notify({
-          message: idx ? `Transaction "${idx}" error` : 'Transaction error',
-          caption: error?.message,
-          type: 'negative',
-          timeout: 0,
-          actions: [closeAction],
+      toast.dismiss()
+      if (error?.message && !String(error?.message).startsWith('User rejected')) {
+        Toast.create({
+          variant: 'danger',
+          message: error?.message,
+          title: idx ? `Transaction "${idx}" error` : 'Transaction error',
         })
       }
       return
@@ -103,43 +167,56 @@ export function useMonitorTransaction() {
 
     const exploreAction = {
       label: 'Explore',
-      color: 'white',
       target: '_blank',
       href: explorerUrl,
-      onClick: () => false,
     }
 
     const telegramAction = {
       label: 'Telegram',
-      color: 'white',
       target: '_blank',
-      href: TELEGRAM_ANNOUNCEMENT_URL,
+      href: String(TELEGRAM_ANNOUNCEMENT_URL),
     }
 
     try {
-      dismiss()
+      // dismiss()
+      toast.dismiss()
 
-      dismiss = notify({
-        // spinner: true,
-        progress: true,
-        type: 'ongoing',
+      // dismiss = Notify.create({
+      //   // spinner: true,
+      //   progress: true,
+      //   type: 'ongoing',
+      //   message: idx ? `Confirming transaction "${idx}" ...` : 'Confirming transaction...',
+      //   actions: [exploreAction],
+      //   timeout: confirmTimeout,
+      // })
+
+      toast = Toast.create({
+        variant: 'info',
         message: idx ? `Confirming transaction "${idx}" ...` : 'Confirming transaction...',
+        value: confirmTimeout,
+        progressProps: {
+          variant: 'gray',
+        },
         actions: [exploreAction],
-        timeout: confirmTimeout,
       })
-      const res = await connectionStore.connection.confirmTransaction(signature, commitment)
 
-      dismiss()
+      const latestBlockHash = await connectionStore.connection.getLatestBlockhash()
+      const res = await connectionStore.connection.confirmTransaction({
+        blockhash: latestBlockHash.blockhash,
+        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+        signature,
+      }, commitment)
+
+      toast.dismiss()
 
       if (res.value.err) {
-        // console.error(res.value.err)
-        // noinspection ExceptionCaughtLocallyJS
         throw new Error(JSON.stringify(res.value.err))
       }
 
-      dismiss = notify({
+      Toast.create({
+        value: 0,
+        variant: 'success',
         message: idx ? `Transaction "${idx}" confirmed` : 'Transaction confirmed',
-        type: 'positive',
         actions: [exploreAction],
       })
 
@@ -147,13 +224,19 @@ export function useMonitorTransaction() {
         onSuccess(signature)
       }
     } catch (error: any) {
-      dismiss()
-      notify({
-        message: idx ? `Transaction "${idx}" error` : 'Transaction error',
-        caption: error.message,
-        type: 'negative',
-        timeout: 0,
-        actions: [exploreAction, telegramAction, closeAction],
+      toast.dismiss()
+
+      let message = error.message
+      if (message.includes('block height exceeded')) {
+        message = `<span>${message}</span><br><strong>Change fee</strong>`
+      }
+
+      Toast.create({
+        title: idx ? `Transaction "${idx}" error` : 'Transaction error',
+        message,
+        actions: [exploreAction, telegramAction],
+        value: 0,
+        variant: 'danger',
       })
 
       if (onError) {
@@ -165,5 +248,9 @@ export function useMonitorTransaction() {
     }
   }
 
-  return { monitorTransaction, sending }
+  return {
+    monitorTransaction,
+    hasSufficientBalance,
+
+    sending }
 }

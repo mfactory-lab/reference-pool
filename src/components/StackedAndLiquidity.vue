@@ -26,19 +26,13 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
+<script lang="ts" setup>
 import { lamportsToSol, priceFormatter } from '~/utils'
 
-export default defineComponent({
-  setup() {
-    const stakePoolStore = useStakePoolStore()
-    return {
-      reserveStakeBalance: computed(() =>
-        priceFormatter.format(lamportsToSol(stakePoolStore.reserveStakeBalance)),
-      ),
-    }
-  },
-})
+const stakePoolStore = useStakePoolStore()
+const reserveStakeBalance = computed(() =>
+  priceFormatter.format(lamportsToSol(stakePoolStore.reserveStakeBalance || 0)),
+)
 </script>
 
 <template>

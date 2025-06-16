@@ -1,0 +1,218 @@
+/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+
+// Firstlook Section
+
+.firstlook-section {
+  padding-top: 55px;
+  padding-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+
+  @media (max-width: $breakpoint-sm) {
+    padding-top: 0;
+  }
+
+  .total-stacked-alter {
+    display: none;
+
+    @media (max-width: $breakpoint-xs) {
+      display: flex;
+    }
+  }
+
+  .firstlook__epoch {
+    display: none;
+
+    @media (max-width: $breakpoint-sm) {
+      display: flex;
+      margin: 20px 0 40px;
+    }
+  }
+
+  .firstlook__wallet {
+    width: 33.3%;
+
+    @media (max-width: $breakpoint-sm) {
+      width: 100%;
+    }
+  }
+}
+
+.firstlook__body {
+  position: relative;
+  background: url(~/assets/img/bg-sol-part.svg) no-repeat 15px center;
+  background-size: contain;
+  padding: 30px 0;
+  display: flex;
+
+  @media (max-width: $breakpoint-sm) {
+    background-position: center center;
+    flex-direction: column;
+  }
+}
+
+.firstlook {
+  &__wallet,
+  &__stake-box {
+    @media (max-width: $breakpoint-sm) {
+      padding: 0 !important;
+    }
+  }
+
+  &__stake-box {
+    width: 66.6%;
+    margin-left: auto;
+
+    @media (max-width: $breakpoint-sm) {
+      width: 100%;
+    }
+  }
+
+  &__cards {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 26px;
+
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column;
+      gap: 46px;
+    }
+  }
+
+  &__epoch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: -10px auto 20px;
+
+    @media (max-width: $breakpoint-xs) {
+      margin: 0 auto 45px;
+    }
+
+    .apy {
+      color: #000 !important;
+      margin-bottom: 5px;
+
+      .q-inner-loading {
+        background: none;
+      }
+    }
+  }
+
+  &__placeholder {
+    position: absolute;
+    box-shadow:
+      0 1px 5px rgb(0 0 0 / 20%),
+      0 2px 2px rgb(0 0 0 / 14%),
+      0 3px 1px -2px rgb(0 0 0 / 12%);
+    border-radius: 50%;
+    background: #fff;
+    width: 230px;
+    height: 230px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    transform: translateY(-50%);
+
+    &__icon {
+      height: 115px;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      display: none;
+    }
+  }
+}
+
+.faq-section {
+  position: relative;
+  margin: 0 !important;
+  padding-bottom: 40px;
+}
+
+.faq-list {
+  margin-top: 35px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.faq-item {
+  margin-bottom: 30px;
+  padding: 30px 40px;
+  border-radius: 12px;
+  background-color: rgb($gray, 0.05);
+
+  @media (max-width: $breakpoint-sm) {
+    width: 100%;
+    padding: 15px 20px;
+  }
+
+  &__title {
+    font-size: 20px;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  &__body {
+    font-size: 14px;
+    line-height: 1.1;
+  }
+
+  a {
+    color: #000;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Dark Mode
+
+body.body--dark {
+  .firstlook-section {
+    &::before {
+      @include bgWave($dark-page);
+    }
+  }
+
+  .team-section {
+    &::before {
+      @include bgWave($dark-page);
+    }
+  }
+
+  .faq-section {
+    background-color: $dark;
+  }
+}

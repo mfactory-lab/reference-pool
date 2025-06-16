@@ -27,20 +27,21 @@
  */
 
 import { depositSol, depositStake } from '@solana/spl-stake-pool/src'
+import { useAnchorWallet } from '@solana/wallet-adapter-vue'
+import type { PublicKeyInitData } from '@solana/web3.js'
 import { PublicKey, StakeProgram } from '@solana/web3.js'
-import { useQuasar } from 'quasar'
-import { useAnchorWallet } from 'solana-wallets-vue'
 import { computed, ref, toRef } from 'vue'
 import type { ProgramAccount } from '~/store'
 import { formatAmount, sendTransaction, solToLamports } from '~/utils'
 
 export function useDeposit() {
-  const { notify } = useQuasar()
   const connectionStore = useConnectionStore()
   const stakePoolStore = useStakePoolStore()
   const balanceStore = useBalanceStore()
   const { monitorTransaction, sending } = useMonitorTransaction()
-  const wallet = useAnchorWallet()
+  const wallet = import.meta.client ? useAnchorWallet() : ref(null)
+
+  const Toast = useToast()
 
   const lamportsPerSignature = toRef(stakePoolStore, 'lamportsPerSignature')
   const stakePool = toRef(stakePoolStore, 'stakePool')
@@ -106,7 +107,10 @@ export function useDeposit() {
 
         return success
       } catch (error: any) {
-        notify({ message: error.message, type: 'negative' })
+        Toast.create({
+          message: error.message,
+          variant: 'danger',
+        })
         throw error
       } finally {
         loading.value = false
@@ -158,7 +162,10 @@ export function useDeposit() {
 
         return true
       } catch (error: any) {
-        notify({ message: error.message, type: 'negative' })
+        Toast.create({
+          message: error.message,
+          variant: 'danger',
+        })
         throw error
       } finally {
         loading.value = false
@@ -169,7 +176,7 @@ export function useDeposit() {
      * @param stakePubkey
      * @param voterKey
      */
-    delegateAccount: async (stakePubkey, voterKey) => {
+    delegateAccount: async (stakePubkey: PublicKey, voterKey: PublicKeyInitData) => {
       if (!wallet.value?.publicKey) {
         console.log('Wallet is not connected.')
         return
@@ -185,7 +192,10 @@ export function useDeposit() {
           sendTransaction(connectionStore.connection, wallet.value, transaction.instructions, []),
         )
       } catch (error: any) {
-        notify({ message: error.message, type: 'negative' })
+        Toast.create({
+          message: error.message,
+          variant: 'danger',
+        })
         throw error
       }
     },

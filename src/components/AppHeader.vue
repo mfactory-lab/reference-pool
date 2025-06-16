@@ -29,31 +29,28 @@
 <script setup lang="ts">
 import logoImg from '~/assets/img/customize/app-logo.svg'
 import { APP_LOGO } from '~/config'
+
+const logo = computed(() => APP_LOGO || logoImg)
 </script>
 
 <template>
-  <q-header :class="!$q.dark.isActive ? 'bg-white text-dark' : null" class="app-header">
+  <header>
     <div class="container">
-      <q-toolbar>
-        <router-link class="app-header__logo" to="/">
-          <img v-if="!!APP_LOGO" alt="app-logo" :src="APP_LOGO">
-          <img v-else alt="app-logo" :src="logoImg">
-        </router-link>
+      <div class="app-header">
+        <NuxtLink class="app-header__logo" to="/">
+          <img alt="app-logo" :src="String(logo)">
+        </NuxtLink>
         <div class="xs-hide">
           <stacked-and-liquidity />
         </div>
-        <q-space />
         <div class="app-header__epoch">
           <epoch />
         </div>
-        <q-space />
-        <div class="text-right">
-          <div class="q-gutter-sm justify-end flex wrap">
-            <cluster-selector />
-            <connect-wallet />
-          </div>
+        <div class="app-header__actions">
+          <cluster-selector />
+          <connect-wallet />
         </div>
-      </q-toolbar>
+      </div>
     </div>
-  </q-header>
+  </header>
 </template>

@@ -26,136 +26,154 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import type { StakeActivationData } from '@solana/web3.js'
-import type { ProgramAccount } from '~/store'
+<script lang="ts" setup>
 import { formatAmount, lamportsToSol, shortenAddress } from '~/utils'
 
-export default defineComponent({
-  props: {
-    loading: Boolean,
-    onlyDeposit: {
-      type: Boolean,
-      default: false,
-    },
-    stakeAccount: {
-      type: Object as () => ProgramAccount,
-      required: true,
-    },
-  },
-  emits: ['deposit', 'deactivate', 'withdraw'],
-  setup(props, { emit }) {
-    const connectionStore = useConnectionStore()
-    const stakeActivation = ref<StakeActivationData>()
-    const stateLoading = ref(true)
+const {
+  loading,
+  onlyDeposit,
+  account,
+} = defineProps<{
+  loading?: boolean
+  onlyDeposit?: boolean
+  account: StakeAccountWithState
+}>()
 
-    watchEffect(async () => {
-      stateLoading.value = true
-      stakeActivation.value = await connectionStore.connection!.getStakeActivation(
-        props.stakeAccount.pubkey,
-      )
-      stateLoading.value = false
-    })
+const emit = defineEmits(['deposit', 'deactivate', 'withdraw'])
 
-    return {
-      address: computed(() => props.stakeAccount.pubkey.toBase58()),
-      voter: computed(
-        () => props.stakeAccount.account.data?.parsed?.info?.stake?.delegation?.voter,
-      ),
-      shortAddress: computed(() => shortenAddress(props.stakeAccount.pubkey.toBase58())),
-      amount: computed(() => {
-        return formatAmount(lamportsToSol(props.stakeAccount?.account?.lamports ?? 0))
-      }),
-      lamports: computed(() => props.stakeAccount?.account?.lamports),
-      state: computed(() => stakeActivation.value?.state),
-      stateColor: computed(() => {
-        switch (stakeActivation.value?.state) {
-          case 'active':
-            return 'positive'
-          case 'inactive':
-            return 'negative'
-          default:
-            return 'grey'
-        }
-      }),
-      stateLoading,
-      deposit() {
-        emit('deposit', props.stakeAccount)
-      },
-      deactivate(address: string) {
-        emit('deactivate', address)
-      },
-      withdraw(address: string, lamports: number) {
-        emit('withdraw', address, lamports)
-      },
-    }
-  },
+const address = computed(() => account.stakeAccount.pubkey.toBase58())
+
+const shortAddress = computed(() => shortenAddress(account.stakeAccount.pubkey.toBase58()))
+const amount = computed(() => {
+  return formatAmount(lamportsToSol(account.stakeAccount?.account?.lamports ?? 0))
 })
+const lamports = computed(() => account.stakeAccount?.account?.lamports)
+const state = computed(() =>
+  account.stakeAccount.account.data?.parsed?.type === 'delegated'
+    ? account.state
+    : 'not delegated',
+)
+
+const stateColor = computed(() => {
+  switch (account.state) {
+    case 'active':
+      return 'positive'
+    case 'inactive':
+      return 'negative'
+    default:
+      return 'grey'
+  }
+})
+
+// function deposit() {
+//   emit('deposit', account.stakeAccount)
+// }
+
+function deactivate(address: string) {
+  emit('deactivate', address)
+}
+
+function withdraw(address: string, lamports: number) {
+  emit('withdraw', address, lamports)
+}
 </script>
 
 <template>
-  <div class="q-item q-item-type row">
-    <div class="col-12 col-sm-6">
-      <q-item-label>
+  <div class="stake-acc__item">
+    <div class="stake-acc__info">
+      <div class="stake-acc__info-address">
         <copy-to-clipboard :text="address" />
-        <span class="q-mx-sm">{{ shortAddress }}</span>
-        <!-- {{ voter }} -->
-        <q-badge :color="stateColor">
+        <span>{{ shortAddress }}</span>
+        <div class="status-badge" :class="[`status-badge--${stateColor}`]">
           {{ state }}
-        </q-badge>
-      </q-item-label>
-      <q-item-label caption>
+        </div>
+      </div>
+      <div class="stake-acc__info-amount">
         {{ amount }} SOL
-      </q-item-label>
+      </div>
     </div>
-    <div class="col-12 col-sm-6">
-      <q-btn-group rounded unelevated>
-        <template v-if="state === 'active'">
-          <q-btn color="primary" @click="deposit">
-            DEPOSIT
-          </q-btn>
-          <template v-if="!onlyDeposit">
-            <q-btn color="primary-gray" @click="deactivate(address)">
-              DEACTIVATE
-            </q-btn>
-          </template>
-        </template>
-        <template v-else>
-          <q-btn
-            :disabled="state === 'deactivating'"
-            color="secondary"
-            text-color="dark"
-            @click="withdraw(address, lamports)"
+    <div class="stake-acc__item__action">
+      <template v-if="state === 'active'">
+        <template v-if="!onlyDeposit">
+          <j-btn
+            :loading="loading"
+            size="sm"
+            variant="primary"
+            pill
+            @click="deactivate(address)"
           >
-            WITHDRAW
-          </q-btn>
+            DEACTIVATE
+          </j-btn>
         </template>
-      </q-btn-group>
+      </template>
+      <template v-else>
+        <j-btn
+          :loading="loading"
+          size="sm"
+          pill
+          :disabled="state === 'deactivating'"
+          variant="secondary"
+          @click="withdraw(address, lamports)"
+        >
+          WITHDRAW
+        </j-btn>
+      </template>
     </div>
-
-    <q-inner-loading :showing="loading || stateLoading">
-      <q-spinner color="primary" />
-    </q-inner-loading>
   </div>
 </template>
 
-<style scoped lang="scss">
-  .q-item {
-  .q-btn-group {
-    margin-left: 1.5rem;
+<style lang="scss">
+.stake-acc {
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-  .q-btn {
-    font-size: 0.7rem;
-  }
-  @media (max-width: $breakpoint-xs-max) {
-    text-align: center;
-    .q-btn-group {
-      margin: 0.5rem 0 0;
+
+  &__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    &-address {
+      display: flex;
+      align-content: center;
+      gap: 4px;
+
+      [class*='tooltip'] {
+        display: flex;
+        align-items: center;
+      }
     }
-  }
-  @media (min-width: $breakpoint-xs) {
-    .q-btn-group {
-      float: right;
+
+    &-amount {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 16px;
+      color: $neutral-300;
+    }
+
+    .status-badge {
+      height: fit-content;
+      padding: 2px 6px;
+      border-radius: 50px;
+      margin-left: 8px;
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      color: #fff;
+
+      &--positive {
+        background-color: $success;
+      }
+
+      &--negative {
+        background-color: $negative;
+      }
+
+      &--grey {
+        background-color: $neutral-300;
+      }
     }
   }
 }

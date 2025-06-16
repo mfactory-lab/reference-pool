@@ -1,0 +1,192 @@
+/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+
+.j-input {
+  width: 100%;
+
+  &__prepend {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+
+  &:focus,
+  &:focus-within {
+    .input-group {
+      border-color: $primary;
+    }
+  }
+
+  .input-group {
+    height: 42px;
+    padding: 0 12px;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap;
+    gap: 16px;
+    border: 1px solid $gray;
+    border-radius: 12px;
+    width: auto !important;
+
+    &.j-input--error {
+      border-color: $negative;
+    }
+  }
+
+  .input-group-lg {
+    height: 58px;
+    padding: 0 16px;
+
+    .form-control {
+      height: 24px;
+      font-size: 24px;
+      line-height: 24px;
+    }
+
+    .input-wrapper {
+      gap: 4px;
+    }
+  }
+
+  .input-group-sm {
+    height: 38px;
+    padding: 0 8px;
+
+    .form-control {
+      height: 20px;
+      font-size: 16px;
+      line-height: 16px;
+    }
+
+    .input-wrapper__label {
+      font-size: 11px;
+    }
+  }
+
+  .form-control {
+    border: none;
+    padding: 0 !important;
+    font-weight: 400;
+    color: $dark;
+    height: 20px;
+    font-size: 16px;
+    line-height: 16px;
+    background: transparent;
+    margin-top: -2px;
+    border-radius: 0;
+
+    &:focus {
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+  .input-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &__label {
+      color: $neutral-400;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 12px;
+    }
+  }
+
+  .j-input__label {
+    color: $neutral-600;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    padding-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .j-input__desc {
+    color: $neutral-300;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+    padding-top: 8px;
+
+    &.hide {
+      opacity: 0;
+    }
+  }
+
+  .j-input__icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .j-input__btn {
+    height: 24px;
+    padding: 0 8px !important;
+  }
+
+  .validate-label {
+    color: $negative;
+    font-size: 12px;
+    position: absolute;
+    bottom: -22px;
+    left: 0;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+}
+
+body.body--dark {
+  .j-input {
+    .input-group {
+      &:not(.j-input--error) {
+        border-color: $neutral-800;
+      }
+    }
+
+    .j-input__label {
+      color: $neutral-400;
+    }
+
+    input {
+      color: #fff;
+
+      &::placeholder {
+        color: darken(#fff, 10%);
+      }
+    }
+  }
+}

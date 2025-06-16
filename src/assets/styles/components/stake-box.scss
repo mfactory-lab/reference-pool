@@ -1,0 +1,162 @@
+/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+
+.stake-box {
+  .card-header {
+    padding: 0;
+    overflow: hidden;
+    height: 50px;
+    border: none;
+    border-radius: 12px 12px 0 0 !important;
+
+    &-pills {
+      height: 100%;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin: 0;
+    }
+
+    .nav-link {
+      height: 100%;
+      border-radius: 0;
+      width: 100%;
+      color: $gray;
+      background: $primary;
+      font-size: 20px;
+      margin-top: 2px;
+      font-weight: 500;
+      text-align: left;
+      margin: 0;
+
+      &.active {
+        background: $gray;
+        color: #fff;
+      }
+    }
+  }
+
+  .top-section {
+    padding: 12px 0 2px;
+  }
+
+  .with-arrow {
+    position: relative;
+
+    &::before {
+      content: '';
+      background: #455a64 url(~/assets/img/arr-down.svg) no-repeat center center;
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 54px;
+      height: 54px;
+      border-radius: 100%;
+      z-index: 2;
+    }
+  }
+
+  .connect-wallet {
+    padding-left: 16px;
+  }
+
+  .stake-to-input {
+    .j-input {
+      .input-group {
+        border: none;
+      }
+      .form-control:disabled {
+        background: transparent;
+      }
+      .btn {
+        display: none;
+      }
+
+      &__desc {
+        display: none;
+      }
+    }
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: $gray;
+
+    @media (max-width: $breakpoint-xs) {
+      font-size: 11px;
+    }
+  }
+
+  &__rate {
+    font-size: 13px;
+    margin-right: 10px;
+    text-align: right;
+    color: $gray;
+
+    @media (max-width: $breakpoint-xs) {
+      font-size: 11px;
+    }
+  }
+
+  &__stake-info {
+    color: $gray;
+    margin-top: 4px;
+    font-size: 12px;
+  }
+
+  &__action {
+    display: flex;
+    justify-content: flex-end;
+
+    @media (max-width: $breakpoint-xs) {
+      margin-top: 12px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0 20px;
+      height: 52px;
+      font-size: 20px;
+      color: $gray;
+      box-shadow: 1px 2px 0 0 #00000033;
+
+      @media (max-width: $breakpoint-xs) {
+        margin-top: 8px;
+        font-size: 14px;
+        height: 38px;
+      }
+
+      &-content {
+        font-weight: 500;
+      }
+    }
+  }
+}

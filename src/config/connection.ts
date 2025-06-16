@@ -28,9 +28,12 @@
 
 import type { Commitment } from '@solana/web3.js'
 import type { Endpoint } from '~/store'
+import { getRuntimeConfig } from '~/utils'
 
-const MAIN_STAKE_POOL_ADDRESS = import.meta.env.VITE_MAIN_STAKE_POOL_ADDRESS
-const MAIN_STAKE_LIMIT = import.meta.env.VITE_MAIN_STAKE_LIMIT
+const config = getRuntimeConfig()
+
+const MAIN_STAKE_POOL_ADDRESS = config.MAIN_STAKE_POOL_ADDRESS
+const MAIN_STAKE_LIMIT = config.MAIN_STAKE_LIMIT
 
 // const TEST_STAKE_POOL_ADDRESS = import.meta.env.VITE_TEST_STAKE_POOL_ADDRESS
 // const TEST_STAKE_LIMIT = import.meta.env.VITE_TEST_STAKE_LIMIT
@@ -43,28 +46,28 @@ export const ENDPOINTS: Endpoint[] = [
     name: 'Helius RPC',
     cluster: 'mainnet-beta',
     url: 'https://marketa-1sh8m6-fast-mainnet.helius-rpc.com/',
-    stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
-    stakeLimit: Number(MAIN_STAKE_LIMIT),
+    stakePoolAddress: String(MAIN_STAKE_POOL_ADDRESS),
+    stakeLimit: Number(MAIN_STAKE_LIMIT || 1500000),
   },
   {
     id: 'mainnet',
     name: 'Solana Mainnet',
     cluster: 'mainnet-beta',
     url: 'https://api.mainnet-beta.solana.com',
-    stakePoolAddress: MAIN_STAKE_POOL_ADDRESS,
+    stakePoolAddress: String(MAIN_STAKE_POOL_ADDRESS),
     stakeLimit: 100_000,
   },
 ]
 
-if (import.meta.env.DEV) {
-  ENDPOINTS.push({
-    id: 'localnet',
-    name: 'LocalNet',
-    cluster: 'localnet',
-    url: 'http://127.0.0.1:8899',
-    stakePoolAddress: 'HYgufSTxQ8Ma6qgzQ8n2vD5gPTB7YgP5JjurYCgQqFPR',
-  })
-}
+// if (import.meta.env.DEV) {
+//   ENDPOINTS.push({
+//     id: 'localnet',
+//     name: 'LocalNet',
+//     cluster: 'localnet',
+//     url: 'http://127.0.0.1:8899',
+//     stakePoolAddress: 'HYgufSTxQ8Ma6qgzQ8n2vD5gPTB7YgP5JjurYCgQqFPR',
+//   })
+// }
 
 export const DEFAULT_ENDPOINT = ENDPOINTS[0] as Endpoint
 

@@ -1,46 +1,26 @@
-/*
- * This file is part of Solana Reference Stake Pool code.
- *
- * Copyright © 2021, mFactory GmbH
- *
- * Solana Reference Stake Pool is free software: you can redistribute it
- * and/or modify it under the terms of the GNU Affero General Public License
- * as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * Solana Reference Stake Pool is distributed in the hope that it
- * will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.
- * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
- *
- * You can be released from the requirements of the Affero GNU General Public License
- * by purchasing a commercial license. The purchase of such a license is
- * mandatory as soon as you develop commercial activities using the
- * Solana Reference Stake Pool code without disclosing the source code of
- * your own applications.
- *
- * The developer of this program can be contacted at <info@mfactory.ch>.
- */
-
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import BN from 'bn.js'
 
 const SOL_DECIMALS = Math.log10(LAMPORTS_PER_SOL)
 
+export function divideBnToNumber(numerator: BN, denominator: BN): number {
+  if (denominator.isZero()) {
+    return 0
+  }
+  const quotient = numerator.div(denominator).toNumber()
+  const rem = numerator.umod(denominator)
+  const gcd = rem.gcd(denominator)
+  return quotient + rem.div(gcd).toNumber() / denominator.div(gcd).toNumber()
+}
+
 export function lamportsToSol(lamports: number | BN): number {
   if (typeof lamports === 'number') {
     return Math.abs(lamports) / LAMPORTS_PER_SOL
   }
-
   let signMultiplier = 1
   if (lamports.isNeg()) {
     signMultiplier = -1
   }
-
   const absLamports = lamports.abs()
   const lamportsString = absLamports.toString(10).padStart(10, '0')
   const splitIndex = lamportsString.length - SOL_DECIMALS
@@ -48,16 +28,21 @@ export function lamportsToSol(lamports: number | BN): number {
   return signMultiplier * Number.parseFloat(solString)
 }
 
-export function lamportsToSolString(lamports: number | BN, maximumFractionDigits = 9): string {
+export function lamportsToSolString(lamports: number | BN, maximumFractionDigits = SOL_DECIMALS): string {
   const sol = lamportsToSol(lamports)
   return `◎ ${new Intl.NumberFormat('en-US', { maximumFractionDigits }).format(sol)}`
 }
+
+// export const solToLamports = (amount: string | number | BN): number => {
+//   const val = new BN(amount, 10)
+//   return val.mul(new BN(LAMPORTS_PER_SOL, 10)).toNumber()
+// }
 
 export function solToLamports(amount: number): number {
   if (Number.isNaN(amount)) {
     return Number(0)
   }
-  return new BN(amount.toFixed(SOL_DECIMALS).replace('.', '')).toNumber()
+  return new BN(Number(amount).toFixed(SOL_DECIMALS).replace('.', '')).toNumber()
 }
 
 export const priceFormatter = new Intl.NumberFormat('en-US', {
@@ -87,7 +72,7 @@ export const formatPct = new Intl.NumberFormat('en-US', {
 const SI_SYMBOL = ['', 'K', 'M', 'G', 'T', 'P', 'E']
 
 function abbreviateNumber(number: number, precision: number, trimZeros = false) {
-  const tier = (Math.log10(number) / 3) | 0
+  const tier = Math.trunc(Math.log10(number) / 3)
   let scaled = number
   const suffix = SI_SYMBOL[tier]
   if (tier > 0) {
@@ -99,7 +84,7 @@ function abbreviateNumber(number: number, precision: number, trimZeros = false) 
     return ''
   }
   const result = trimZeros ? Number(scaled.toFixed(precision)) : scaled.toFixed(precision)
-  return result + (typeof suffix === 'string' ? suffix : '')
+  return result + (suffix ?? '')
 }
 
 export function formatAmount(val: number, precision = 5, abbr = true) {
@@ -133,8 +118,8 @@ export function isInvalidTime(n: string, p: string): boolean {
   return num < 1 || num > max
 }
 
-export function formatMoney(val: string | number): string {
-  if (typeof val === 'undefined' || val === null || val === '') {
+export function formatMoney(val: string | number, integer = false): string {
+  if (val === undefined || val === null || val === '') {
     return ''
   }
 
@@ -142,11 +127,17 @@ export function formatMoney(val: string | number): string {
 
   const decimalSeparator = val.lastIndexOf('.')
 
-  let integerPart = decimalSeparator >= 0 ? val.slice(0, decimalSeparator) : val
-  let fractionalPart = decimalSeparator >= 0 ? val.slice(decimalSeparator + 1) : null
+  let integerPart = decimalSeparator === -1 ? val : val.slice(0, decimalSeparator)
+
+  let fractionalPart = decimalSeparator === -1 ? null : val.slice(decimalSeparator + 1)
+
+  // round integer value
+  if (integer && fractionalPart && (+`0.${fractionalPart}` >= 0.5)) {
+    integerPart = `${+integerPart + 1}`
+  }
 
   if (fractionalPart) {
-    fractionalPart = fractionalPart.slice(0, 2).replace(/\D+/g, '')
+    fractionalPart = fractionalPart.slice(0, 2).replaceAll(/\D+/g, '')
     if (fractionalPart.length === 1) {
       fractionalPart += '0'
     }
@@ -154,21 +145,137 @@ export function formatMoney(val: string | number): string {
     fractionalPart = '00'
   }
 
-  integerPart = integerPart.replace(/\D+/g, '')
+  integerPart = integerPart.replaceAll(/\D+/g, '')
   if (!integerPart) {
     integerPart = '0'
   }
 
   let formatted = ''
   for (let i = 0; i < integerPart.length; i++) {
-    if (i !== 0 && i % 3 === 0) {
-      formatted = `${integerPart[integerPart.length - i - 1]},${formatted}`
-    } else {
-      formatted = integerPart[integerPart.length - i - 1] + formatted
-    }
+    formatted = i !== 0 && i % 3 === 0 ? `${integerPart[integerPart.length - i - 1]},${formatted}` : integerPart[integerPart.length - i - 1] + formatted
   }
 
-  formatted += `.${fractionalPart}`
+  return integer ? formatted : `${formatted}.${fractionalPart}`
+}
 
-  return formatted
+/**
+ * Function to allow only numbers and a single decimal point to be inputted.
+ *
+ * @param {any} e - event parameter
+ */
+export function onlyNumber(e: any) {
+  const keyCode = e.keyCode ?? e.which
+  if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
+    e.preventDefault()
+  }
+  if (keyCode === 46 && String(e.target.value).includes('.')) {
+    e.preventDefault()
+  }
+}
+
+export function getSolPriceFormatter(n = 5) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'decimal',
+    minimumFractionDigits: n,
+    maximumFractionDigits: n,
+  })
+}
+
+export function solFormatter(val: number, text = ' SOL', maxDigits?: number) {
+  if (val === 0) {
+    return `0${text}`
+  }
+  const decimals = maxDigits ?? Math.max(13 - `${val}`.length, 5)
+  const solPriceFormatter = getSolPriceFormatter(decimals)
+  return `${val < 0 ? '-' : ''}${solPriceFormatter.format(lamportsToSol(val))}${text}`
+}
+
+export function formatAmountPrice(val: number | bigint) {
+  return priceFormatter.format(val)
+}
+
+export function capitalize(s: string) {
+  if (!s[0]) {
+    return s
+  }
+  return s[0].toUpperCase() + s.slice(1)
+}
+
+export function formatPrice(price: number | string, minDigits = 0, maxDigits = 10) {
+  const longPriceFormatter = new Intl.NumberFormat('en-US', {
+    style: 'decimal',
+    minimumFractionDigits: minDigits,
+    maximumFractionDigits: maxDigits,
+  })
+  return longPriceFormatter.format(Number(price))
+}
+
+export function parseFormattedPrice(formattedPrice: string): number {
+  return Number.parseFloat(formattedPrice.replaceAll(',', ''))
+}
+
+export function truncateNumber(num: number) {
+  if (num === 0) {
+    return '0'
+  }
+
+  const strNum = num.toString()
+  const decimalIndex = strNum.indexOf('.')
+
+  if (decimalIndex === -1) {
+    return num.toFixed(2)
+  }
+
+  const integerPart = strNum.slice(0, decimalIndex)
+  if (Number.parseInt(integerPart) > 0) {
+    return num.toFixed(2)
+  }
+
+  let i = decimalIndex + 1
+  while (i < strNum.length && strNum[i] === '0') {
+    i++
+  }
+
+  return strNum.slice(0, i + 1)
+}
+
+export function padNumber(number: number) {
+  return number < 10 ? `0${number}` : number
+}
+
+export function getNumberWithZeros(count: number) {
+  return 10 ** count
+}
+
+export function dateToUtc(date: Date) {
+  const newDate = new Date(date)
+  const day = newDate.getUTCDate()
+  const month = newDate.getUTCMonth() + 1
+  const year = newDate.getUTCFullYear()
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+export function formatReward(val: number) {
+  if (!val) {
+    return '0'
+  }
+  if (val < 100_000) {
+    return '<0.0001'
+  }
+  return formatAmount(lamportsToSol(val))
+}
+
+export function getMonthsForLocale(localeName = 'en-US', monthFormat?: 'numeric' | '2-digit' | 'long' | 'short' | 'narrow' | undefined) {
+  const format = new Intl
+    .DateTimeFormat(localeName, { month: monthFormat ?? 'short' }).format
+  return [...Array.from({ length: 12 }).keys()]
+    .map(m => format(new Date(Date.UTC(2021, (m) % 12))))
+}
+
+// format number with decimals 99.9842 => 99.98
+export function truncatePercent(value: number, dec = 2): string {
+  const [intPart, decimalPart = ''] = value.toString().split('.')
+  return decimalPart.length > dec
+    ? `${intPart}.${decimalPart.slice(0, dec)}`
+    : `${value}`
 }

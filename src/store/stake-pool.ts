@@ -28,13 +28,13 @@
 
 import type { StakePool } from '@solana/spl-stake-pool/src/layouts'
 import type { PublicKey } from '@solana/web3.js'
-import type { Ref } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 import { getStakePoolAccount } from '@solana/spl-stake-pool'
 import { divideBnToNumber } from '@solana/spl-stake-pool/src/utils'
 import { StakeProgram } from '@solana/web3.js'
 import { useIntervalFn } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { computed, ref, toRef, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { POOL_RELOAD_INTERVAL } from '~/config'
 
 export type StakePoolStore = {
@@ -44,7 +44,7 @@ export type StakePoolStore = {
   reserveStakeBalance: Ref<number>
   lamportsPerSignature: Ref<number>
   fees: any
-  stakePoolAddress: Ref<PublicKey | null>
+  stakePoolAddress?: ComputedRef<PublicKey | null | undefined>
   connectionLost: Ref<boolean>
   loadReserveStake: () => void
 }
@@ -72,16 +72,17 @@ export const useStakePoolStore = defineStore('stake-pool', (): StakePoolStore =>
     stakeReferralFee: 0,
   })
 
-  const stakePoolAddress = toRef(connectionStore, 'stakePoolAddress')
+  const stakePoolAddress = computed(() => connectionStore?.stakePoolAddress)
   const connectionLost = computed(() => !stakePool.value)
 
   async function loadReserveStake() {
-    if (!stakePool.value) {
+    console.log('[StakePool] Load reserve stake balance')
+    if (!stakePool.value || import.meta.client) {
       return
     }
     const reserveStakeAddress = stakePool.value!.reserveStake.toBase58()
     console.log('Loading reserve stake balance from', reserveStakeAddress)
-    const reserveStake = await connectionStore.connection.getAccountInfo(
+    const reserveStake = await connectionStore?.connection.getAccountInfo(
       stakePool.value!.reserveStake,
     )
     reserveStakeBalance.value = reserveStake?.lamports ?? 0
@@ -89,7 +90,7 @@ export const useStakePoolStore = defineStore('stake-pool', (): StakePoolStore =>
   }
 
   async function loadStakePool() {
-    if (!stakePoolAddress.value) {
+    if (!stakePoolAddress.value || !connectionStore) {
       stakePool.value = undefined
       return
     }
@@ -109,6 +110,9 @@ export const useStakePoolStore = defineStore('stake-pool', (): StakePoolStore =>
   }
 
   async function loadMinRentBalance() {
+    if (!connectionStore) {
+      return
+    }
     minRentBalance.value = await connectionStore.connection.getMinimumBalanceForRentExemption(
       StakeProgram.space,
     )
@@ -118,17 +122,19 @@ export const useStakePoolStore = defineStore('stake-pool', (): StakePoolStore =>
   // TODO: don't reload when transaction error
   emitter.on(ACCOUNT_CHANGE_EVENT, loadStakePool)
 
-  useIntervalFn(loadStakePool, POOL_RELOAD_INTERVAL)
+  if (import.meta.client) {
+    useIntervalFn(loadStakePool, POOL_RELOAD_INTERVAL)
 
-  watch(
-    stakePoolAddress,
-    () => {
-      return Promise.all([loadStakePool(), loadMinRentBalance()])
-    },
-    {
-      immediate: true,
-    },
-  )
+    watch(
+      stakePoolAddress,
+      () => {
+        return Promise.all([loadStakePool(), loadMinRentBalance()])
+      },
+      {
+        immediate: true,
+      },
+    )
+  }
 
   // watch(reserveStakeBalance, async (con) => {
   //   const { blockhash } = await con.getRecentBlockhash('max');

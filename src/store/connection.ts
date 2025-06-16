@@ -69,15 +69,21 @@ export const useConnectionStore = defineStore('connection', () => {
       commitment: state.commitment,
       fetchMiddleware: endpoint.value?.getToken
         ? tokenAuthFetchMiddleware({
-          tokenExpiry: 5 * 60 * 1000, // 5 min
-          getToken: endpoint.value?.getToken,
-        })
+            tokenExpiry: 5 * 60 * 1000, // 5 min
+            getToken: endpoint.value?.getToken,
+          })
         : undefined,
     })
   })
 
   const stakePoolAddress = computed<PublicKey | null>(() => {
-    return endpoint.value ? new PublicKey(endpoint.value.stakePoolAddress) : null
+    try {
+      return endpoint.value?.stakePoolAddress
+        ? new PublicKey(endpoint.value.stakePoolAddress)
+        : null
+    } catch {
+      return null
+    }
   })
 
   const stakeLimit = computed<number>(() => {

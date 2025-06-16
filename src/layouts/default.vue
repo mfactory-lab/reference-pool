@@ -26,14 +26,22 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
+<script setup lang="ts">
+import { CookieModal } from '~/features/cookie'
+
+if (import.meta.client) {
+  onMounted(() => {
+    initWallet()
+  })
+}
+</script>
+
 <template>
-  <q-layout view="lfh Lpr lff">
-    <app-header />
-    <q-page-container>
-      <connection-lost />
-      <router-view />
-    </q-page-container>
-    <app-footer />
+  <app-header />
+  <connection-lost />
+  <NuxtPage />
+  <app-footer />
+  <client-only>
     <cookie-modal />
-  </q-layout>
+  </client-only>
 </template>

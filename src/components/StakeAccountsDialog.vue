@@ -26,170 +26,114 @@
   - The developer of this program can be contacted at <info@mfactory.ch>.
   -->
 
-<script lang="ts">
-import { evaClose, evaRefresh } from '@quasar/extras/eva-icons'
+<script lang="ts" setup>
+import { useAnchorWallet } from '@solana/wallet-adapter-vue'
 import { PublicKey, StakeProgram } from '@solana/web3.js'
-import { useAnchorWallet, useWallet } from 'solana-wallets-vue'
 import type { ProgramAccount } from '~/store'
 import { sendTransaction } from '~/utils'
 
-export default defineComponent({
-  props: {
-    voter: {
-      type: String,
-      required: false,
+const emit = defineEmits(['beforeDeposit', 'afterDeposit', 'beforeDeactivate', 'afterDeactivate', 'beforeWithdraw', 'afterWithdraw'])
+
+const { width } = useWindowSize()
+
+const connectionStore = useConnectionStore()
+const { publicKey } = useClientWallet()
+const anchorWallet = import.meta.client ? useAnchorWallet() : ref(null)
+const stakeAccounts = useStakeAccountStore()
+const { monitorTransaction } = useMonitorTransaction()
+const { depositStake } = useDeposit()
+
+const dialog = computed(() => stakeAccounts.dialog)
+const loadingPubkey = ref()
+
+const accounts = computed(() => stakeAccounts.accountsFull)
+
+function updateDialog(v: boolean) {
+  (stakeAccounts.dialog = v)
+}
+
+async function deposit(stakeAccount: ProgramAccount) {
+  emit('beforeDeposit')
+  loadingPubkey.value = stakeAccount.pubkey.toBase58()
+  const success = await depositStake(stakeAccount)
+  if (success) {
+    stakeAccounts.removeAccount(stakeAccount.pubkey.toBase58())
+  }
+  loadingPubkey.value = null
+  emit('afterDeposit')
+}
+
+async function deactivate(address: string) {
+  emit('beforeDeactivate')
+  loadingPubkey.value = address
+  await monitorTransaction(
+    sendTransaction(
+      connectionStore.connection,
+      anchorWallet.value!,
+      StakeProgram.deactivate({
+        stakePubkey: new PublicKey(address),
+        authorizedPubkey: publicKey.value!,
+      }).instructions,
+      [],
+    ),
+    {
+      commitment: 'finalized',
     },
-  },
-  emits: [
-    'beforeDeposit',
-    'afterDeposit',
-    'beforeDeactivate',
-    'afterDeactivate',
-    'beforeWithdraw',
-    'afterWithdraw',
-  ],
-  setup(props, { emit }) {
-    const connectionStore = useConnectionStore()
-    const { publicKey } = useWallet()
-    const anchorWallet = useAnchorWallet()
-    const stakeAccounts = useStakeAccountStore()
-    const { monitorTransaction } = useMonitorTransaction()
-    const { depositStake } = useDeposit()
+  )
+  loadingPubkey.value = null
+  emit('afterDeactivate')
+}
 
-    const dialog = computed(() => stakeAccounts.dialog)
-    const loading = computed(() => stakeAccounts.loading)
-    const loadingPubkey = ref()
-
-    return {
-      dialog,
-      loading,
-      loadingPubkey,
-
-      accounts: computed(() => {
-        if (props.voter) {
-          return stakeAccounts.data.filter(
-            acc => acc.account.data?.parsed?.info?.stake?.delegation?.voter === props.voter,
-          )
-        }
-        return stakeAccounts.data
-      }),
-
-      updateDialog: (v: boolean) => (stakeAccounts.dialog = v),
-
-      deposit: async (stakeAccount: ProgramAccount) => {
-        emit('beforeDeposit')
-        loadingPubkey.value = stakeAccount.pubkey.toBase58()
-        const success = await depositStake(stakeAccount)
-        if (success) {
-          stakeAccounts.removeAccount(stakeAccount.pubkey.toBase58())
-        }
-        loadingPubkey.value = null
-        emit('afterDeposit')
-      },
-
-      deactivate: async (address: string) => {
-        emit('beforeDeactivate')
-        loadingPubkey.value = address
-        await monitorTransaction(
-          sendTransaction(
-            connectionStore.connection,
-            anchorWallet.value!,
-            StakeProgram.deactivate({
-              stakePubkey: new PublicKey(address),
-              authorizedPubkey: publicKey.value!,
-            }).instructions,
-            [],
-          ),
-          {
-            commitment: 'finalized',
-          },
-        )
-        loadingPubkey.value = null
-        emit('afterDeactivate')
-      },
-
-      withdraw: async (address: string, lamports: number) => {
-        emit('beforeWithdraw')
-        loadingPubkey.value = address
-        await monitorTransaction(
-          sendTransaction(
-            connectionStore.connection,
-            anchorWallet.value!,
-            StakeProgram.withdraw({
-              stakePubkey: new PublicKey(address),
-              authorizedPubkey: publicKey.value!,
-              toPubkey: publicKey.value!,
-              lamports,
-              // custodianPubkey: wallet.value!.publicKey!,
-            }).instructions,
-            [],
-          ),
-          {
-            onSuccess: () => stakeAccounts.removeAccount(address),
-          },
-        )
-        loadingPubkey.value = null
-        emit('afterWithdraw')
-      },
-
-      refresh() {
-        stakeAccounts.load()
-      },
-      icons: {
-        close: evaClose,
-        refresh: evaRefresh,
-      },
-    }
-  },
-})
+async function withdraw(address: string, lamports: number) {
+  emit('beforeWithdraw')
+  loadingPubkey.value = address
+  await monitorTransaction(
+    sendTransaction(
+      connectionStore.connection,
+      anchorWallet.value!,
+      StakeProgram.withdraw({
+        stakePubkey: new PublicKey(address),
+        authorizedPubkey: publicKey.value!,
+        toPubkey: publicKey.value!,
+        lamports,
+        // custodianPubkey: wallet.value!.publicKey!,
+      }).instructions,
+      [],
+    ),
+    {
+      onSuccess: () => stakeAccounts.removeAccount(address),
+    },
+  )
+  loadingPubkey.value = null
+  emit('afterWithdraw')
+}
 </script>
 
 <template>
-  <q-dialog v-model="dialog" @update:model-value="updateDialog">
-    <q-card>
-      <q-card-section v-if="loading" class="flex flex-center">
-        <q-spinner size="md" />
-      </q-card-section>
-
-      <template v-else>
-        <q-card-section class="relative-position">
-          <div class="text-h6 text-center">
-            Stake Accounts
-            <q-btn rounded unelevated dense size="sm" :icon="icons.refresh" @click="refresh" />
-          </div>
-          <q-btn
-            padding="md"
-            color="transparent"
-            text-color="primary-gray"
-            unelevated
-            class="absolute-right"
-            :icon="icons.close"
-            size="md"
-            @click="updateDialog(false)"
-          />
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section class="scroll" style="max-height: 70vh">
-          <q-list v-if="accounts.length > 0" separator style="width: 500px">
-            <stake-account-item
-              v-for="acc in accounts"
-              :key="acc.pubkey.toBase58()"
-              :stake-account="acc"
-              :loading="acc.pubkey.toBase58() === loadingPubkey"
-              @deactivate="deactivate"
-              @withdraw="withdraw"
-              @deposit="deposit"
-            />
-          </q-list>
-          <div v-else class="flex flex-center q-pa-lg">
-            Your stake accounts will be shown here.
-            <br>
-            You don't have any valid stake accounts.
-          </div>
-        </q-card-section>
-      </template>
-    </q-card>
-  </q-dialog>
+  <j-dialog v-model="dialog" class-name="stake-accounts-dialog" title="Stake Accounts" @update:model-value="updateDialog">
+    <div v-if="accounts.length > 0" :style="{ width: width < 650 ? '100%' : '500px' }">
+      <stake-account-item
+        v-for="acc in accounts"
+        :key="acc.stakeAccount.pubkey.toBase58()"
+        :account="acc"
+        :loading="acc.stakeAccount.pubkey.toBase58() === loadingPubkey"
+        @deactivate="deactivate"
+        @withdraw="withdraw"
+        @deposit="deposit"
+      />
+    </div>
+    <div v-else class="flex flex-center q-pa-lg">
+      Your stake accounts will be shown here.
+      <br>
+      You don't have any valid stake accounts.
+    </div>
+  </j-dialog>
 </template>
+
+<style lang="scss">
+.stake-accounts-dialog {
+  .stake-acc__item:not(:last-child) {
+    margin-bottom: 10px;
+  }
+}
+</style>

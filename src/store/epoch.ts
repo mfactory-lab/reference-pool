@@ -28,7 +28,7 @@
 
 import type { Connection, EpochInfo } from '@solana/web3.js'
 import { defineStore } from 'pinia'
-import { computed, ref, toRef, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { EPOCH_RELOAD_INTERVAL } from '~/config'
 
 export const EPOCH_UPDATE_EVENT = Symbol('EPOCH_UPDATE_EVENT')
@@ -37,7 +37,7 @@ export const useEpochStore = defineStore('epoch', () => {
   const emitter = useEmitter()
   const connectionStore = useConnectionStore()
 
-  const stakePoolAddress = toRef(connectionStore, 'stakePoolAddress')
+  const stakePoolAddress = computed(() => connectionStore?.stakePoolAddress)
 
   const epochInfo = ref<EpochInfo>()
   const epochTimeRemaining = ref(0)
@@ -54,41 +54,47 @@ export const useEpochStore = defineStore('epoch', () => {
 
   // Try to load epoch info
   const loadEpochInfo = () =>
-    connectionStore.connection.getEpochInfo().then(e => (epochInfo.value = e))
+    connectionStore?.connection.getEpochInfo().then(e => (epochInfo.value = e))
 
-  const loadHourlySlotTime = () =>
-    calcHourlySlotTime(connectionStore.connection).then(v => (hourlySlotTime.value = v))
-
-  watch(
-    stakePoolAddress,
-    () => {
-      Promise.all([loadEpochInfo(), loadHourlySlotTime()]).then()
-    },
-    { immediate: true },
-  )
-
-  watch(epochInfo, (e) => {
-    epochTimeRemaining.value = e ? (e.slotsInEpoch - e.slotIndex) * hourlySlotTime.value : 0
-    epochTimeTotal.value = e ? e.slotsInEpoch * hourlySlotTime.value : 0
-    if (e && e.epoch !== epochNumber.value) {
-      epochNumber.value = e.epoch
+  const loadHourlySlotTime = () => {
+    if (connectionStore?.connection) {
+      return calcHourlySlotTime(connectionStore.connection).then(v => (hourlySlotTime.value = v))
     }
-  })
+    return Promise.resolve()
+  }
 
-  // Re-sync epoch info
-  setInterval(async () => {
-    await Promise.all([loadEpochInfo(), loadHourlySlotTime()])
-    emitter.emit(EPOCH_UPDATE_EVENT, epochInfo.value)
-    console.log('Reload epoch info', epochInfo.value)
-  }, EPOCH_RELOAD_INTERVAL)
+  if (import.meta.client) {
+    watch(
+      stakePoolAddress,
+      () => {
+        Promise.all([loadEpochInfo(), loadHourlySlotTime()]).then()
+      },
+      { immediate: true },
+    )
 
-  // Update timer
-  setInterval(async () => {
-    const newVal = epochTimeRemaining.value - 1000
-    epochTimeRemaining.value = Math.max(newVal, 0)
+    watch(epochInfo, (e) => {
+      epochTimeRemaining.value = e ? (e.slotsInEpoch - e.slotIndex) * hourlySlotTime.value : 0
+      epochTimeTotal.value = e ? e.slotsInEpoch * hourlySlotTime.value : 0
+      if (e && e.epoch !== epochNumber.value) {
+        epochNumber.value = e.epoch
+      }
+    })
+
+    // Re-sync epoch info
+    setInterval(async () => {
+      await Promise.all([loadEpochInfo(), loadHourlySlotTime()])
+      emitter.emit(EPOCH_UPDATE_EVENT, epochInfo.value)
+      console.log('Reload epoch info', epochInfo.value)
+    }, EPOCH_RELOAD_INTERVAL)
+
+    // Update timer
+    setInterval(async () => {
+      const newVal = epochTimeRemaining.value - 1000
+      epochTimeRemaining.value = Math.max(newVal, 0)
     // console.log('epochTimeRemaining', epochTimeRemaining.value);
     // console.log('epochProgress', epochProgress.value);
-  }, 1000)
+    }, 1000)
+  }
 
   return {
     epochInfo,

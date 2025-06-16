@@ -27,90 +27,86 @@
   -->
 
 <script lang="ts" setup>
+const { badgeType = 'default' } = defineProps<{
+  badgeType?: 'default' | 'mobile' | string
+}>()
+
 const epochStore = useEpochStore()
-const epochNumber = computed(() => epochStore.epochNumber)
+const epochNumber = computed(() => epochStore?.epochNumber)
 const epochProgress = computed(() => +epochStore.epochProgress)
 
-const time = computed(() => {
-  const timeInMs = epochStore.epochTimeRemaining
-  const _h = timeInMs / 1000 / 60 / 60
+function formatTime(time: number | string) {
+  return Number(time) >= 10 ? time.toString() : `0${time}`
+}
+
+function formatTimeToHMS(time: number) {
+  const _h = time / 1000 / 60 / 60
   const h = Math.floor(_h)
   const m = Math.floor((_h - h) * 60)
   const s = Math.ceil(((_h - h) * 60 - m) * 60)
-  return { h, m: m < 10 ? `0${m}` : m, s: s < 10 ? `0${s}` : s }
-})
+  return { h: formatTime(h), m: formatTime(m), s: formatTime(s) }
+}
+
+const time = computed(() => formatTimeToHMS(epochStore.epochTimeRemaining))
 </script>
 
 <template>
-  <div class="epoch">
-    <q-circular-progress
-      show-value
-      class="q-mt-xs epoch__progress"
-      :value="epochProgress"
-      size="106px"
-      :thickness="0.2"
-      color="natural-gray"
-      track-color="primary"
-      center-color="white"
-    >
-      <div class="epoch__label">
-        <div class="epoch__label-title">
-          Epoch
+  <div class="epoch-badge" :class="[`epoch-badge-${badgeType}`]">
+    <div v-if="badgeType === 'default'" class="epoch-badge__circle">
+      <j-circular-progress :progress="epochProgress" width="106" stroke-color="#1ce4b0" :stroke-width="40">
+        <div class="epoch-data">
+          <div class="epoch-data__title">
+            Epoch
+          </div>
+          <div class="epoch-data__epoch">
+            {{ epochNumber }}
+          </div>
+          <div class="epoch-data__time">
+            <span>{{ time.h }}:{{ time.m }}</span>
+            <span>{{ time.s }}</span>
+          </div>
         </div>
-        <div class="epoch__label-number">
-          {{ epochNumber }}
-        </div>
-        <div class="epoch__label-value">
-          {{ time.h }}:{{ time.m }}<br>{{ time.s }}
-        </div>
-      </div>
-    </q-circular-progress>
+      </j-circular-progress>
+    </div>
+    <div v-else class="epoch-badge__linear">
+      <b-progress :value="epochProgress" />
+    </div>
   </div>
 </template>
 
-<style scoped lang="scss">
-  .epoch {
-    @media (max-width: $breakpoint-sm) {
-      margin-bottom: 16px;
+<style  lang="scss">
+ .epoch-badge {
+  .epoch-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &__title {
+      font-size: 10px;
+      line-height: 12px;
+      text-transform: uppercase;
+      color: $gray;
     }
-    &__progress {
-      @media (max-width: $breakpoint-sm) {
-        width: 95px;
-      }
+
+    &__epoch {
+      color: #100808;
+      font-size: 18px;
+      font-weight: 500;
+      line-height: normal;
     }
-    &__label {
-      font-style: normal;
-      font-weight: normal;
-      text-align: center;
 
-      &-title {
-        font-size: 10px;
-        line-height: 12px;
-        text-transform: uppercase;
-        color: $gray;
-      }
-
-      &-value {
-        font-size: 18px;
-        line-height: 100%;
-        color: #5a7683;
-        font-weight: 500;
-
-        @media (max-width: $breakpoint-sm) {
-          font-size: 16px;
-        }
-      }
-
-      &-number {
-        color: #100808;
-        font-size: 18px;
-        margin-bottom: 3px;
-        font-weight: 500;
-
-        @media (max-width: $breakpoint-sm) {
-          font-size: 16px;
-        }
-      }
+    &__time {
+      width: 40px;
+      font-size: 18px;
+      line-height: 100%;
+      margin-top: 2px;
+      color: #5a7683;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   }
+}
 </style>

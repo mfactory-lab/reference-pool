@@ -26,11 +26,11 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
+export * from './connection'
 export * from './apy'
 export * from './auth'
 export * from './balance'
 export * from './coin-rate'
-export * from './connection'
 export * from './epoch'
 export * from './stake-accounts'
 export * from './stake-pool'

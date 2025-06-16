@@ -26,20 +26,20 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import type { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
-import type { Buffer } from 'node:buffer'
+// eslint-disable-next-line unicorn/prefer-node-protocol
+import type { Buffer } from 'buffer'
+import type { AccountInfo } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import debounce from 'lodash-es/debounce'
 import { defineStore } from 'pinia'
-import { useWallet } from 'solana-wallets-vue'
-import { computed, ref, watch } from 'vue'
-import { findAssociatedTokenAddress, lamportsToSol } from '~/utils'
+import { getTokenBalance, lamportsToSol } from '~/utils'
 
-const ACCOUNT_CHANGE_DEBOUNCE = 300
+const ACCOUNT_CHANGE_DEBOUNCE = 500
 
 export const useBalanceStore = defineStore('balance', () => {
   const connectionStore = useConnectionStore()
   const stakePoolStore = useStakePoolStore()
-  const { publicKey } = useWallet()
+  const wallet = useClientWallet()
   const emitter = useEmitter()
 
   const nativeBalance = ref(0)
@@ -52,14 +52,14 @@ export const useBalanceStore = defineStore('balance', () => {
   const solBalance = computed(() => lamportsToSol(nativeBalance.value))
 
   async function _getTokenBalance() {
-    if (!publicKey.value || !stakePool.value?.poolMint) {
+    if (!wallet?.publicKey.value || !stakePool.value?.poolMint) {
       return
     }
     tokenBalanceLoading.value = true
     const balance = await getTokenBalance(
       connectionStore.connection,
-      publicKey.value,
-      stakePool.value?.poolMint,
+      wallet?.publicKey.value,
+      new PublicKey(stakePool.value?.poolMint),
     )
     hasTokenAccount.value = balance !== null
     tokenBalance.value = balance ?? 0
@@ -70,7 +70,7 @@ export const useBalanceStore = defineStore('balance', () => {
   const _onAccountChange = debounce(async (acc: AccountInfo<Buffer> | null) => {
     nativeBalance.value = acc?.lamports ?? 0
     console.log('[Balance] SOL:', nativeBalance.value)
-    _getTokenBalance().then()
+    await _getTokenBalance()
   }, ACCOUNT_CHANGE_DEBOUNCE)
 
   const _onDisconnect = () => {
@@ -79,18 +79,21 @@ export const useBalanceStore = defineStore('balance', () => {
     tokenBalance.value = 0
   }
 
-  emitter.on(ACCOUNT_CHANGE_EVENT, _onAccountChange)
-  emitter.on(WALLET_DISCONNECT_EVENT, _onDisconnect)
+  if (import.meta.client) {
+    emitter.on(ACCOUNT_CHANGE_EVENT, _onAccountChange)
+    emitter.on(WALLET_DISCONNECT_EVENT, _onDisconnect)
 
-  watch(
-    publicKey,
-    (pk) => {
-      if (pk) {
-        connectionStore.connection.getAccountInfo(pk).then(_onAccountChange)
-      }
-    },
-    { immediate: true },
-  )
+    watch(
+      () => wallet?.publicKey.value,
+      (pk) => {
+        if (pk) {
+          connectionStore.connection.getAccountInfo(pk).then(_onAccountChange)
+          tokenBalanceLoading.value = true
+        }
+      },
+      { immediate: true },
+    )
+  }
 
   return {
     solBalance,
@@ -102,22 +105,3 @@ export const useBalanceStore = defineStore('balance', () => {
     tokenBalance,
   }
 })
-
-/**
- * Gets TokenAccountBalance from the associated token account
- */
-export async function getTokenBalance(
-  connection: Connection,
-  walletAddress: PublicKey,
-  mint: PublicKey,
-): Promise<number | null> {
-  try {
-    const associatedTokenAcc = await findAssociatedTokenAddress(walletAddress, mint)
-    const tBalance = await connection.getTokenAccountBalance(associatedTokenAcc)
-    return tBalance.value.uiAmount
-  } catch (err) {
-    console.log(err)
-    // No token account found
-    return null
-  }
-}

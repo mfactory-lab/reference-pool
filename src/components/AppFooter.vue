@@ -29,79 +29,74 @@
 <script setup lang="ts">
 import { COPYRIGHT, COPYRIGHT_BY, FOOTER_LINKS, POWERED_BY, POWERED_LINK } from '~/config'
 
-const fLinks = FOOTER_LINKS ? JSON.parse(FOOTER_LINKS) : {}
-const footerLinks = Object.keys(fLinks).map(title => ({ title, url: fLinks[title] }))
+const fLinks: { [key: string]: string } = FOOTER_LINKS as { [key: string]: string }
+const footerLinks = fLinks ? Object.keys(fLinks)?.map(title => ({ title, url: fLinks[title] })) : []
 const year = new Date().getFullYear()
 </script>
 
 <template>
-  <q-footer :class="$style.footer">
+  <footer>
     <div class="container">
-      <div class="row q-col-gutter-lg">
-        <div class="col justify-between d-flex column">
-          <div class="text-caption">
-            <span v-if="COPYRIGHT_BY">© Copyright {{ year }} {{ COPYRIGHT_BY }}. All rights reserved.</span>
-            <span v-if="COPYRIGHT">{{ COPYRIGHT }}</span>
-            <br v-if="POWERED_BY && (COPYRIGHT || COPYRIGHT_BY)">
-            <a v-if="POWERED_LINK && POWERED_BY" :href="POWERED_LINK" target="_blank">{{ POWERED_BY }}</a>
-            <span v-if="POWERED_BY && !POWERED_LINK">{{ POWERED_BY }}</span>
-          </div>
-        </div>
-        <div class="col col-12 col-md-auto justify-between q-mt-auto d-flex column">
-          <div :class="$style.nav" class="row text-caption footer-links">
-            <app-footer-link v-for="link in footerLinks" :key="link.title" :url="link.url" :title="link.title" />
-          </div>
-        </div>
+      <div class="footer-info">
+        <span v-if="COPYRIGHT_BY">© Copyright {{ year }} {{ COPYRIGHT_BY }}. All rights reserved.</span>
+        <span v-if="COPYRIGHT">{{ COPYRIGHT }}</span>
+        <br v-if="POWERED_BY && (COPYRIGHT || COPYRIGHT_BY)">
+        <a v-if="POWERED_LINK && POWERED_BY" :href="String(POWERED_LINK)" target="_blank">{{ POWERED_BY }}</a>
+        <span v-if="POWERED_BY && !POWERED_LINK">{{ POWERED_BY }}</span>
+      </div>
+      <div class="footer-links">
+        <app-footer-link v-for="link in footerLinks" :key="link.title" :url="link.url" :title="link.title" />
       </div>
     </div>
-  </q-footer>
+  </footer>
 </template>
 
-<style lang="scss" module>
-  .footer {
+<style lang="scss">
+  footer {
   background-color: $gray !important;
   color: #fff !important;
   padding: 1rem 0 1rem;
-  @media (max-width: $breakpoint-sm) {
-    text-align: center;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.25rem;
+  letter-spacing: 0.03333em;
+
+  .container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
   }
 
   a {
     color: #fff;
     text-decoration: none;
   }
-}
 
-.nav {
-  justify-content: center;
-  text-align: center;
-
-  a {
-    margin: 0 0.5em;
+  .footer-info {
+    @media (max-width: $breakpoint-sm) {
+      text-align: center;
+    }
   }
-}
-</style>
 
-<style lang="scss" scope>
-  .contact-title {
-  text-align: right;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  padding-right: 93px;
-  margin-top: -15px;
-  margin-bottom: -10px;
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
 
-  @media (max-width: $breakpoint-sm) {
-    text-align: center;
-    margin-bottom: 5px;
-    padding-right: 0;
-  }
-}
+    @media (max-width: $breakpoint-xs) {
+      justify-content: center;
+      gap: 0;
 
-.footer-links {
-  @media (max-width: $breakpoint-sm) {
-    margin-top: 10px;
+      a {
+        margin: 0 8px;
+      }
+    }
   }
 }
 </style>

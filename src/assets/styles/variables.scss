@@ -1,0 +1,151 @@
+/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+
+$primary: #1ce4b0;
+$secondary: #ffd140;
+$accent: #609ecc;
+$gray: #455a64;
+$almostWhite: #eff5f6;
+
+$graySuperLight: #f3f4f5;
+$black: #0f1016;
+$dark: #111;
+$lightGray: #9eb3bd;
+$lightGrayNatural: #e9e9e9;
+$naturalGray: #e7e7e7;
+
+$success: #03c879;
+$warning: #ff9100;
+$danger: #f49376;
+$negative: #ef643b;
+$accent: #008dcd;
+$teal: #009999;
+$neutral-50: #f4f4f4;
+$neutral-100: #ebebeb;
+$neutral-200: #c7c7c7;
+$neutral-300: #878787;
+$neutral-400: #717171;
+$neutral-500: #5b5b5b;
+$neutral-600: #4e4e4e;
+$neutral-800: #3c3c3c;
+$neutral-900: #2f2f2f;
+$gray-dark: #2f2f2f;
+$green-50: #d9f7eb;
+$green-900: #013c24;
+$orange-50: #ffeed9;
+$orange-900: #4d2b00;
+$red-50: #fde8e2;
+$red-900: #481e12;
+$yellow-50: #fff9d9;
+$yelow-700: #b29600;
+$yellow-900: #4d4000;
+$purple-50: #e6e0fc;
+$purple-300: #896ff2;
+$purple-500: #5731ed;
+$purple-900: #1a0f47;
+
+$positive: #1ce4b0;
+$info: #609ecc;
+
+$generic-border-radius: 12px;
+
+// Light mode
+$body-bg: #f4f4f4;
+
+// Dark mode
+$dark-page: #121212;
+$dark-primary: #1e2423;
+
+// Assumes the browser default, typically `16px`
+$body-font-size: 1rem;
+
+$button-padding: 9px 17px;
+
+$fontprimary: 'Montserrat';
+
+$breakpoint-md: 1024px;
+$breakpoint-sm: 1023px;
+$breakpoint-xs: 650px;
+
+$transition-base: all 0.1s ease-in-out;
+
+// breakpoints
+$breakpoint-xl: 1400px;
+$breakpoint-lg: 1200px;
+$breakpoint-md: 1024px;
+$breakpoint-sm: 1023px;
+$breakpoint-xs: 650px;
+
+// tooltip
+$tooltip-padding-y: 12px;
+$tooltip-padding-x: 12px;
+$tooltip-border-radius: 12px;
+$tooltip-bg-color: #fff;
+$tooltip-border-color: $neutral-100;
+
+// button
+$btn-padding-y-lg: 12px;
+$btn-padding-x-lg: 32px;
+$btn-font-size-lg: 14px;
+$btn-border-radius-lg: 8px;
+
+$btn-padding-y-md: 10px;
+$btn-padding-x-md: 20px;
+$btn-font-size-md: 14px;
+$btn-border-radius-md: 8px;
+
+$btn-padding-y-sm: 8px;
+$btn-padding-x-sm: 16px;
+$btn-font-size-sm: 14px;
+$btn-border-radius-sm: 8px;
+
+$btn-hover-bg-tint-amount: 30%;
+
+// toggle
+$form-switch-checked-color: #fff;
+$form-switch-focus-color: #fff;
+$form-switch-color: #fff;
+
+// accordion
+$accordion-button-padding-y: 32px;
+$accordion-button-padding-x: 0;
+$accordion-body-padding-x: 0;
+
+//popover
+$popover-max-width: fit-content;
+
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';
+@import 'bootstrap/scss/buttons';
+
+.btn-md {
+  @include button-size($btn-padding-y-md, $btn-padding-x-md, $btn-font-size-md, $btn-border-radius-md);
+}

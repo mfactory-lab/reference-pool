@@ -1,0 +1,77 @@
+/*!
+ * This file is part of Solana Reference Stake Pool code.
+ *
+ * Copyright © 2021, mFactory GmbH
+ *
+ * Solana Reference Stake Pool is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * Solana Reference Stake Pool is distributed in the hope that it
+ * will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.
+ * If not, see <https://www.gnu.org/licenses/agpl-3.0.html>.
+ *
+ * You can be released from the requirements of the Affero GNU General Public License
+ * by purchasing a commercial license. The purchase of such a license is
+ * mandatory as soon as you develop commercial activities using the
+ * Solana Reference Stake Pool code without disclosing the source code of
+ * your own applications.
+ *
+ * The developer of this program can be contacted at <info@mfactory.ch>.
+ */
+
+@import 'mixins';
+@import 'fonts';
+@import 'components';
+
+body {
+  font-family: $fontprimary;
+}
+
+#__nuxt {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+main {
+  flex: 1;
+}
+
+.page-title {
+  padding-top: 1.5rem;
+  margin: 0 0 1.5rem;
+  font-size: 3rem;
+}
+
+.container {
+  max-width: 960px !important;
+  padding: 0 15px !important;
+  width: 100%;
+  margin: 0 auto;
+
+  @media (max-width: $breakpoint-sm) {
+    max-width: 600px !important;
+  }
+}
+
+.xs-hide {
+  @media (max-width: $breakpoint-xs) {
+    display: none !important;
+  }
+}
+
+.card {
+  box-shadow:
+    0 1px 5px rgba(0, 0, 0, 0.2),
+    0 2px 2px rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.12);
+  border-radius: 12px !important;
+  border: none !important;
+}

@@ -29,21 +29,29 @@
 import type { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { StakeProgram } from '@solana/web3.js'
 import { defineStore } from 'pinia'
-import { useWallet } from 'solana-wallets-vue'
 import { computed, ref, watch } from 'vue'
-import { getFilteredProgramAccounts, lamportsToSol, sleep } from '~/utils'
+import { getFilteredProgramAccounts, lamportsToSol } from '~/utils'
 
 export type ProgramAccount = {
   pubkey: PublicKey
   account: AccountInfo<ParsedAccountData>
 }
 
+export type StakeAccountWithState = {
+  stakeAccount: ProgramAccount
+  state: string
+}
+
 export const useStakeAccountStore = defineStore('stake-accounts', () => {
   const connectionStore = useConnectionStore()
-  const { publicKey } = useWallet()
+  const { publicKey } = useClientWallet()
   const data = ref<ProgramAccount[]>([])
+  const accountsFull = ref<StakeAccountWithState[]>([])
   const loading = ref<boolean>(false)
   const dialog = ref<boolean>(false)
+
+  const epochStore = useEpochStore()
+  const epoch = computed(() => epochStore.epochNumber)
 
   // filter by voter
   const voter = ref<string | null>()
@@ -52,28 +60,27 @@ export const useStakeAccountStore = defineStore('stake-accounts', () => {
     data.value = data.value.filter(acc => acc.pubkey.toBase58() !== address)
   }
 
-  async function load({ delay }: { delay?: number } = {}) {
-    if (loading.value || !publicKey.value) {
+  async function load() {
+    if (!publicKey.value || !import.meta.client) {
       console.log('[Stake accounts] Skip loading...')
       return
     }
 
-    loading.value = true
-    console.log('[Stake accounts] Loading...')
-
+    // stake user info account
     const filters = [
       {
         // 12 is Staker authority offset in stake account stake
         memcmp: {
-          offset: 12,
+          offset: 12 + 32,
           bytes: publicKey.value.toBase58(),
+          // bytes: '2n5KTrz1b5MLkPATsosHJhc9JsRtnMxAEq1mWHZiHsZR',
         },
       },
       { dataSize: 200 },
       // {
       //   memcmp: {
       //     offset: 44,
-      //     bytes: wallet.publicKey!.toBase58(),
+      //     bytes: publicKey!.toBase58(),
       //   },
       // },
       // {
@@ -81,24 +88,55 @@ export const useStakeAccountStore = defineStore('stake-accounts', () => {
       // },
     ]
 
-    if (delay) {
-      await sleep(delay)
-    }
-
-    try {
-      data.value = await getFilteredProgramAccounts(
-        connectionStore.connection,
-        StakeProgram.programId,
-        filters,
-      ) as any
-      console.log('[Stake accounts] Data:', data.value)
-      // console.log(data.value.map((acc) => acc.pubkey.toBase58()).join('\n'));
-    } catch (e: any) {
-      console.log('[Stake accounts] Error:', e.message)
-    } finally {
-      loading.value = false
-    }
+    data.value = await getFilteredProgramAccounts(
+      connectionStore.connection,
+      StakeProgram.programId,
+      filters,
+    ) as any
   }
+
+  const updateAccounts = async () => {
+    const source = data.value
+    const newData: any = []
+    accountsFull.value = source.map((item: any) => {
+      // if used accountsFull then acc = item.stakeAccount
+      const acc = item
+      let state = ''
+      try {
+        const newDataIndex = -1
+        const stakeNewData = newDataIndex >= 0
+          ? newData[newDataIndex]
+          : acc.account
+
+        if (!stakeNewData.state && epoch.value > 0) {
+          const delegation = stakeNewData.data.parsed?.info.stake?.delegation
+          if (delegation) {
+            const activation = +delegation.activationEpoch
+            const deactivation = +delegation.deactivationEpoch
+            // state: 'active' | 'inactive' | 'activating' | 'deactivating';
+            if (activation < epoch.value && deactivation > 99_999) {
+              stakeNewData.state = 'active'
+            } else if (activation === epoch.value && deactivation > 99_999) {
+              stakeNewData.state = 'activating'
+            } else if (activation < epoch.value && deactivation === epoch.value) {
+              stakeNewData.state = 'deactivating'
+            } else if ((activation < epoch.value && deactivation < epoch.value) || (activation === epoch.value && deactivation === epoch.value)) {
+              stakeNewData.state = 'inactive'
+            }
+          }
+        }
+        state = stakeNewData.state
+      } catch (error) {
+        console.log('getStakeActivation error ===', error)
+      }
+      return {
+        stakeAccount: acc,
+        state,
+      }
+    })
+  }
+
+  watch(data, () => updateAccounts(), { immediate: true })
 
   watch(
     publicKey,
@@ -137,6 +175,7 @@ export const useStakeAccountStore = defineStore('stake-accounts', () => {
     loading,
     dialog,
     voter,
+    accountsFull,
     stakeSolBalance,
     data: computed(() => (voter.value ? voterAccounts(voter.value) : data.value)),
     voterStake,

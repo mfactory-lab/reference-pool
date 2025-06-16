@@ -26,15 +26,18 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
+import { getRuntimeConfig } from '~/utils'
+
+const config = getRuntimeConfig()
+
 // apy
 export const DEFAULT_APY = 0.07
-// export const APY_VALIDATOR_ID = '8BYmtxKY1LuvjesaMi1nkXcj6ghuq48iiGKq2jNpnrNY'
-export const APY_VALIDATOR_ID = ''
+export const API2_URL = 'https://api2.jpool.one'
 
 // meta
-export const SITE_TITLE = import.meta.env.VITE_APP_TITLE
-export const SITE_DESCRIPTION = import.meta.env.VITE_APP_DESCRIPTION
-export const SITE_KEYWORDS = import.meta.env.VITE_APP_KEYWORDS
+export const SITE_TITLE = config.APP_TITLE
+export const SITE_DESCRIPTION = config.APP_DESCRIPTION
+export const SITE_KEYWORDS = config.APP_KEYWORDS
 
 // intervals
 export const EPOCH_RELOAD_INTERVAL = 60_000
@@ -46,17 +49,21 @@ export const VALIDATORS_RELOAD_INTERVAL = 1_800_000
 // export const HOW_TO_STAKE_URL = 'https://www.youtube.com/embed/KXPPGC8iOPM'
 export const HOW_TO_STAKE_URL = 'https://www.youtube.com/channel/UCYG4ZRUBMgEPaBT1OrZKC-Q'
 
-export const PASSWORD_PROTECT = import.meta.env.VITE_PASSWORD_PROTECT
+export const API_COLLECTOR_URL = 'https://api.thevalidators.io'
+
+export const MIN_REMAINING_BALANCE = 0.001
+
+export const PASSWORD_PROTECT = config.PASSWORD_PROTECT
 export const WITHDRAW_SOL_ACTIVE = true
 
-export const XSOL_NAME = import.meta.env.VITE_XSOL_NAME
+export const XSOL_NAME = config.XSOL_NAME
 
-export const APP_LOGO = import.meta.env.VITE_APP_LOGO
-export const XSOL_LOGO = import.meta.env.VITE_XSOL_LOGO
-export const NO_WALLET_ICON = import.meta.env.VITE_NO_WALLET_ICON
+export const APP_LOGO = config.APP_LOGO
+export const XSOL_LOGO = config.XSOL_LOGO
+export const NO_WALLET_ICON = config.NO_WALLET_ICON
 
-export const COPYRIGHT = import.meta.env.VITE_COPYRIGHT
-export const COPYRIGHT_BY = import.meta.env.VITE_COPYRIGHT_BY
-export const POWERED_BY = import.meta.env.VITE_POWERED_BY
-export const POWERED_LINK = import.meta.env.VITE_POWERED_LINK
-export const FOOTER_LINKS = import.meta.env.VITE_FOOTER_LINKS
+export const COPYRIGHT = config.COPYRIGHT
+export const COPYRIGHT_BY = config.COPYRIGHT_BY
+export const POWERED_BY = config.POWERED_BY
+export const POWERED_LINK = config.POWERED_LINK
+export const FOOTER_LINKS = config.FOOTER_LINKS

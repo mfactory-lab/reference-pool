@@ -26,14 +26,12 @@
  * The developer of this program can be contacted at <info@mfactory.ch>.
  */
 
-import type { ValidatorAccount } from '@solana/spl-stake-pool/src/utils'
 import type { Keypair } from '@solana/web3.js'
 import { withdrawSol, withdrawStake } from '@solana/spl-stake-pool/src'
 import { StakeProgram } from '@solana/web3.js'
 import { useDebounce } from '@vueuse/core'
-import { useQuasar } from 'quasar'
-import { useAnchorWallet, useWallet } from 'solana-wallets-vue'
 import { computed, ref, toRef, watch } from 'vue'
+import { useAnchorWallet } from '@solana/wallet-adapter-vue'
 import { WITHDRAW_SOL_ACTIVE } from '~/config'
 import { sendTransaction, sendTransactions, solToLamports } from '~/utils'
 
@@ -41,18 +39,19 @@ export function useWithdraw() {
   const connectionStore = useConnectionStore()
   const stakePoolStore = useStakePoolStore()
   const stakeAccountStore = useStakeAccountStore()
-  const epochStore = useEpochStore()
+  // const epochStore = useEpochStore()
 
-  const { notify } = useQuasar()
+  const Toast = useToast()
+
   const { monitorTransaction, sending } = useMonitorTransaction()
 
-  const { connected } = useWallet()
-  const anchorWallet = useAnchorWallet()
+  const { connected } = useClientWallet()
+  const anchorWallet = import.meta.client ? useAnchorWallet() : ref(null)
 
   const lamportsPerSignature = toRef(stakePoolStore, 'lamportsPerSignature')
   const stakePool = toRef(stakePoolStore, 'stakePool')
   const reserveStakeBalance = toRef(stakePoolStore, 'reserveStakeBalance')
-  const epochInfo = toRef(epochStore, 'epochInfo')
+  // const epochInfo = toRef(epochStore, 'epochInfo')
 
   const useReserve = ref(false)
   const useWithdrawSol = ref(true)
@@ -120,7 +119,7 @@ export function useWithdraw() {
           undefined,
           undefined,
           undefined,
-          epochInfo.value?.epoch ? await prepareApyComparator(epochInfo.value.epoch) : undefined,
+          /* epochInfo.value?.epoch ? await prepareApyComparator(epochInfo.value.epoch) : */ undefined,
         )
 
         const instructions = [...withdrawInstructions]
@@ -175,7 +174,10 @@ export function useWithdraw() {
 
         return true
       } catch (error: any) {
-        notify({ message: error.message, type: 'negative' })
+        Toast.create({
+          message: error.message,
+          variant: 'danger',
+        })
         // throw e
       } finally {
         loading.value = false
@@ -189,35 +191,36 @@ export function useWithdraw() {
  * @param {number} epoch
  * @returns {Promise<((a: ValidatorAccount, b: ValidatorAccount) => number) | undefined>}
  */
-async function prepareApyComparator(epoch: number) {
-  if (!epoch) {
-    return
-  }
+// async function prepareApyComparator(epoch: number) {
+// if (!epoch) {
 
-  try {
-    const apyInfo = await loadApyInfo(epoch)
-    if (apyInfo.validators.length > 0) {
-      const voteApyMap = apyInfo.validators.reduce<Record<string, number>>((res, v) => {
-        res[v.vote] = v.apy
-        return res
-      }, {})
-      console.log('Use APY Comparator')
-      return (a: ValidatorAccount, b: ValidatorAccount) => {
-        const aVoteId = a.voteAddress?.toBase58()
-        const bVoteId = b.voteAddress?.toBase58()
-        if (!aVoteId || !bVoteId) {
-          return 0
-        }
-        const aApy = Number.parseFloat(String(voteApyMap[aVoteId]))
-        const bApy = Number.parseFloat(String(voteApyMap[bVoteId]))
-        // console.log(`Compare ${aVoteId} (${aApy}) and ${bVoteId} (${bApy})`);
-        // if (isNaN(aApy) || isNaN(bApy)) {
-        //   return defaultResult;
-        // }
-        return aApy - bApy
-      }
-    }
-  } catch (error) {
-    console.log('Error:', error)
-  }
-}
+// }
+
+// try {
+// const apyInfo = /* await loadApyInfo(epoch)
+// if (apyInfo.validators.length > 0) {
+//   const voteApyMap = apyInfo.validators.reduce<Record<string, number>>((res, v) => {
+//     res[v.vote] = v.apy
+//     return res
+//   }, {})
+//   console.log('Use APY Comparator')
+//   return (a: ValidatorAccount, b: ValidatorAccount) => {
+//     const aVoteId = a.voteAddress?.toBase58()
+//     const bVoteId = b.voteAddress?.toBase58()
+//     if (!aVoteId || !bVoteId) {
+//       return 0
+//     }
+//     const aApy = Number.parseFloat(String(voteApyMap[aVoteId]))
+//     const bApy = Number.parseFloat(String(voteApyMap[bVoteId]))
+// console.log(`Compare ${aVoteId} (${aApy}) and ${bVoteId} (${bApy})`);
+// if (isNaN(aApy) || isNaN(bApy)) {
+//   return defaultResult;
+// }
+// return aApy - bApy
+// return 0
+// }
+// }
+// } catch (error) {
+//   console.log('Error:', error)
+// }
+// }
