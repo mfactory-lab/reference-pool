@@ -28,33 +28,38 @@
 
 import type { Commitment } from '@solana/web3.js'
 import type { Endpoint } from '~/store'
+import { clusterApiUrl } from '@solana/web3.js'
 import { getRuntimeConfig } from '~/utils'
 
 const config = getRuntimeConfig()
 
 const MAIN_STAKE_POOL_ADDRESS = config.MAIN_STAKE_POOL_ADDRESS
-const MAIN_STAKE_LIMIT = config.MAIN_STAKE_LIMIT
-
-// const TEST_STAKE_POOL_ADDRESS = import.meta.env.VITE_TEST_STAKE_POOL_ADDRESS
-// const TEST_STAKE_LIMIT = import.meta.env.VITE_TEST_STAKE_LIMIT
-
-// const DEV_STAKE_POOL_ADDRESS = import.meta.env.VITE_DEV_STAKE_POOL_ADDRESS
+const TEST_STAKE_POOL_ADDRESS = import.meta.env.VITE_TEST_STAKE_POOL_ADDRESS
+const DEV_STAKE_POOL_ADDRESS = import.meta.env.VITE_DEV_STAKE_POOL_ADDRESS
 
 export const ENDPOINTS: Endpoint[] = [
-  {
-    id: 'helius-mainnet',
-    name: 'Helius RPC',
-    cluster: 'mainnet-beta',
-    url: 'https://marketa-1sh8m6-fast-mainnet.helius-rpc.com/',
-    stakePoolAddress: String(MAIN_STAKE_POOL_ADDRESS),
-    stakeLimit: Number(MAIN_STAKE_LIMIT || 1500000),
-  },
   {
     id: 'mainnet',
     name: 'Solana Mainnet',
     cluster: 'mainnet-beta',
-    url: 'https://api.mainnet-beta.solana.com',
+    url: clusterApiUrl('mainnet-beta'),
     stakePoolAddress: String(MAIN_STAKE_POOL_ADDRESS),
+    stakeLimit: 100_000,
+  },
+  {
+    id: 'testnet',
+    name: 'Testnet',
+    cluster: 'testnet',
+    url: clusterApiUrl('testnet'),
+    stakePoolAddress: String(TEST_STAKE_POOL_ADDRESS),
+    stakeLimit: 100_000,
+  },
+  {
+    id: 'devnet',
+    name: 'Devnet',
+    cluster: 'devnet',
+    url: clusterApiUrl('devnet'),
+    stakePoolAddress: String(DEV_STAKE_POOL_ADDRESS),
     stakeLimit: 100_000,
   },
 ]
